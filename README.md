@@ -134,6 +134,18 @@ java -jar cc-api/target/cc-api-1.0.0.jar
 java -jar fs-api/target/fs-api-1.0.0.jar
 ```
 
+### 接口文档（Swagger/OpenAPI）
+
+- cc-api 文档：
+  - Swagger UI: `http://localhost:8080/swagger-ui.html` 或 `http://localhost:8080/swagger-ui/index.html`
+  - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+- fs-api 文档：
+  - Swagger UI: `http://localhost:8081/swagger-ui.html` 或 `http://localhost:8081/swagger-ui/index.html`
+  - OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+
+注意：若配置了 `server.servlet.context-path`，请在上述 URL 前加上该前缀；两个服务启动后也会在启动日志中打印可访问地址。
+
+
 #### 3. Docker部署
 ```bash
 # 构建镜像
