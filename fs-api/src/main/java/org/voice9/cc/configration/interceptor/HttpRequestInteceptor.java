@@ -116,7 +116,8 @@ public class HttpRequestInteceptor implements HandlerInterceptor {
 
     private void set403(HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8");
         logger.warn("response for 401 status");
         PrintWriter writer = response.getWriter();
         writer.write(JSON.toJSONString(new CommonResponse(ErrorCode.ACCOUNT_NOT_LOGIN)));
