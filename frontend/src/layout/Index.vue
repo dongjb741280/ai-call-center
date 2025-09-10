@@ -50,13 +50,13 @@
               <el-menu-item
                 v-for="child in route.children"
                 :key="child.path"
-                :index="child.path"
+                :index="child.path.startsWith('/') ? child.path : `${route.path.replace(/\/$/, '')}/${child.path}`"
               >
                 <el-icon><component :is="child.meta?.icon" /></el-icon>
                 <span>{{ child.meta?.title }}</span>
               </el-menu-item>
             </el-sub-menu>
-            <el-menu-item v-else :index="route.path">
+            <el-menu-item v-else :index="route.path || '/'">
               <el-icon><component :is="route.meta?.icon" /></el-icon>
               <span>{{ route.meta?.title }}</span>
             </el-menu-item>
@@ -87,9 +87,10 @@ const collapsed = ref(false)
 // 当前激活的菜单
 const activeMenu = computed(() => route.path)
 
-// 菜单路由
+// 菜单路由（从路由配置读取，getRoutes() 不包含嵌套 children）
 const menuRoutes = computed(() => {
-  return router.getRoutes().find(r => r.path === '/')?.children || []
+  const root = router.options?.routes?.find(r => r.path === '/')
+  return root?.children || []
 })
 
 // 切换侧边栏
