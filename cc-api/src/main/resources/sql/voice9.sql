@@ -383,6 +383,9 @@ CREATE TABLE `cc_admin_user` (
   `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '用户名',
   `passwd` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '密码',
   `avatar` varchar(255) NOT NULL DEFAULT '',
+  `nickname` varchar(255) NOT NULL DEFAULT '' COMMENT '昵称',
+  `phone` varchar(64) NOT NULL DEFAULT '' COMMENT '电话',
+  `email` varchar(255) NOT NULL DEFAULT '' COMMENT '邮箱',
   `user_type` int NOT NULL DEFAULT '1' COMMENT '类型',
   `status` int NOT NULL DEFAULT '0' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
@@ -393,7 +396,7 @@ CREATE TABLE `cc_admin_user` (
 -- Records of cc_admin_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `cc_admin_user` (`id`, `cts`, `uts`, `company_id`, `username`, `passwd`, `avatar`, `user_type`, `status`) VALUES (1, 1, 1, 1, 'admin', '$2a$04$FirdLmDLwGWC6/.WnsFICeH1CR6sHib95jKbxqpzG6f0cVFc1.dhC', '', 1, 1);
+INSERT INTO `cc_admin_user` (`id`, `cts`, `uts`, `company_id`, `username`, `passwd`, `avatar`, `nickname`, `phone`, `email`, `user_type`, `status`) VALUES (1, 1, 1, 1, 'admin', '$2a$04$FirdLmDLwGWC6/.WnsFICeH1CR6sHib95jKbxqpzG6f0cVFc1.dhC', '', '', '', '', 1, 1);
 COMMIT;
 
 -- ----------------------------
@@ -747,6 +750,11 @@ CREATE TABLE `cc_company` (
   `group_agent_limit` int NOT NULL DEFAULT '0' COMMENT '单技能组中坐席上限',
   `record_storage` int NOT NULL DEFAULT '0' COMMENT '录音保留天数',
   `notify_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '话单回调通知',
+  `display_number` varchar(255) NOT NULL DEFAULT '' COMMENT '外显号码',
+  `oss_product` varchar(64) NOT NULL DEFAULT '' COMMENT '录音OSS产品',
+  `record_file_type` varchar(32) NOT NULL DEFAULT '' COMMENT '录音文件类型',
+  `record_encrypt` varchar(32) NOT NULL DEFAULT '' COMMENT '录音文件加密',
+  `cdr_encrypt_push` varchar(32) NOT NULL DEFAULT '' COMMENT '话单加密推送',
   `ext1` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
   `ext2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展2',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',

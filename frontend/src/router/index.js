@@ -34,13 +34,13 @@ const routes = [
             path: 'users',
             name: 'AdminUsers',
             component: () => import('@/views/admin/Users.vue'),
-            meta: { title: '用户管理', icon: 'User' }
+            meta: { title: '账号管理', icon: 'User' }
           },
           {
             path: 'roles',
             name: 'AdminRoles',
             component: () => import('@/views/admin/Roles.vue'),
-            meta: { title: '角色管理', icon: 'UserFilled' }
+            meta: { title: '系统角色', icon: 'UserFilled' }
           },
           {
             path: 'menus',
@@ -53,6 +53,48 @@ const routes = [
             name: 'AdminCompanies',
             component: () => import('@/views/admin/Companies.vue'),
             meta: { title: '企业管理', icon: 'OfficeBuilding' }
+          },
+          {
+            path: 'gateways',
+            name: 'AdminGateways',
+            component: () => import('@/views/admin/Gateways.vue'),
+            meta: { title: '网关管理', icon: 'Link' }
+          },
+          {
+            path: 'number-route',
+            name: 'AdminNumberRoute',
+            component: () => import('@/views/admin/NumberRoute.vue'),
+            meta: { title: '号码路由', icon: 'Switch' }
+          },
+          {
+            path: 'number-location',
+            name: 'AdminNumberLocation',
+            component: () => import('@/views/admin/NumberLocation.vue'),
+            meta: { title: '号码归属地', icon: 'Location' }
+          },
+          {
+            path: 'blacklist',
+            name: 'AdminBlacklist',
+            component: () => import('@/views/admin/Blacklist.vue'),
+            meta: { title: '黑名单', icon: 'RemoveFilled' }
+          },
+          {
+            path: 'modules',
+            name: 'AdminModules',
+            component: () => import('@/views/admin/Modules.vue'),
+            meta: { title: '模块站点', icon: 'Grid' }
+          },
+          {
+            path: 'sip-gateway',
+            name: 'AdminSipGateway',
+            component: () => import('@/views/admin/SipGateway.vue'),
+            meta: { title: 'sip网关', icon: 'Connection' }
+          },
+          {
+            path: 'ai-engine',
+            name: 'AdminAiEngine',
+            component: () => import('@/views/admin/AiEngine.vue'),
+            meta: { title: 'ai引擎', icon: 'Cpu' }
           }
         ]
       },

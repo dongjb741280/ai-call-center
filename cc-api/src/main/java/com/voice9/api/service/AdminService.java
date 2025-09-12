@@ -6,6 +6,7 @@ import com.voice9.core.entity.AdminRole;
 import com.voice9.core.entity.AdminUser;
 import com.voice9.core.entity.SipGateway;
 import com.voice9.core.po.AdminLoginResult;
+import com.voice9.core.po.MenusPo;
 import com.voice9.core.po.RolePo;
 import com.voice9.core.vo.AdminLogin;
 import com.voice9.api.vo.server.MenuVo;
@@ -41,6 +42,14 @@ public interface AdminService extends BaseService<AdminUser> {
      * @return
      */
     List<AdminMenu> menusList(Map<String, Object> params);
+
+    /**
+     * 获取菜单树状结构
+     *
+     * @param params
+     * @return
+     */
+    List<MenusPo> getMenuTree(Map<String, Object> params);
 
     /**
      * 添加/修改菜单
@@ -121,6 +130,16 @@ public interface AdminService extends BaseService<AdminUser> {
      * @return
      */
     int deleteSipGateway(List<Long> ids);
+
+    /**
+     * 保存用户角色关联
+     *
+     * @param userId 用户ID
+     * @param roleIds 角色ID列表
+     * @param companyId 企业ID
+     * @return
+     */
+    Integer saveUserRoles(Long userId, List<Long> roleIds, Long companyId);
 
 
 }

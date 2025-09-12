@@ -100,9 +100,24 @@ public class Company implements Serializable {
     private Integer agentLimit;
 
     /**
+     * 企业坐席数量（实时/缓存）
+     */
+    private Integer agentSize;
+
+    /**
      * 开通技能组
      */
     private Integer groupLimit;
+
+    /**
+     * 外呼并发限制
+     */
+    private Integer outboundLimit;
+
+    /**
+     * 到期时间（时间戳）
+     */
+    private Long expireTime;
 
     /**
      * 单技能组中坐席上限
@@ -118,6 +133,31 @@ public class Company implements Serializable {
      * 话单回调通知
      */
     private String notifyUrl;
+
+    /**
+     * 外显号码
+     */
+    private String displayNumber;
+
+    /**
+     * 录音OSS产品
+     */
+    private String ossProduct;
+
+    /**
+     * 录音文件类型
+     */
+    private String recordFileType;
+
+    /**
+     * 录音文件加密
+     */
+    private String recordEncrypt;
+
+    /**
+     * 话单加密推送
+     */
+    private String cdrEncryptPush;
 
     /**
      * 扩展1
@@ -295,12 +335,36 @@ public class Company implements Serializable {
         this.agentLimit = agentLimit;
     }
 
+    public Integer getAgentSize() {
+        return agentSize;
+    }
+
+    public void setAgentSize(Integer agentSize) {
+        this.agentSize = agentSize;
+    }
+
     public Integer getGroupLimit() {
         return groupLimit;
     }
 
     public void setGroupLimit(Integer groupLimit) {
         this.groupLimit = groupLimit;
+    }
+
+    public Integer getOutboundLimit() {
+        return outboundLimit;
+    }
+
+    public void setOutboundLimit(Integer outboundLimit) {
+        this.outboundLimit = outboundLimit;
+    }
+
+    public Long getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(Long expireTime) {
+        this.expireTime = expireTime;
     }
 
     public Integer getGroupAgentLimit() {
@@ -325,6 +389,46 @@ public class Company implements Serializable {
 
     public void setNotifyUrl(String notifyUrl) {
         this.notifyUrl = notifyUrl == null ? null : notifyUrl.trim();
+    }
+
+    public String getDisplayNumber() {
+        return displayNumber;
+    }
+
+    public void setDisplayNumber(String displayNumber) {
+        this.displayNumber = displayNumber == null ? null : displayNumber.trim();
+    }
+
+    public String getOssProduct() {
+        return ossProduct;
+    }
+
+    public void setOssProduct(String ossProduct) {
+        this.ossProduct = ossProduct == null ? null : ossProduct.trim();
+    }
+
+    public String getRecordFileType() {
+        return recordFileType;
+    }
+
+    public void setRecordFileType(String recordFileType) {
+        this.recordFileType = recordFileType == null ? null : recordFileType.trim();
+    }
+
+    public String getRecordEncrypt() {
+        return recordEncrypt;
+    }
+
+    public void setRecordEncrypt(String recordEncrypt) {
+        this.recordEncrypt = recordEncrypt == null ? null : recordEncrypt.trim();
+    }
+
+    public String getCdrEncryptPush() {
+        return cdrEncryptPush;
+    }
+
+    public void setCdrEncryptPush(String cdrEncryptPush) {
+        this.cdrEncryptPush = cdrEncryptPush == null ? null : cdrEncryptPush.trim();
     }
 
     public String getExt1() {
@@ -401,6 +505,11 @@ public class Company implements Serializable {
         sb.append(", groupAgentLimit=").append(groupAgentLimit);
         sb.append(", recordStorage=").append(recordStorage);
         sb.append(", notifyUrl=").append(notifyUrl);
+        sb.append(", displayNumber=").append(displayNumber);
+        sb.append(", ossProduct=").append(ossProduct);
+        sb.append(", recordFileType=").append(recordFileType);
+        sb.append(", recordEncrypt=").append(recordEncrypt);
+        sb.append(", cdrEncryptPush=").append(cdrEncryptPush);
         sb.append(", ext1=").append(ext1);
         sb.append(", ext2=").append(ext2);
         sb.append(", ext3=").append(ext3);
@@ -444,6 +553,11 @@ public class Company implements Serializable {
                 && (this.getGroupAgentLimit() == null ? other.getGroupAgentLimit() == null : this.getGroupAgentLimit().equals(other.getGroupAgentLimit()))
                 && (this.getRecordStorage() == null ? other.getRecordStorage() == null : this.getRecordStorage().equals(other.getRecordStorage()))
                 && (this.getNotifyUrl() == null ? other.getNotifyUrl() == null : this.getNotifyUrl().equals(other.getNotifyUrl()))
+                && (this.getDisplayNumber() == null ? other.getDisplayNumber() == null : this.getDisplayNumber().equals(other.getDisplayNumber()))
+                && (this.getOssProduct() == null ? other.getOssProduct() == null : this.getOssProduct().equals(other.getOssProduct()))
+                && (this.getRecordFileType() == null ? other.getRecordFileType() == null : this.getRecordFileType().equals(other.getRecordFileType()))
+                && (this.getRecordEncrypt() == null ? other.getRecordEncrypt() == null : this.getRecordEncrypt().equals(other.getRecordEncrypt()))
+                && (this.getCdrEncryptPush() == null ? other.getCdrEncryptPush() == null : this.getCdrEncryptPush().equals(other.getCdrEncryptPush()))
                 && (this.getExt1() == null ? other.getExt1() == null : this.getExt1().equals(other.getExt1()))
                 && (this.getExt2() == null ? other.getExt2() == null : this.getExt2().equals(other.getExt2()))
                 && (this.getExt3() == null ? other.getExt3() == null : this.getExt3().equals(other.getExt3()))
@@ -476,6 +590,11 @@ public class Company implements Serializable {
         result = prime * result + ((getGroupAgentLimit() == null) ? 0 : getGroupAgentLimit().hashCode());
         result = prime * result + ((getRecordStorage() == null) ? 0 : getRecordStorage().hashCode());
         result = prime * result + ((getNotifyUrl() == null) ? 0 : getNotifyUrl().hashCode());
+        result = prime * result + ((getDisplayNumber() == null) ? 0 : getDisplayNumber().hashCode());
+        result = prime * result + ((getOssProduct() == null) ? 0 : getOssProduct().hashCode());
+        result = prime * result + ((getRecordFileType() == null) ? 0 : getRecordFileType().hashCode());
+        result = prime * result + ((getRecordEncrypt() == null) ? 0 : getRecordEncrypt().hashCode());
+        result = prime * result + ((getCdrEncryptPush() == null) ? 0 : getCdrEncryptPush().hashCode());
         result = prime * result + ((getExt1() == null) ? 0 : getExt1().hashCode());
         result = prime * result + ((getExt2() == null) ? 0 : getExt2().hashCode());
         result = prime * result + ((getExt3() == null) ? 0 : getExt3().hashCode());

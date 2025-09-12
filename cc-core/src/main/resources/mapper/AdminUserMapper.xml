@@ -9,12 +9,15 @@
         <result column="username" jdbcType="VARCHAR" property="username"/>
         <result column="passwd" jdbcType="VARCHAR" property="passwd"/>
         <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
         <result column="user_type" jdbcType="INTEGER" property="userType"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, company_id, username, passwd, avatar, user_type, status
+        , cts, uts, company_id, username, passwd, avatar, nickname, phone, email, user_type, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -27,15 +30,15 @@
         from cc_admin_user
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.AdminUser">
+    <insert id="insert" parameterType="com.voice9.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
         insert into cc_admin_user (id, cts, uts, company_id,
-                                      username, passwd, avatar, user_type,
+                                      username, passwd, avatar, nickname, phone, email, user_type,
                                       status)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
-                #{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{passwd,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER},
+                #{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{passwd,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER},
                 #{status,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminUser">
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
         insert into cc_admin_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -58,6 +61,15 @@
             </if>
             <if test="avatar != null">
                 avatar,
+            </if>
+            <if test="nickname != null">
+                nickname,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                email,
             </if>
             <if test="userType != null">
                 user_type,
@@ -88,6 +100,15 @@
             <if test="avatar != null">
                 #{avatar,jdbcType=VARCHAR},
             </if>
+            <if test="nickname != null">
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
             <if test="userType != null">
                 #{userType,jdbcType=INTEGER},
             </if>
@@ -117,6 +138,15 @@
             <if test="avatar != null">
                 avatar = #{avatar,jdbcType=VARCHAR},
             </if>
+            <if test="nickname != null">
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
             <if test="userType != null">
                 user_type = #{userType,jdbcType=INTEGER},
             </if>
@@ -134,6 +164,9 @@
             username   = #{username,jdbcType=VARCHAR},
             passwd     = #{passwd,jdbcType=VARCHAR},
             avatar     = #{avatar,jdbcType=VARCHAR},
+            nickname   = #{nickname,jdbcType=VARCHAR},
+            phone      = #{phone,jdbcType=VARCHAR},
+            email      = #{email,jdbcType=VARCHAR},
             user_type  = #{userType,jdbcType=INTEGER},
             status     = #{status,jdbcType=INTEGER}
         where id = #{id,jdbcType=BIGINT}
@@ -148,6 +181,56 @@
     <!-- 查询角色账号 -->
     <select id="selectByRoleId"  parameterType="Long"  resultMap="BaseResultMap" >
         select <include refid="Base_Column_List"/> from cc_admin_user where id in (select uid  from cc_admin_user_role where role_id = #{roleId} ) and status = 1
+    </select>
+
+    <!-- 分页查询用户列表（带企业名称、角色名称） -->
+    <select id="selectListByMap" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+            u.id,
+            u.cts,
+            u.uts,
+            u.company_id as companyId,
+            u.username,
+            u.passwd,
+            u.avatar,
+            u.nickname,
+            u.phone,
+            u.email,
+            u.user_type as userType,
+            u.status,
+            c.name as companyName,
+            group_concat(distinct r.role_name order by r.role_name separator ',') as roleName,
+            group_concat(distinct ur.role_id order by ur.role_id separator ',') as roleIds
+        from cc_admin_user u
+        left join cc_company c on u.company_id = c.id
+        left join cc_admin_user_role ur on u.id = ur.uid
+        left join cc_admin_role r on ur.role_id = r.id
+        <where>
+            <if test="companyId != null">
+                and u.company_id = #{companyId}
+            </if>
+            <if test="username != null and username != ''">
+                and u.username like concat('%', #{username}, '%')
+            </if>
+            <if test="status != null">
+                and u.status = #{status}
+            </if>
+        </where>
+        group by
+            u.id,
+            u.cts,
+            u.uts,
+            u.company_id,
+            u.username,
+            u.passwd,
+            u.avatar,
+            u.nickname,
+            u.phone,
+            u.email,
+            u.user_type,
+            u.status,
+            c.name
+        order by u.uts desc
     </select>
 
 </mapper>

@@ -39,10 +39,6 @@ public class CompanyInfo extends Company {
      */
     private List<CompanyStat> companyStats;
 
-    /**
-     * 企业坐席数量
-     */
-    private Integer agentSize;
 
 
     public List<Long> getGroupIds() {
@@ -85,11 +81,5 @@ public class CompanyInfo extends Company {
         this.companyStats = companyStats;
     }
 
-    public Integer getAgentSize() {
-        return agentSize;
-    }
-
-    public void setAgentSize(Integer agentSize) {
-        this.agentSize = agentSize;
-    }
+    
 }

@@ -27,7 +27,7 @@ public class AdminUserRole implements Serializable {
     /**
      * 账号ID
      */
-    private Long accountId;
+    private Long uid;
 
     /**
      * 角色ID
@@ -66,11 +66,11 @@ public class AdminUserRole implements Serializable {
     }
 
     public Long getAccountId() {
-        return accountId;
+        return uid;
     }
 
     public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+        this.uid = accountId;
     }
 
     public Long getRoleId() {
@@ -98,7 +98,7 @@ public class AdminUserRole implements Serializable {
         sb.append(", id=").append(id);
         sb.append(", cts=").append(cts);
         sb.append(", uts=").append(uts);
-        sb.append(", accountId=").append(accountId);
+        sb.append(", uid=").append(uid);
         sb.append(", roleId=").append(roleId);
         sb.append(", companyId=").append(companyId);
         sb.append(", serialVersionUID=").append(serialVersionUID);

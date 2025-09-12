@@ -20,10 +20,18 @@
         <result column="secret_key" jdbcType="VARCHAR" property="secretKey"/>
         <result column="ivr_limit" jdbcType="INTEGER" property="ivrLimit"/>
         <result column="agent_limit" jdbcType="INTEGER" property="agentLimit"/>
+        <result column="agent_size" jdbcType="INTEGER" property="agentSize"/>
         <result column="group_limit" jdbcType="INTEGER" property="groupLimit"/>
+        <result column="outbound_limit" jdbcType="INTEGER" property="outboundLimit"/>
+        <result column="expire_time" jdbcType="BIGINT" property="expireTime"/>
         <result column="group_agent_limit" jdbcType="INTEGER" property="groupAgentLimit"/>
         <result column="record_storage" jdbcType="INTEGER" property="recordStorage"/>
         <result column="notify_url" jdbcType="VARCHAR" property="notifyUrl"/>
+        <result column="display_number" jdbcType="VARCHAR" property="displayNumber"/>
+        <result column="oss_product" jdbcType="VARCHAR" property="ossProduct"/>
+        <result column="record_file_type" jdbcType="VARCHAR" property="recordFileType"/>
+        <result column="record_encrypt" jdbcType="VARCHAR" property="recordEncrypt"/>
+        <result column="cdr_encrypt_push" jdbcType="VARCHAR" property="cdrEncryptPush"/>
         <result column="ext1" jdbcType="VARCHAR" property="ext1"/>
         <result column="ext2" jdbcType="VARCHAR" property="ext2"/>
         <result column="ext3" jdbcType="VARCHAR" property="ext3"/>
@@ -34,8 +42,8 @@
     <sql id="Base_Column_List">
         id
         , cts, uts, name, id_path, pid, company_code, gmt, contact, phone, balance, bill_type,
-    pay_type, hidden_customer, secret_type, secret_key, ivr_limit, agent_limit, group_limit, group_agent_limit, record_storage,
-    notify_url, ext1, ext2, ext3, ext4, ext5, status
+    pay_type, hidden_customer, secret_type, secret_key, ivr_limit, agent_limit, agent_size, group_limit, outbound_limit, expire_time, group_agent_limit, record_storage,
+    notify_url, display_number, oss_product, record_file_type, record_encrypt, cdr_encrypt_push, ext1, ext2, ext3, ext4, ext5, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -50,16 +58,16 @@
     </delete>
     <insert id="insert" parameterType="com.voice9.core.entity.Company">
         insert into cc_company (id, cts, uts, name, id_path, pid, company_code, gmt, contact, phone, balance,
-                                bill_type, pay_type, hidden_customer, secret_type, secret_key, ivr_limit, agent_limit,
-                                group_limit,
-                                group_agent_limit, record_storage, notify_url, ext1, ext2, ext3, ext4, ext5, status)
+                                bill_type, pay_type, hidden_customer, secret_type, secret_key, ivr_limit, agent_limit, agent_size,
+                                group_limit, outbound_limit, expire_time,
+                                group_agent_limit, record_storage, notify_url, display_number, oss_product, record_file_type, record_encrypt, cdr_encrypt_push, ext1, ext2, ext3, ext4, ext5, status)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
                 #{idPath,jdbcType=VARCHAR}, #{pid,jdbcType=BIGINT}, #{companyCode,jdbcType=VARCHAR}, #{gmt,jdbcType=INTEGER},
                 #{contact,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{balance,jdbcType=BIGINT},
                 #{billType,jdbcType=INTEGER}, #{payType,jdbcType=INTEGER}, #{hiddenCustomer,jdbcType=INTEGER},
                 #{secretType,jdbcType=INTEGER}, #{secretKey,jdbcType=VARCHAR}, #{ivrLimit,jdbcType=INTEGER},
-                #{agentLimit,jdbcType=INTEGER}, #{groupLimit,jdbcType=INTEGER}, #{groupAgentLimit,jdbcType=INTEGER},
-                #{recordStorage,jdbcType=INTEGER}, #{notifyUrl,jdbcType=VARCHAR}, #{ext1,jdbcType=VARCHAR},
+                #{agentLimit,jdbcType=INTEGER}, #{agentSize,jdbcType=INTEGER}, #{groupLimit,jdbcType=INTEGER}, #{outboundLimit,jdbcType=INTEGER}, #{expireTime,jdbcType=BIGINT}, #{groupAgentLimit,jdbcType=INTEGER},
+                #{recordStorage,jdbcType=INTEGER}, #{notifyUrl,jdbcType=VARCHAR}, #{displayNumber,jdbcType=VARCHAR}, #{ossProduct,jdbcType=VARCHAR}, #{recordFileType,jdbcType=VARCHAR}, #{recordEncrypt,jdbcType=VARCHAR}, #{cdrEncryptPush,jdbcType=VARCHAR}, #{ext1,jdbcType=VARCHAR},
                 #{ext2,jdbcType=VARCHAR},
                 #{ext3,jdbcType=VARCHAR}, #{ext4,jdbcType=VARCHAR}, #{ext5,jdbcType=VARCHAR},
                 #{status,jdbcType=INTEGER})
@@ -121,8 +129,17 @@
             <if test="agentLimit != null">
                 agent_limit,
             </if>
+            <if test="agentSize != null">
+                agent_size,
+            </if>
             <if test="groupLimit != null">
                 group_limit,
+            </if>
+            <if test="outboundLimit != null">
+                outbound_limit,
+            </if>
+            <if test="expireTime != null">
+                expire_time,
             </if>
             <if test="groupAgentLimit != null">
                 group_agent_limit,
@@ -133,6 +150,11 @@
             <if test="notifyUrl != null">
                 notify_url,
             </if>
+            <if test="displayNumber != null">display_number,</if>
+            <if test="ossProduct != null">oss_product,</if>
+            <if test="recordFileType != null">record_file_type,</if>
+            <if test="recordEncrypt != null">record_encrypt,</if>
+            <if test="cdrEncryptPush != null">cdr_encrypt_push,</if>
             <if test="ext1 != null">
                 ext1,
             </if>
@@ -207,8 +229,17 @@
             <if test="agentLimit != null">
                 #{agentLimit,jdbcType=INTEGER},
             </if>
+            <if test="agentSize != null">
+                #{agentSize,jdbcType=INTEGER},
+            </if>
             <if test="groupLimit != null">
                 #{groupLimit,jdbcType=INTEGER},
+            </if>
+            <if test="outboundLimit != null">
+                #{outboundLimit,jdbcType=INTEGER},
+            </if>
+            <if test="expireTime != null">
+                #{expireTime,jdbcType=BIGINT},
             </if>
             <if test="groupAgentLimit != null">
                 #{groupAgentLimit,jdbcType=INTEGER},
@@ -219,6 +250,11 @@
             <if test="notifyUrl != null">
                 #{notifyUrl,jdbcType=VARCHAR},
             </if>
+            <if test="displayNumber != null">#{displayNumber,jdbcType=VARCHAR},</if>
+            <if test="ossProduct != null">#{ossProduct,jdbcType=VARCHAR},</if>
+            <if test="recordFileType != null">#{recordFileType,jdbcType=VARCHAR},</if>
+            <if test="recordEncrypt != null">#{recordEncrypt,jdbcType=VARCHAR},</if>
+            <if test="cdrEncryptPush != null">#{cdrEncryptPush,jdbcType=VARCHAR},</if>
             <if test="ext1 != null">
                 #{ext1,jdbcType=VARCHAR},
             </if>
@@ -290,8 +326,17 @@
             <if test="agentLimit != null">
                 agent_limit = #{agentLimit,jdbcType=INTEGER},
             </if>
+            <if test="agentSize != null">
+                agent_size = #{agentSize,jdbcType=INTEGER},
+            </if>
             <if test="groupLimit != null">
                 group_limit = #{groupLimit,jdbcType=INTEGER},
+            </if>
+            <if test="outboundLimit != null">
+                outbound_limit = #{outboundLimit,jdbcType=INTEGER},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime,jdbcType=BIGINT},
             </if>
             <if test="groupAgentLimit != null">
                 group_agent_limit = #{groupAgentLimit,jdbcType=INTEGER},
@@ -302,6 +347,11 @@
             <if test="notifyUrl != null">
                 notify_url = #{notifyUrl,jdbcType=VARCHAR},
             </if>
+            <if test="displayNumber != null">display_number = #{displayNumber,jdbcType=VARCHAR},</if>
+            <if test="ossProduct != null">oss_product = #{ossProduct,jdbcType=VARCHAR},</if>
+            <if test="recordFileType != null">record_file_type = #{recordFileType,jdbcType=VARCHAR},</if>
+            <if test="recordEncrypt != null">record_encrypt = #{recordEncrypt,jdbcType=VARCHAR},</if>
+            <if test="cdrEncryptPush != null">cdr_encrypt_push = #{cdrEncryptPush,jdbcType=VARCHAR},</if>
             <if test="ext1 != null">
                 ext1 = #{ext1,jdbcType=VARCHAR},
             </if>
@@ -325,7 +375,6 @@
     </update>
 
     <resultMap id="CompanyInfoResultMap" type="com.voice9.core.po.CompanyInfo" extends="BaseResultMap">
-        <association property="agentSize" column="id" select="com.voice9.core.mapper.AgentMapper.agentSize"></association>
         <collection property="groupIds" column="id" select="com.voice9.core.mapper.GroupMapper.selectGroupIds"></collection>
         <collection property="companyStats" column="id"
                     select="com.voice9.core.mapper.CompanyStatMapper.selectByCompanyId"></collection>

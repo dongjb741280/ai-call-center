@@ -13,6 +13,16 @@
       <el-form-item label="角色名称">
         <el-input v-model="searchForm.roleName" placeholder="请输入角色名称" clearable />
       </el-form-item>
+      <el-form-item label="企业名称">
+        <el-select v-model="searchForm.companyId" placeholder="请选择企业" clearable style="min-width: 180px">
+          <el-option
+            v-for="company in companyList"
+            :key="company.id"
+            :label="company.name"
+            :value="company.id"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSearch">
           <el-icon><Search /></el-icon>
@@ -27,11 +37,17 @@
 
     <!-- 角色表格 -->
     <el-table :data="roleList" v-loading="loading" style="width: 100%">
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="roleName" label="角色名称" width="150" />
-      <el-table-column prop="roleCode" label="角色编码" width="150" />
-      <el-table-column prop="description" label="描述" min-width="200" />
-      <el-table-column prop="createTime" label="创建时间" width="160" />
+      <el-table-column prop="id" label="id" width="100" />
+      <el-table-column prop="cts" label="创建时间" width="180">
+        <template #default="{ row }">{{ formatDateTime(row.cts) }}</template>
+      </el-table-column>
+      <el-table-column prop="uts" label="修改时间" width="180">
+        <template #default="{ row }">{{ formatDateTime(row.uts) }}</template>
+      </el-table-column>
+      <el-table-column label="企业名称" min-width="160">
+        <template #default="{ row }">{{ findCompanyName(row.companyId) }}</template>
+      </el-table-column>
+      <el-table-column prop="roleName" label="角色名称" min-width="150" />
       <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" size="small" @click="handleEdit(row)">
@@ -73,19 +89,18 @@
         :rules="roleRules"
         label-width="100px"
       >
+        <el-form-item label="企业名称" prop="companyId">
+          <el-select v-model="roleForm.companyId" placeholder="请选择企业" style="width: 100%" clearable filterable>
+            <el-option
+              v-for="company in companyList"
+              :key="company.id"
+              :label="company.name"
+              :value="company.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" />
-        </el-form-item>
-        <el-form-item label="角色编码" prop="roleCode">
-          <el-input v-model="roleForm.roleCode" placeholder="请输入角色编码" />
-        </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input
-            v-model="roleForm.description"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入角色描述"
-          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -123,9 +138,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getRoleList, addRole, updateRole, deleteRole, getRoleMenus, bindRoleMenus, getMenuList } from '@/api/admin'
+import { getRoleList, addRole, updateRole, deleteRole, getRoleMenus, bindRoleMenus, getMenuTree, getCompanyList } from '@/api/admin'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -138,7 +153,8 @@ const menuTreeRef = ref()
 
 // 搜索表单
 const searchForm = reactive({
-  roleName: ''
+  roleName: '',
+  companyId: ''
 })
 
 // 分页
@@ -150,22 +166,22 @@ const pagination = reactive({
 
 // 角色列表
 const roleList = ref([])
+const companyList = ref([])
 
 // 角色表单
 const roleForm = reactive({
   id: null,
-  roleName: '',
-  roleCode: '',
-  description: ''
+  companyId: '',
+  roleName: ''
 })
 
 // 表单验证规则
 const roleRules = {
+  companyId: [
+    { required: true, message: '请输入企业id', trigger: 'blur' }
+  ],
   roleName: [
     { required: true, message: '请输入角色名称', trigger: 'blur' }
-  ],
-  roleCode: [
-    { required: true, message: '请输入角色编码', trigger: 'blur' }
   ]
 }
 
@@ -176,22 +192,64 @@ const currentRoleId = ref(null)
 
 // 树形组件配置
 const treeProps = {
-  children: 'children',
+  children: 'childs',
   label: 'name'
+}
+
+// 扁平化菜单树，提取所有 id（兼容 children/childs 字段）
+const flattenMenuIds = (nodes) => {
+  const result = []
+  if (!Array.isArray(nodes)) return result
+  const stack = [...nodes]
+  while (stack.length) {
+    const node = stack.pop()
+    if (!node) continue
+    if (node.id !== undefined && node.id !== null) {
+      result.push(node.id)
+    }
+    const children = Array.isArray(node.children)
+      ? node.children
+      : (Array.isArray(node.childs) ? node.childs : [])
+    if (children.length) stack.push(...children)
+  }
+  return result
+}
+
+// 提取被选中的菜单ID（uid === 1）
+const flattenCheckedMenuIds = (nodes) => {
+  const result = []
+  if (!Array.isArray(nodes)) return result
+  const stack = [...nodes]
+  while (stack.length) {
+    const node = stack.pop()
+    if (!node) continue
+    // 只提取被选中的菜单（uid === 1）
+    if (node.id !== undefined && node.id !== null && node.uid === 1) {
+      result.push(node.id)
+    }
+    const children = Array.isArray(node.children)
+      ? node.children
+      : (Array.isArray(node.childs) ? node.childs : [])
+    if (children.length) stack.push(...children)
+  }
+  return result
 }
 
 // 加载角色列表
 const loadRoleList = async () => {
   loading.value = true
   try {
+    const query = {}
+    if (searchForm.roleName) query.roleName = searchForm.roleName
+    if (searchForm.companyId) query.companyId = searchForm.companyId
     const params = {
-      page: pagination.currentPage,
-      size: pagination.pageSize,
-      ...searchForm
+      pageNum: pagination.currentPage,
+      pageSize: pagination.pageSize,
+      query: Object.keys(query).length ? JSON.stringify(query) : undefined
     }
     const response = await getRoleList(params)
-    roleList.value = response.data.records || []
-    pagination.total = response.data.total || 0
+    roleList.value = (response.data && (response.data.list || response.data.records)) || []
+    pagination.total = (response.data && response.data.total) || 0
   } catch (error) {
     ElMessage.error('加载角色列表失败：' + error.message)
   } finally {
@@ -199,10 +257,20 @@ const loadRoleList = async () => {
   }
 }
 
+// 加载企业列表
+const loadCompanyList = async () => {
+  try {
+    const response = await getCompanyList({ page: 1, size: 1000 })
+    companyList.value = (response.data && (response.data.list || response.data.records)) || []
+  } catch (error) {
+    ElMessage.error('加载企业列表失败：' + error.message)
+  }
+}
+
 // 加载菜单树
 const loadMenuTree = async () => {
   try {
-    const response = await getMenuList()
+    const response = await getMenuTree()
     menuTreeData.value = response.data || []
   } catch (error) {
     ElMessage.error('加载菜单列表失败：' + error.message)
@@ -218,7 +286,8 @@ const handleSearch = () => {
 // 重置
 const handleReset = () => {
   Object.assign(searchForm, {
-    roleName: ''
+    roleName: '',
+    companyId: ''
   })
   handleSearch()
 }
@@ -226,8 +295,14 @@ const handleReset = () => {
 // 添加角色
 const handleAdd = () => {
   isEdit.value = false
+  // 先重置数据模型
+  Object.assign(roleForm, { id: null, companyId: '', roleName: '' })
   dialogVisible.value = true
-  resetForm()
+  // 等待弹窗中的表单挂载后再重置校验状态与表单
+  nextTick(() => {
+    roleFormRef.value?.resetFields()
+    roleFormRef.value?.clearValidate()
+  })
 }
 
 // 编辑角色
@@ -236,9 +311,8 @@ const handleEdit = (row) => {
   dialogVisible.value = true
   Object.assign(roleForm, {
     id: row.id,
-    roleName: row.roleName,
-    roleCode: row.roleCode,
-    description: row.description
+    companyId: row.companyId,
+    roleName: row.roleName
   })
 }
 
@@ -264,15 +338,22 @@ const handleDelete = async (row) => {
 // 绑定菜单
 const handleBindMenus = async (row) => {
   currentRoleId.value = row.id
+  // 先清空已选，打开弹窗
+  checkedMenus.value = []
   menuDialogVisible.value = true
-  
+
   // 加载菜单树
   await loadMenuTree()
-  
-  // 加载当前角色的菜单
+
+  // 加载当前角色的菜单并勾选
   try {
     const response = await getRoleMenus(row.id)
-    checkedMenus.value = response.data.menuIds || []
+    console.log('角色菜单响应:', response)
+    // 使用新的函数提取被选中的菜单ID
+    checkedMenus.value = flattenCheckedMenuIds((response && response.data && response.data.adminMenuList) || [])
+    console.log('选中的菜单ID:', checkedMenus.value)
+    await nextTick()
+    menuTreeRef.value?.setCheckedKeys(checkedMenus.value)
   } catch (error) {
     ElMessage.error('加载角色菜单失败：' + error.message)
   }
@@ -332,9 +413,8 @@ const handleBindSubmit = async () => {
 const resetForm = () => {
   Object.assign(roleForm, {
     id: null,
-    roleName: '',
-    roleCode: '',
-    description: ''
+    companyId: '',
+    roleName: ''
   })
   roleFormRef.value?.resetFields()
 }
@@ -360,9 +440,35 @@ const handleCurrentChange = (val) => {
   loadRoleList()
 }
 
+// 时间格式化
+const formatDateTime = (seconds) => {
+  if (!seconds) return '-'
+  try {
+    // 后端为秒级时间戳
+    const date = new Date(Number(seconds) * 1000)
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const hh = String(date.getHours()).padStart(2, '0')
+    const mm = String(date.getMinutes()).padStart(2, '0')
+    const ss = String(date.getSeconds()).padStart(2, '0')
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+  } catch (e) {
+    return '-'
+  }
+}
+
 onMounted(() => {
   loadRoleList()
+  loadCompanyList()
 })
+
+// 根据企业ID获取名称
+const findCompanyName = (id) => {
+  if (!id) return '-'
+  const item = companyList.value.find((c) => String(c.id) === String(id))
+  return item ? item.name : String(id)
+}
 </script>
 
 <style scoped>

@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,9 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
 
     @Autowired
     private AdminRoleMapper adminRoleMapper;
+
+    @Autowired
+    private AdminUserRoleMapper adminUserRoleMapper;
 
     @Autowired
     private SipGatewayMapper sipGatewayMapper;
@@ -103,6 +107,50 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
         return adminMenuMapper.selectList(params);
     }
 
+    @Override
+    public List<MenusPo> getMenuTree(Map<String, Object> params) {
+        // 获取所有菜单数据
+        Map<String, Object> allMenusParams = new HashMap<>();
+        allMenusParams.put("status", 1);
+        List<AdminMenu> allMenus = adminMenuMapper.selectList(allMenusParams);
+        
+        if (CollectionUtils.isEmpty(allMenus)) {
+            return new ArrayList<>();
+        }
+        
+        // 构建菜单树
+        return buildMenuTree(allMenus, "");
+    }
+    
+    /**
+     * 构建菜单树
+     */
+    private List<MenusPo> buildMenuTree(List<AdminMenu> allMenus, String parentId) {
+        List<MenusPo> result = new ArrayList<>();
+        
+        for (AdminMenu menu : allMenus) {
+            if (Objects.equals(menu.getParentId(), parentId)) {
+                MenusPo menuPo = new MenusPo();
+                BeanUtils.copyProperties(menu, menuPo);
+                
+                // 递归查找子菜单
+                List<MenusPo> children = buildMenuTree(allMenus, menu.getMenuId());
+                menuPo.setChilds(children);
+                
+                result.add(menuPo);
+            }
+        }
+        
+        // 按menu_order排序
+        result.sort((a, b) -> {
+            Integer orderA = a.getMenuOrder() != null ? a.getMenuOrder() : 0;
+            Integer orderB = b.getMenuOrder() != null ? b.getMenuOrder() : 0;
+            return orderA.compareTo(orderB);
+        });
+        
+        return result;
+    }
+
 
     private List<MenusPo> getMenus(Long uid) {
         Map<String, Object> params = new HashMap<>();
@@ -159,13 +207,13 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
         RolePo rolePo = new RolePo();
         BeanUtils.copyProperties(adminRole, rolePo);
 
-        //获取所有菜单
-        List<MenusPo> adminMenus = getAllMenus(null);
+        //获取所有菜单树
+        List<MenusPo> adminMenus = getMenuTree(null);
 
         //获取角色菜单
         List<String> roleMenuIds = adminMenuMapper.selectByRoleId(id);
 
-        //递归遍历
+        //递归遍历，设置选中状态
         forEachMenu(roleMenuIds, adminMenus);
 
         rolePo.setAdminMenuList(adminMenus);
@@ -207,15 +255,19 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
         }
         List<AdminMenu> adminMenus = adminMenuMapper.selectList(params);
         if (CollectionUtils.isEmpty(adminMenus)) {
-            return null;
+            return new ArrayList<>();
         }
         List<MenusPo> menusPoList = new ArrayList<>();
         for (AdminMenu child : adminMenus) {
             MenusPo childPo = new MenusPo();
-            params.put("parentId", child.getMenuId());
-            params.remove("menuLevel");
             BeanUtils.copyProperties(child, childPo);
-            childPo.setChilds(getAllMenus(params));
+            
+            // 递归查询子菜单
+            Map<String, Object> childParams = new HashMap<>();
+            childParams.put("parentId", child.getMenuId());
+            List<MenusPo> childMenus = getAllMenus(childParams);
+            childPo.setChilds(childMenus);
+            
             menusPoList.add(childPo);
         }
         return menusPoList;
@@ -390,5 +442,43 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
     @Override
     BaseMapper<AdminUser> baseMapper() {
         return adminUserMapper;
+    }
+
+    @Override
+    public Integer saveUserRoles(Long userId, List<Long> roleIds, Long companyId) {
+        logger.info("saveUserRoles called with userId: {}, roleIds: {}, companyId: {}", userId, roleIds, companyId);
+        
+        if (userId == null || roleIds == null || roleIds.isEmpty()) {
+            logger.warn("saveUserRoles: userId or roleIds is null or empty");
+            return 0;
+        }
+        
+        try {
+            // 先删除用户现有的角色关联
+            int deletedCount = adminUserRoleMapper.deleteByUserId(userId);
+            logger.info("Deleted {} existing user roles for userId: {}", deletedCount, userId);
+            
+            // 插入新的角色关联
+            long now = Instant.now().getEpochSecond();
+            int count = 0;
+            for (Long roleId : roleIds) {
+                AdminUserRole userRole = new AdminUserRole();
+                userRole.setAccountId(userId);
+                userRole.setRoleId(roleId);
+                userRole.setCompanyId(companyId);
+                userRole.setCts(now);
+                userRole.setUts(now);
+                
+                int insertResult = adminUserRoleMapper.insertSelective(userRole);
+                logger.info("Inserted user role: userId={}, roleId={}, result={}", userId, roleId, insertResult);
+                count++;
+            }
+            
+            logger.info("Successfully saved {} user roles for userId: {}", count, userId);
+            return count;
+        } catch (Exception e) {
+            logger.error("Error saving user roles for userId: {}, error: {}", userId, e.getMessage(), e);
+            throw e;
+        }
     }
 }

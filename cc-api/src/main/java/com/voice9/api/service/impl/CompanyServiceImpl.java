@@ -38,6 +38,12 @@ public class CompanyServiceImpl extends BaseServiceImpl<Company> implements Comp
         BeanUtils.copyProperties(companyVo, company);
         company.setSecretKey(RandomStringUtils.randomAlphabetic(16));
         company.setSecretType(2);
+        
+        // 设置创建时间和修改时间
+        long currentTime = Instant.now().getEpochSecond();
+        company.setCts(currentTime);
+        company.setUts(currentTime);
+        
         return companyMapper.insertSelective(company);
     }
 
@@ -57,6 +63,8 @@ public class CompanyServiceImpl extends BaseServiceImpl<Company> implements Comp
 
     @Override
     public int updateCompany(Company company) {
+        // 设置修改时间
+        company.setUts(Instant.now().getEpochSecond());
         return companyMapper.updateByPrimaryKeySelective(company);
     }
 

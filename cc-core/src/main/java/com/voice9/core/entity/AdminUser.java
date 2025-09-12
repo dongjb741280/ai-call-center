@@ -55,9 +55,29 @@ public class AdminUser implements Serializable {
     private String avatar;
 
     /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
+     * 电话
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
      * 状态
      */
     private Integer status;
+
+    /**
+     * 角色ID列表（用于前端传递，不存储到数据库）
+     */
+    private java.util.List<Long> roleIds;
 
 
     private static final long serialVersionUID = 1L;
@@ -134,12 +154,44 @@ public class AdminUser implements Serializable {
         this.avatar = avatar;
     }
 
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname == null ? null : nickname.trim();
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
+    }
+
     public Integer getStatus() {
         return status;
     }
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public java.util.List<Long> getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(java.util.List<Long> roleIds) {
+        this.roleIds = roleIds;
     }
 
     @Override
@@ -155,6 +207,9 @@ public class AdminUser implements Serializable {
         sb.append(", username=").append(username);
         sb.append(", passwd=").append(passwd);
         sb.append(", userType=").append(userType);
+        sb.append(", nickname=").append(nickname);
+        sb.append(", phone=").append(phone);
+        sb.append(", email=").append(email);
         sb.append(", status=").append(status);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
@@ -180,6 +235,9 @@ public class AdminUser implements Serializable {
             && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
             && (this.getPasswd() == null ? other.getPasswd() == null : this.getPasswd().equals(other.getPasswd()))
             && (this.getUserType() == null ? other.getUserType() == null : this.getUserType().equals(other.getUserType()))
+            && (this.getNickname() == null ? other.getNickname() == null : this.getNickname().equals(other.getNickname()))
+            && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
+            && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
             && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()));
     }
 
@@ -194,6 +252,9 @@ public class AdminUser implements Serializable {
         result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
         result = prime * result + ((getPasswd() == null) ? 0 : getPasswd().hashCode());
         result = prime * result + ((getUserType() == null) ? 0 : getUserType().hashCode());
+        result = prime * result + ((getNickname() == null) ? 0 : getNickname().hashCode());
+        result = prime * result + ((getPhone() == null) ? 0 : getPhone().hashCode());
+        result = prime * result + ((getEmail() == null) ? 0 : getEmail().hashCode());
         result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         return result;
     }

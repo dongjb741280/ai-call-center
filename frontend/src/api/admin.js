@@ -32,6 +32,18 @@ export const deleteUser = (id) => {
   })
 }
 
+// 文件上传：用户头像
+export const uploadUserAvatar = (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request({
+    url: '/cc-api/admin/user/avatar',
+    method: 'post',
+    data: formData,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
 // 角色管理
 export const getRoleList = (params) => {
   return request({
@@ -52,7 +64,7 @@ export const addRole = (data) => {
 export const updateRole = (data) => {
   return request({
     url: '/cc-api/admin/role',
-    method: 'put',
+    method: 'post',
     data
   })
 }
@@ -83,6 +95,14 @@ export const bindRoleMenus = (data) => {
 export const getMenuList = (params) => {
   return request({
     url: '/cc-api/admin/menu',
+    method: 'get',
+    params
+  })
+}
+
+export const getMenuTree = (params) => {
+  return request({
+    url: '/cc-api/admin/menu/tree',
     method: 'get',
     params
   })
@@ -128,9 +148,9 @@ export const addCompany = (data) => {
   })
 }
 
-export const updateCompany = (data) => {
+export const updateCompany = (id, data) => {
   return request({
-    url: '/cc-api/admin/company',
+    url: `/cc-api/admin/company/${id}`,
     method: 'put',
     data
   })

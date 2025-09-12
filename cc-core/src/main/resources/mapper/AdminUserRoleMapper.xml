@@ -5,13 +5,13 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
-        <result column="account_id" jdbcType="BIGINT" property="accountId"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
         <result column="role_id" jdbcType="BIGINT" property="roleId"/>
         <result column="company_id" jdbcType="BIGINT" property="companyId"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, account_id, role_id, company_id
+        , cts, uts, uid, role_id, company_id
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -24,13 +24,13 @@
         from cc_admin_user_role
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.AdminUserRole">
-        insert into cc_admin_user_role (id, cts, uts, account_id,
+    <insert id="insert" parameterType="com.voice9.core.entity.AdminUserRole" useGeneratedKeys="true" keyProperty="id">
+        insert into cc_admin_user_role (id, cts, uts, uid,
                                            role_id, company_id)
-        values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{accountId,jdbcType=BIGINT},
+        values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{uid,jdbcType=BIGINT},
                 #{roleId,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminUserRole">
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminUserRole" useGeneratedKeys="true" keyProperty="id">
         insert into cc_admin_user_role
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -42,8 +42,8 @@
             <if test="uts != null">
                 uts,
             </if>
-            <if test="accountId != null">
-                account_id,
+            <if test="uid != null">
+                uid,
             </if>
             <if test="roleId != null">
                 role_id,
@@ -62,8 +62,8 @@
             <if test="uts != null">
                 #{uts,jdbcType=BIGINT},
             </if>
-            <if test="accountId != null">
-                #{accountId,jdbcType=BIGINT},
+            <if test="uid != null">
+                #{uid,jdbcType=BIGINT},
             </if>
             <if test="roleId != null">
                 #{roleId,jdbcType=BIGINT},
@@ -82,8 +82,8 @@
             <if test="uts != null">
                 uts = #{uts,jdbcType=BIGINT},
             </if>
-            <if test="accountId != null">
-                account_id = #{accountId,jdbcType=BIGINT},
+            <if test="uid != null">
+                uid = #{uid,jdbcType=BIGINT},
             </if>
             <if test="roleId != null">
                 role_id = #{roleId,jdbcType=BIGINT},
@@ -98,9 +98,13 @@
         update cc_admin_user_role
         set cts        = #{cts,jdbcType=BIGINT},
             uts        = #{uts,jdbcType=BIGINT},
-            account_id = #{accountId,jdbcType=BIGINT},
+            uid        = #{uid,jdbcType=BIGINT},
             role_id    = #{roleId,jdbcType=BIGINT},
             company_id = #{companyId,jdbcType=BIGINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
+    
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete from cc_admin_user_role where uid = #{userId,jdbcType=BIGINT}
+    </delete>
 </mapper>

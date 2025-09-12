@@ -281,7 +281,7 @@
         from
             cc_admin_menu a , cc_admin_role_menu b
         where
-            a.menu_id = b.menu_id and  b.id = #{roleId} and a.status = 1
+            a.id = b.menu_id and  b.role_id = #{roleId} and a.status = 1
     </select>
 
     <update id="deleteMenu" parameterType="String">

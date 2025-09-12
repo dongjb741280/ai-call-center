@@ -1,49 +1,39 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard-header">
-      <h2>仪表板</h2>
-      <p>欢迎使用AI呼叫中心管理系统</p>
+    <!-- 顶部欢迎与许可证信息（合并为一个卡片） -->
+    <div class="top-card">
+      <div class="welcome-text">{{ welcomeText }}</div>
+      <div class="top-meta">
+        <span class="meta-item">licenseDate：{{ license.licenseDate }}</span>
+        <span class="meta-item">licenseNum：{{ license.licenseNum }}</span>
+        <span class="meta-item">ip地址：{{ license.ip }}</span>
+      </div>
     </div>
 
-    <!-- 统计卡片 -->
+    <!-- 统计卡片（与截图一致） -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">
-          <el-icon><User /></el-icon>
+        <div class="stat-content only">
+          <p>外呼总数</p>
+          <h3>{{ stats.calloutTotal }}</h3>
         </div>
-        <div class="stat-content">
+      </div>
+      <div class="stat-card">
+        <div class="stat-content only">
+          <p>呼入总数</p>
+          <h3>{{ stats.callinTotal }}</h3>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content only">
+          <p>坐席总数</p>
           <h3>{{ stats.totalAgents }}</h3>
-          <p>总坐席数</p>
         </div>
       </div>
-      
       <div class="stat-card">
-        <div class="stat-icon">
-          <el-icon><Phone /></el-icon>
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.totalCalls }}</h3>
-          <p>今日通话</p>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon">
-          <el-icon><Clock /></el-icon>
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.avgCallDuration }}</h3>
-          <p>平均通话时长</p>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon">
-          <el-icon><TrendCharts /></el-icon>
-        </div>
-        <div class="stat-content">
-          <h3>{{ stats.callSuccessRate }}%</h3>
-          <p>通话成功率</p>
+        <div class="stat-content only">
+          <p>坐席在线数</p>
+          <h3>{{ stats.onlineAgents }}</h3>
         </div>
       </div>
     </div>
@@ -52,57 +42,20 @@
     <div class="charts-grid">
       <div class="chart-card">
         <div class="chart-header">
-          <h3>通话趋势</h3>
-          <el-radio-group v-model="callTrendPeriod" size="small">
-            <el-radio-button label="today">今日</el-radio-button>
-            <el-radio-button label="week">本周</el-radio-button>
-            <el-radio-button label="month">本月</el-radio-button>
-          </el-radio-group>
+          <h3>坐席维度的统计</h3>
         </div>
         <div class="chart-content">
-          <v-chart :option="callTrendOption" style="height: 300px;" />
+          <v-chart :option="agentStackBarOption" style="height: 320px;" />
         </div>
       </div>
-      
       <div class="chart-card">
         <div class="chart-header">
-          <h3>坐席状态分布</h3>
+          <h3>企业每个小时区间的统计</h3>
         </div>
         <div class="chart-content">
-          <v-chart :option="agentStatusOption" style="height: 300px;" />
+          <v-chart :option="companyHourlyLineOption" style="height: 320px;" />
         </div>
       </div>
-    </div>
-
-    <!-- 最近通话记录 -->
-    <div class="recent-calls">
-      <div class="section-header">
-        <h3>最近通话记录</h3>
-        <el-button type="primary" @click="$router.push('/call/logs')">
-          查看全部
-        </el-button>
-      </div>
-      <el-table :data="recentCalls" style="width: 100%">
-        <el-table-column prop="callId" label="通话ID" width="120" />
-        <el-table-column prop="agentName" label="坐席" width="100" />
-        <el-table-column prop="phoneNumber" label="电话号码" width="130" />
-        <el-table-column prop="callType" label="通话类型" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.callType === '呼入' ? 'success' : 'primary'">
-              {{ row.callType }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="duration" label="通话时长" width="100" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">
-              {{ row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" />
-      </el-table>
     </div>
   </div>
 </template>
@@ -111,7 +64,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart, PieChart } from 'echarts/charts'
+import { LineChart, BarChart } from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
@@ -123,149 +76,61 @@ import VChart from 'vue-echarts'
 use([
   CanvasRenderer,
   LineChart,
-  PieChart,
+  BarChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
   GridComponent
 ])
 
-const callTrendPeriod = ref('today')
+// 顶部信息
+const welcomeText = ref('admin[test]欢迎回来!')
+const license = reactive({
+  licenseDate: '2026-08-31',
+  licenseNum: 20000,
+  ip: '140.99.255.94'
+})
 
-// 统计数据
+// 统计数据（与四个卡片对应）
 const stats = reactive({
-  totalAgents: 0,
-  totalCalls: 0,
-  avgCallDuration: '0:00',
-  callSuccessRate: 0
+  calloutTotal: 4,
+  callinTotal: 6,
+  totalAgents: 109,
+  onlineAgents: 1
 })
 
-// 最近通话记录
-const recentCalls = ref([])
-
-// 通话趋势图表配置
-const callTrendOption = ref({
-  tooltip: {
-    trigger: 'axis'
-  },
-  legend: {
-    data: ['呼入', '呼出']
-  },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    data: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00']
-  },
-  yAxis: {
-    type: 'value'
-  },
+// 坐席维度堆叠柱状图
+const agentStackBarOption = ref({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  legend: { data: ['loginTime', 'readyTime', 'talkTime', 'calloutCnt', 'callinAnswerCnt'] },
+  grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+  xAxis: { type: 'value' },
+  yAxis: { type: 'category', data: ['1001@test'] },
   series: [
-    {
-      name: '呼入',
-      type: 'line',
-      data: [12, 8, 15, 25, 18, 22],
-      smooth: true,
-      itemStyle: {
-        color: '#67C23A'
-      }
-    },
-    {
-      name: '呼出',
-      type: 'line',
-      data: [8, 12, 18, 20, 15, 10],
-      smooth: true,
-      itemStyle: {
-        color: '#409EFF'
-      }
-    }
+    { name: 'loginTime', type: 'bar', stack: 'total', emphasis: { focus: 'series' }, data: [726], itemStyle: { color: '#5470C6' } },
+    { name: 'readyTime', type: 'bar', stack: 'total', emphasis: { focus: 'series' }, data: [94], itemStyle: { color: '#91CC75' } },
+    { name: 'talkTime', type: 'bar', stack: 'total', emphasis: { focus: 'series' }, data: [2], itemStyle: { color: '#FAC858' } },
+    { name: 'calloutCnt', type: 'bar', stack: 'total', emphasis: { focus: 'series' }, data: [1], itemStyle: { color: '#EE6666' } },
+    { name: 'callinAnswerCnt', type: 'bar', stack: 'total', emphasis: { focus: 'series' }, data: [1], itemStyle: { color: '#73C0DE' } }
   ]
 })
 
-// 坐席状态分布图表配置
-const agentStatusOption = ref({
-  tooltip: {
-    trigger: 'item'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left'
-  },
+// 企业每小时区间折线图
+const companyHourlyLineOption = ref({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['agentCnt', 'callinCnt', 'calloutCnt'] },
+  grid: { left: '3%', right: '3%', bottom: '3%', containLabel: true },
+  xAxis: { type: 'category', boundaryGap: false, data: ['03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00'] },
+  yAxis: { type: 'value' },
   series: [
-    {
-      name: '坐席状态',
-      type: 'pie',
-      radius: '50%',
-      data: [
-        { value: 35, name: '空闲' },
-        { value: 20, name: '忙碌' },
-        { value: 15, name: '通话中' },
-        { value: 10, name: '离线' }
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
-    }
+    { name: 'agentCnt', type: 'line', smooth: true, data: [1,1,1,1,1,1,1,1,1,1,1,1], itemStyle: { color: '#5470C6' } },
+    { name: 'callinCnt', type: 'line', smooth: true, data: [0,0,0,0,0,0,2,0,0,3,0,0], itemStyle: { color: '#91CC75' } },
+    { name: 'calloutCnt', type: 'line', smooth: true, data: [0,0,0,0,0,0,0,0,0,2,0,1], itemStyle: { color: '#FAC858' } }
   ]
 })
 
-// 获取状态类型
-const getStatusType = (status) => {
-  const statusMap = {
-    '已接通': 'success',
-    '未接通': 'warning',
-    '通话中': 'primary',
-    '已挂断': 'info'
-  }
-  return statusMap[status] || 'info'
-}
-
-// 加载数据
 const loadData = async () => {
-  // 模拟数据
-  stats.totalAgents = 80
-  stats.totalCalls = 156
-  stats.avgCallDuration = '3:45'
-  stats.callSuccessRate = 85
-  
-  recentCalls.value = [
-    {
-      callId: 'C20231201001',
-      agentName: '张三',
-      phoneNumber: '138****1234',
-      callType: '呼入',
-      duration: '2:30',
-      status: '已接通',
-      createTime: '2023-12-01 14:30:25'
-    },
-    {
-      callId: 'C20231201002',
-      agentName: '李四',
-      phoneNumber: '139****5678',
-      callType: '呼出',
-      duration: '1:45',
-      status: '已接通',
-      createTime: '2023-12-01 14:25:10'
-    },
-    {
-      callId: 'C20231201003',
-      agentName: '王五',
-      phoneNumber: '137****9012',
-      callType: '呼入',
-      duration: '0:00',
-      status: '未接通',
-      createTime: '2023-12-01 14:20:15'
-    }
-  ]
+  // TODO: 接入后端接口替换为真实数据
 }
 
 onMounted(() => {
@@ -275,26 +140,36 @@ onMounted(() => {
 
 <style scoped>
 .dashboard {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
+  padding: 0 12px;
 }
 
-.dashboard-header {
-  margin-bottom: 24px;
+.top-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  background: #e1e7f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
 }
 
-.dashboard-header h2 {
-  font-size: 24px;
-  font-weight: 600;
+.welcome-text {
+  font-weight: 500;
   color: #303133;
-  margin: 0 0 8px 0;
 }
 
-.dashboard-header p {
-  font-size: 14px;
-  color: #909399;
-  margin: 0;
+.top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  color: #606266;
 }
+
+.meta-item { white-space: nowrap; }
 
 .stats-grid {
   display: grid;
@@ -304,25 +179,15 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: #fff;
+  background: #e9eef5;
   border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  padding: 20px;
 }
 
-.stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #409EFF, #67C23A);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 24px;
+.stat-content.only p {
+  font-size: 14px;
+  color: #909399;
+  margin: 0 0 8px 0;
 }
 
 .stat-content h3 {
@@ -366,26 +231,7 @@ onMounted(() => {
   margin: 0;
 }
 
-.recent-calls {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.section-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-  margin: 0;
-}
+/* 删除最近通话区域相关样式 */
 
 /* 响应式 */
 @media (max-width: 768px) {
@@ -396,6 +242,8 @@ onMounted(() => {
   .stats-grid {
     grid-template-columns: 1fr;
   }
+
+  .top-card { flex-direction: column; align-items: flex-start; }
 }
 </style>
 
