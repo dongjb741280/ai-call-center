@@ -39,8 +39,8 @@
           <span v-else class="text-gray-400">顶级企业</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="160" />
-      <el-table-column prop="updateTime" label="修改时间" width="160" />
+      <el-table-column prop="createTime" label="创建时间" width="170" />
+      <el-table-column prop="updateTime" label="修改时间" width="170" />
       <el-table-column prop="seatCount" label="坐席数" width="100" />
       <el-table-column prop="skillGroupCount" label="技能组数" width="100" />
       <el-table-column prop="ivrConcurrent" label="IVR并发" width="110" />
@@ -56,7 +56,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="recordRetention" label="录音保留" width="110" />
-      <el-table-column prop="cdrCallback" label="话单回调" min-width="140" />
+      <el-table-column prop="cdrCallback" label="话单回调" min-width="440" />
       <el-table-column prop="ossProduct" label="录音OSS产品" width="140" />
       <el-table-column prop="recordFileType" label="录音文件类型" width="120" />
       <el-table-column prop="recordEncrypt" label="录音文件加密" width="120" />
