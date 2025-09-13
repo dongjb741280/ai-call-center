@@ -16,7 +16,7 @@ import org.voice9.cc.exception.BusinessException;
 import org.voice9.web.base.BaseController;
 
 /**
- * Created by caoliang on 2020/12/16
+ * Created by dongjb on 2025/09/03
  * <p>
  * rest cti for agent
  */
@@ -64,7 +64,7 @@ public class AgentCallController extends BaseController {
     }
 
     /**
-     * 5.2.2 发起呼叫
+     * 5.2.2 挂断
      *
      * @param agentInfo
      * @return

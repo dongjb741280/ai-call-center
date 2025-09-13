@@ -1,7 +1,7 @@
 package com.voice9.core.entity;
 
 /**
- * Created by caoliang on 2021/12/6
+ * Created by dongjb on 2025/09/03
  */
 public class StreamEntity {
 

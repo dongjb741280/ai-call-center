@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 坐席状态历史表
  *
- * @author caoliang
- * @date 2020/06/06
+ * @author dongjb
+ * @date 2025/09/03
  */
 public class AgentStateLog implements Serializable {
     /**

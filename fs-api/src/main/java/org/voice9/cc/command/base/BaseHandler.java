@@ -23,7 +23,7 @@ import org.voice9.cc.websocket.WebSocketHandler;
 import org.voice9.cc.fs.esl.transport.SendMsg;
 
 /**
- * Created by caoliang on 2020/8/23
+ * Created by dongjb on 2025/09/03
  */
 public class BaseHandler {
     protected Logger logger = LoggerFactory.getLogger(BaseHandler.class);

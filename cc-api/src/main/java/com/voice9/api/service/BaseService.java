@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import java.util.Map;
 
 /**
- * Create by caoliang on 2020/10/28
+ * Create by dongjb on 2025/09/03
  */
 public interface BaseService<T> {
 

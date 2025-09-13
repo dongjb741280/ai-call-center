@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by caoliang on 2022/4/6
+ * Created by dongjb on 2025/09/03
  */
 public class RoleVo {
 

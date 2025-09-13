@@ -6,7 +6,7 @@ import org.voice9.cc.configration.HandlerType;
 import org.voice9.cc.tcp.event.SubLoginEvent;
 
 /**
- * Created by caoliang on 2021/8/8.
+ * Created by dongjb on 2025/09/03
  */
 @HandlerType("SUB_LOGIN")
 @Component

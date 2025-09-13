@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 企业号码
  *
- * @author caoliang
- * @date   2020/06/06
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class CompanyPhone implements Serializable {
     /**

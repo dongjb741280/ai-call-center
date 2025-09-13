@@ -5,7 +5,7 @@ import com.voice9.core.entity.AdminRole;
 import java.util.List;
 
 /**
- * Created by caoliang on 2022/1/27.
+ * Created by dongjb on 2025/09/03
  */
 public class RolePo extends AdminRole {
 

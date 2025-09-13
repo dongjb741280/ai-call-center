@@ -3,7 +3,7 @@ package com.voice9.core.vo;
 import javax.validation.constraints.NotBlank;
 
 /**
- * Created by caoliang on 2022/1/18
+ * Created by dongjb on 2025/09/03
  */
 public class AdminLogin {
 

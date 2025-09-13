@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 坐席技能组表
  *
- * @author caoliang
- * @date   2022/01/25
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class AgentGroup implements Serializable {
     /**

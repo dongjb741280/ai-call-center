@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Create by caoliang on 2020/8/23
+ * Create by dongjb on 2025/09/03
  */
 public class ClassScanerUtil implements ResourceLoaderAware {
     private final List<TypeFilter> includeFilters = new LinkedList<>();

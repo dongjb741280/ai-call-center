@@ -12,7 +12,7 @@ import org.voice9.cc.websocket.event.WsReadyEvent;
 import java.time.Instant;
 
 /**
- * Create by caoliang on 2020/11/1
+ * Create by dongjb on 2025/09/03
  * <p>
  * 坐席空闲
  * 2002 示闲失败

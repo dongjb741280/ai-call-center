@@ -3,7 +3,7 @@ package org.voice9.cc.configration;
 import java.lang.annotation.*;
 
 /**
- * Create by caoliang on 2020/8/23
+ * Create by dongjb on 2025/09/03
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

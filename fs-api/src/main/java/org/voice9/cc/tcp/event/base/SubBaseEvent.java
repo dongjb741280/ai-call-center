@@ -5,7 +5,7 @@ import io.netty.channel.Channel;
 
 
 /**
- * Create by caoliang on 2020/10/29
+ * Create by dongjb on 2025/09/03
  */
 public class SubBaseEvent {
 

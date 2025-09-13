@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Created by caoliang on 2020/11/6
+ * Created by dongjb on 2025/09/03
  */
 @Service
 public class CompanyServiceImpl extends BaseServiceImpl<Company> implements CompanyService {

@@ -6,7 +6,7 @@ import com.voice9.core.entity.SkillAgent;
 import java.util.List;
 
 /**
- * Created by caoliang on 2021/10/1
+ * Created by dongjb on 2025/09/03
  */
 public class SkillInfo extends Skill {
 

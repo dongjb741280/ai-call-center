@@ -3,7 +3,7 @@ package com.voice9.core.strategy;
 import com.voice9.core.po.CallInfo;
 
 /**
- * Created by caoliang on 2021/8/2
+ * Created by dongjb on 2025/09/03
  * <p>
  * 多媒体在技能组中排队策略
  */

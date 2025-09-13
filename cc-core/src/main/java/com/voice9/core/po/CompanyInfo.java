@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2020/11/6
+ * Created by dongjb on 2025/09/03
  */
 public class CompanyInfo extends Company {
 

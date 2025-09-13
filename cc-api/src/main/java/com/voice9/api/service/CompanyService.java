@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2021/3/22
+ * Created by dongjb on 2025/09/03
  */
 public interface CompanyService extends BaseService<Company> {
 

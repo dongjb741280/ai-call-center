@@ -3,7 +3,7 @@ package org.voice9.cc.tcp.event;
 import org.voice9.cc.tcp.event.base.SubBaseEvent;
 
 /**
- * Created by caoliang on 2021/8/8.
+ * Created by dongjb on 2025/09/03
  */
 public class SubLoginEvent extends SubBaseEvent {
 

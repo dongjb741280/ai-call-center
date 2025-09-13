@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 
  *
- * @author caoliang
- * @date   2021/09/04
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class CompanyStat implements Serializable {
     /**

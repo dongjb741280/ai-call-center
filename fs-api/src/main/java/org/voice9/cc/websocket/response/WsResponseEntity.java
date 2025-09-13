@@ -4,7 +4,7 @@ package org.voice9.cc.websocket.response;
 import com.voice9.core.enums.ErrorCode;
 
 /**
- * Created by caoliang on 2020/11/3
+ * Created by dongjb on 2025/09/03
  */
 public class WsResponseEntity<T> {
 

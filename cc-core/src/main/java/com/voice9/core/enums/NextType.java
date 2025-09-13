@@ -1,7 +1,7 @@
 package com.voice9.core.enums;
 
 /**
- * Create by caoliang on 2020/12/6
+ * Create by dongjb on 2025/09/03
  */
 public enum NextType {
 

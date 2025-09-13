@@ -5,7 +5,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by caoliang on 2021/5/9
+ * Created by dongjb on 2025/09/03
  */
 public class SkillGroupVo {
 

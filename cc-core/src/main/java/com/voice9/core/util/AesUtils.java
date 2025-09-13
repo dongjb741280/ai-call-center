@@ -7,7 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by caoliang on 2020/11/2
+ * Created by dongjb on 2025/09/03
  * <p>
  * 工作模式[CBC，CFB，ECB，OFB，PCBC]
  * <p>

@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 
  *
- * @author caoliang
- * @date   2022/01/06
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class AdminMenu implements Serializable {
     /**

@@ -17,7 +17,7 @@ import org.voice9.cc.fs.event.base.FsBaseEvent;
 import org.voice9.cc.websocket.response.WsResponseEntity;
 
 /**
- * Created by caoliang on 2020/8/23
+ * Created by dongjb on 2025/09/03
  */
 public abstract class BaseEventHandler<T extends FsBaseEvent> extends BaseHandler implements Handler<T> {
     protected Logger logger = LoggerFactory.getLogger(BaseEventHandler.class);

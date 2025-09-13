@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 话单明细表
  *
- * @author caoliang
+ * @author dongjb
  * @date   2020/06/06
  */
 public class CallDevice implements Serializable {

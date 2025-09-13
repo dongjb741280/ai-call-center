@@ -4,7 +4,7 @@ import com.voice9.core.po.AgentInfo;
 import com.voice9.core.strategy.AgentStrategy;
 
 /**
- * Created by caoliang on 2021/8/3
+ * Created by dongjb on 2025/09/03
  *
  * 累计空闲最长时间，不包含当前的空闲时间
  */

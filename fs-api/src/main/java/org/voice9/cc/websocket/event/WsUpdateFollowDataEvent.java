@@ -5,7 +5,7 @@ import org.voice9.cc.websocket.event.base.WsBaseEvent;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2021/7/19
+ * Created by dongjb on 2025/09/03
  */
 public class WsUpdateFollowDataEvent extends WsBaseEvent {
 

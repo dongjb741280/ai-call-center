@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 坐席技能表
  *
- * @author caoliang
- * @date 2020/06/06
+ * @author dongjb
+ * @date 2025/09/03
  */
 public class SkillAgent implements Serializable {
     /**

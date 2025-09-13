@@ -14,7 +14,7 @@ import org.voice9.cc.websocket.handler.WsNotReadyHandler;
 import org.voice9.cc.websocket.handler.WsReadyHandler;
 
 /**
- * Created by caoliang on 2020/11/2
+ * Created by dongjb on 2025/09/03
  */
 public class BaseController {
     protected Logger logger = LoggerFactory.getLogger(getClass());

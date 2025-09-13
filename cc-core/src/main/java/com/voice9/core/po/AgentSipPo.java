@@ -4,7 +4,7 @@ import com.voice9.core.entity.Agent;
 import com.voice9.core.entity.AgentSip;
 
 /**
- * Created by caoliang on 2020/06/06
+ * Created by dongjb on 2025/09/03
  */
 public class AgentSipPo extends AgentSip {
 

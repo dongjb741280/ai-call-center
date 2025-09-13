@@ -7,7 +7,7 @@ import com.voice9.core.entity.OverflowFront;
 import java.util.List;
 
 /**
- * Created by caoliang on 2020/06/06
+ * Created by dongjb on 2025/09/03
  */
 public class GroupOverFlow extends OverflowConfig {
 

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * ivr流程表
  *
- * @author caoliang
+ * @author dongjb
  * @date   2022/03/15
  */
 public class IvrWorkflow implements Serializable {

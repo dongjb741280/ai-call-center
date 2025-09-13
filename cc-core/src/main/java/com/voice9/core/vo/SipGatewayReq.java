@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by caoliang on 2024/6/24
+ * Created by dongjb on 2025/09/03
  */
 public class SipGatewayReq {
 

@@ -7,7 +7,7 @@ import com.voice9.core.vo.SkillAgentsVo;
 import com.voice9.core.vo.SkillVo;
 
 /**
- * Created by caoliang on 2021/10/1
+ * Created by dongjb on 2025/09/03
  */
 public interface SkillService extends BaseService<Skill> {
 

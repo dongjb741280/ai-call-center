@@ -3,7 +3,7 @@ package com.voice9.core.strategy;
 import com.voice9.core.po.AgentInfo;
 
 /**
- * Created by caoliang on 2021/8/2
+ * Created by dongjb on 2025/09/03
  * <p>
  * 坐席在技能组空闲策略
  */

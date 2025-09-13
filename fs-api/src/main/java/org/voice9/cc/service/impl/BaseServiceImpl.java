@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.voice9.cc.service.BaseService;
 
 /**
- * Create by caoliang on 2020/10/28
+ * Create by dongjb on 2025/09/03
  */
 public abstract class BaseServiceImpl<T> implements BaseService<T> {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

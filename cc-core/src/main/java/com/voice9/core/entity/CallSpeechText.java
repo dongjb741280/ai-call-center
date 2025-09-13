@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 
 /**
- * @author caoliang
- * @date 2022/06/13
+ * @author dongjb
+ * @date 2025/09/03
  */
 public class CallSpeechText implements Serializable {
     /**

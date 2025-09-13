@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by caoliang on 2022/2/20
+ * Created by dongjb on 2025/09/03
  */
 public class WsConferenceResponse {
 

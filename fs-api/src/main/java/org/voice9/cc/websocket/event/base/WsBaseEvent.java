@@ -3,7 +3,7 @@ package org.voice9.cc.websocket.event.base;
 import io.netty.channel.Channel;
 
 /**
- * Create by caoliang on 2020/10/26
+ * Create by dongjb on 2025/09/03
  */
 public class WsBaseEvent {
 

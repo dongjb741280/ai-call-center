@@ -3,7 +3,7 @@ package org.voice9.cc.fs.event;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * Created by caoliang on 2020/10/20
+ * Created by dongjb on 2025/09/03
  */
 public class FsRingAsrEvent extends FsBridgeEvent {
 

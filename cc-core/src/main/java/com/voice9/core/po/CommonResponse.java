@@ -3,7 +3,7 @@ package com.voice9.core.po;
 import com.voice9.core.enums.ErrorCode;
 
 /**
- * Created by caoliang on 2020/8/24
+ * Created by dongjb on 2025/09/03
  */
 public class CommonResponse<T> {
     private int code;

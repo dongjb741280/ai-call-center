@@ -6,7 +6,7 @@ import org.voice9.cc.websocket.handler.base.WsBaseHandler;
 import org.voice9.cc.websocket.event.WsWorkNotReadyEvent;
 
 /**
- * Create by caoliang on 2020/11/1
+ * Create by dongjb on 2025/09/03
  * <p>
  * 自定义忙碌状态
  */

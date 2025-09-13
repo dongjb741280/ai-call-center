@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 网关注册账号表
  *
- * @author caoliang
- * @date   2024/06/24
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class SipGateway implements Serializable {
     /**

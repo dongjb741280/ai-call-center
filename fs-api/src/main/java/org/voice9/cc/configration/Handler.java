@@ -1,7 +1,7 @@
 package org.voice9.cc.configration;
 
 /**
- * Create by caoliang on 2020/8/23
+ * Create by dongjb on 2025/09/03
  */
 public interface Handler<T> {
 

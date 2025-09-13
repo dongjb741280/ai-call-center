@@ -1,7 +1,7 @@
 package org.voice9.cc.fs.stream;
 
 /**
- * Created by caoliang on 2021/12/4
+ * Created by dongjb on 2025/09/03
  */
 public class G711 {
 

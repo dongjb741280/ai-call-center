@@ -1,7 +1,7 @@
 package org.voice9.cc.websocket.response;
 
 /**
- * Created by caoliang on 2022/2/20
+ * Created by dongjb on 2025/09/03
  */
 public class WsConsultResponse {
 

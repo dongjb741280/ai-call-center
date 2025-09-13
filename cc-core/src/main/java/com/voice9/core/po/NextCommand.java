@@ -5,7 +5,7 @@ import com.voice9.core.enums.NextType;
 import java.io.Serializable;
 
 /**
- * Created by caoliang on 2020/12/21
+ * Created by dongjb on 2025/09/03
  */
 public class NextCommand implements Serializable {
 

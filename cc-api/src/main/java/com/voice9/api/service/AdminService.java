@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2022/1/6
+ * Created by dongjb on 2025/09/03
  */
 public interface AdminService extends BaseService<AdminUser> {
 

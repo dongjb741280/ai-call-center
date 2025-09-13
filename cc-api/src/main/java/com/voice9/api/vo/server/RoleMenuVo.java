@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Created by caoliang on 2022/4/11
+ * Created by dongjb on 2025/09/03
  */
 public class RoleMenuVo {
 

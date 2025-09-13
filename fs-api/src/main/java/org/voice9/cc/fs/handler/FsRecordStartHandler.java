@@ -8,7 +8,7 @@ import org.voice9.cc.fs.event.FsRecordStartEvent;
 import org.voice9.cc.fs.handler.base.BaseEventHandler;
 
 /**
- * Created by caoliang on 2021/8/9
+ * Created by dongjb on 2025/09/03
  * <p>
  * 录音开始
  */

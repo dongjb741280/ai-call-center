@@ -9,7 +9,7 @@ import org.voice9.cc.configration.Handler;
 import org.voice9.cc.websocket.WebSocketHandler;
 
 /**
- * Create by caoliang on 2020/10/30
+ * Create by dongjb on 2025/09/03
  */
 public abstract class SubBaseHandler<T extends SubBaseEvent> implements Handler<T> {
     protected Logger logger = LoggerFactory.getLogger(getClass());

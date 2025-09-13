@@ -6,7 +6,7 @@ import com.voice9.core.po.GroupInfo;
 import java.util.List;
 
 /**
- * Create by caoliang on 2020/10/28
+ * Create by dongjb on 2025/09/03
  */
 public interface GroupService extends BaseService<Group> {
 

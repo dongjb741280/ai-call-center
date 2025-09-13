@@ -13,7 +13,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
- * Created by caoliang on 2021/8/2
+ * Created by dongjb on 2025/09/03
  * <p>
  * 自定义排队策略
  */

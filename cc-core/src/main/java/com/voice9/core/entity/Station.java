@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 站点类型配置信息
  *
- * @author caoliang
- * @date 2021/09/01
+ * @author dongjb
+ * @date 2025/09/03
  */
 public class Station implements Serializable {
     /**

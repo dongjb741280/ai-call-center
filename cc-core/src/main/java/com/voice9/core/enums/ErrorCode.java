@@ -1,7 +1,7 @@
 package com.voice9.core.enums;
 
 /**
- * Create by caoliang on 2020/06/06
+ * Create by dongjb on 2025/09/03
  */
 public enum ErrorCode {
     RUNTIME_EXCEPTION(1001, "未知错误"),

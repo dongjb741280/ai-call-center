@@ -3,7 +3,7 @@ package org.voice9.cc.service;
 import com.voice9.core.entity.GroupMemory;
 
 /**
- * Created by caoliang on 2021/8/14
+ * Created by dongjb on 2025/09/03
  */
 public interface GroupMemoryService extends BaseService<GroupMemory>{
 

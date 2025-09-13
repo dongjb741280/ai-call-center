@@ -1,7 +1,7 @@
 package org.voice9.cc.service;
 
 /**
- * Create by caoliang on 2020/10/28
+ * Create by dongjb on 2025/09/03
  */
 public interface BaseService<T> {
 

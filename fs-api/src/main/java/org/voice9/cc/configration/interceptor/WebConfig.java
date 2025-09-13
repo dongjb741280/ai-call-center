@@ -10,7 +10,7 @@ import org.voice9.cc.cache.CacheService;
 import org.voice9.cc.service.AgentService;
 
 /**
- * Create by caoliang on 2020/9/20
+ * Create by dongjb on 2025/09/03
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

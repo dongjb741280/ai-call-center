@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 自定义溢出策略优先级
  *
- * @author caoliang
- * @date   2020/06/06
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class OverflowExp implements Serializable {
     /**

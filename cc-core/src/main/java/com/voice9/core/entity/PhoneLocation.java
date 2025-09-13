@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * 
  *
- * @author caoliang
+ * @author dongjb
  * @date   2020/06/06
  */
 public class PhoneLocation implements Serializable {

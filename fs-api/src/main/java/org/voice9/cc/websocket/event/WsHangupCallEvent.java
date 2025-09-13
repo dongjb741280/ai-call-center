@@ -3,7 +3,7 @@ package org.voice9.cc.websocket.event;
 import org.voice9.cc.websocket.event.base.WsBaseEvent;
 
 /**
- * Created by caoliang on 2020/11/6
+ * Created by dongjb on 2025/09/03
  * <p>
  * 挂机
  */

@@ -3,7 +3,7 @@ package com.voice9.api.util;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
- * Created by caoliang on 2020/11/2
+ * Created by dongjb on 2025/09/03
  */
 public class BcryptUtil {
 

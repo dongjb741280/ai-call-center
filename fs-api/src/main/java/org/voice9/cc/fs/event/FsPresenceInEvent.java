@@ -4,7 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import org.voice9.cc.fs.event.base.FsBaseEvent;
 
 /**
- * Created by caoliang on 2022/2/26
+ * Created by dongjb on 2025/09/03
  */
 public class FsPresenceInEvent extends FsBaseEvent {
 

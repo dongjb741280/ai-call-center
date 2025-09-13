@@ -1,7 +1,7 @@
 package com.voice9.core.po;
 
 /**
- * Create by caoliang on 2020/11/10
+ * Create by dongjb on 2025/09/03
  * <p>
  * 坐席属性队列
  */

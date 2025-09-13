@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2020/8/29
+ * Created by dongjb on 2020/8/29
  */
 public class FsBaseEvent {
 

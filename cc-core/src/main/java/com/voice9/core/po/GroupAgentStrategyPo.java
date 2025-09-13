@@ -7,7 +7,7 @@ import com.voice9.core.strategy.AgentStrategy;
 import java.util.List;
 
 /**
- * Created by caoliang on 2020/11/25
+ * Created by dongjb on 2025/09/03
  */
 public class GroupAgentStrategyPo extends GroupAgentStrategy {
 

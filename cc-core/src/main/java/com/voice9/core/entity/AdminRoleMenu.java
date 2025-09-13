@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 权限角色表
  *
- * @author caoliang
- * @date   2022/01/18
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class AdminRoleMenu implements Serializable {
     /**

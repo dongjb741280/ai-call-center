@@ -6,7 +6,7 @@ import com.voice9.core.entity.Agent;
 import java.util.Date;
 
 /**
- * Created by caoliang on 2021/6/22
+ * Created by dongjb on 2025/09/03
  */
 public class ExcelAgentEntity extends Agent {
 

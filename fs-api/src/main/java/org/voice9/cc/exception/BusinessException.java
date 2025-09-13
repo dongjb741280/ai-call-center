@@ -3,7 +3,7 @@ package org.voice9.cc.exception;
 import com.voice9.core.enums.ErrorCode;
 
 /**
- * @author caoliang
+ * @author dongjb
  */
 public class BusinessException  extends RuntimeException{
 

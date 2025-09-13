@@ -3,7 +3,7 @@ package com.voice9.core.vo;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by caoliang on 2021/12/9
+ * Created by dongjb on 2025/09/03
  */
 public class SkillAgentVo {
 

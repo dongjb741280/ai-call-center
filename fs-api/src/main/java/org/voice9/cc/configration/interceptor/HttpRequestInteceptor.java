@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Create by caoliang on 2020/9/20
+ * Create by dongjb on 2025/09/03
  */
 public class HttpRequestInteceptor implements HandlerInterceptor {
     private Logger logger = LoggerFactory.getLogger(HttpRequestInteceptor.class);

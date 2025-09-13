@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 网关组
  *
- * @author caoliang
+ * @author dongjb
  * @date   2020/06/06
  */
 public class RouteGroup implements Serializable {

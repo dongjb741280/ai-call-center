@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by caoliang on 2021/10/1
+ * Created by dongjb on 2025/09/03
  */
 @Service
 public class SkillServiceImpl extends BaseServiceImpl<Skill> implements SkillService {

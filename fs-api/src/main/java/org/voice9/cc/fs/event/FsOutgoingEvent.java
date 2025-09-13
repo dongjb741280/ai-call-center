@@ -3,7 +3,7 @@ package org.voice9.cc.fs.event;
 import org.voice9.cc.fs.event.base.FsBaseEvent;
 
 /**
- * Created by caoliang on 2020/8/29
+ * Created by dongjb on 2025/09/03
  */
 public class FsOutgoingEvent extends FsBaseEvent {
 

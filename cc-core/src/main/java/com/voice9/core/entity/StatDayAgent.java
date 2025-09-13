@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * 
  *
- * @author caoliang
- * @date   2022/05/08
+ * @author dongjb
+ * @date   2025/09/03
  */
 public class StatDayAgent implements Serializable {
     /**
