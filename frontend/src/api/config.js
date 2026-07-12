@@ -236,6 +236,11 @@ export const deleteBlackPhone = (id) => {
   return request({ url: `/cc-api/admin/blackPhone/${id}`, method: 'delete' })
 }
 
+// ==================== 语音文件 ====================
+export const getPlaybackList = (params) => {
+  return request({ url: '/cc-api/admin/playback', method: 'get', params })
+}
+
 // ==================== 号码归属地 ====================
 export const getPhoneAreaList = (params) => {
   return request({ url: '/cc-api/admin/area', method: 'get', params })

@@ -8,6 +8,7 @@
         <result column="company_id" jdbcType="BIGINT" property="companyId"/>
         <result column="level_value" jdbcType="INTEGER" property="levelValue"/>
         <result column="skill_id" jdbcType="BIGINT" property="skillId"/>
+        <result column="skill_name" jdbcType="VARCHAR" property="skillName"/>
         <result column="group_id" jdbcType="BIGINT" property="groupId"/>
         <result column="rank_type" jdbcType="INTEGER" property="rankType"/>
         <result column="rank_value_start" jdbcType="INTEGER" property="rankValueStart"/>
@@ -68,6 +69,7 @@
                b.company_id,
                b.level_value,
                b.skill_id,
+               a.name as skill_name,
                b.group_id,
                b.rank_type,
                b.rank_value_start,

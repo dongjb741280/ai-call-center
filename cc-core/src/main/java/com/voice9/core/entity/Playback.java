@@ -30,6 +30,46 @@ public class Playback implements Serializable {
     private Long companyId;
 
     /**
+     * 文件名
+     */
+    private String name;
+
+    /**
+     * OSS文件路径
+     */
+    private String ossId;
+
+    /**
+     * 1:文件上传,2:语音合成
+     */
+    private Integer type;
+
+    /**
+     * 引擎ID
+     */
+    private Long engineId;
+
+    /**
+     * 引擎名称
+     */
+    private String engineName;
+
+    /**
+     * TTS参数
+     */
+    private String ttsParams;
+
+    /**
+     * 文件hash
+     */
+    private String hashCode;
+
+    /**
+     * 语音文本
+     */
+    private String speechText;
+
+    /**
      * 放音文件
      */
     private String playback;
@@ -48,6 +88,22 @@ public class Playback implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getOssId() { return ossId; }
+    public void setOssId(String ossId) { this.ossId = ossId; }
+    public Integer getType() { return type; }
+    public void setType(Integer type) { this.type = type; }
+    public Long getEngineId() { return engineId; }
+    public void setEngineId(Long engineId) { this.engineId = engineId; }
+    public String getEngineName() { return engineName; }
+    public void setEngineName(String engineName) { this.engineName = engineName; }
+    public String getTtsParams() { return ttsParams; }
+    public void setTtsParams(String ttsParams) { this.ttsParams = ttsParams; }
+    public String getHashCode() { return hashCode; }
+    public void setHashCode(String hashCode) { this.hashCode = hashCode; }
+    public String getSpeechText() { return speechText; }
+    public void setSpeechText(String speechText) { this.speechText = speechText; }
 
     public Long getCts() {
         return cts;

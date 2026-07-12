@@ -35,6 +35,11 @@ public class SkillGroup implements Serializable {
     private Long skillId;
 
     /**
+     * 技能名称
+     */
+    private String skillName;
+
+    /**
      * 技能组ID
      */
     private Long groupId;
@@ -114,6 +119,14 @@ public class SkillGroup implements Serializable {
 
     public void setSkillId(Long skillId) {
         this.skillId = skillId;
+    }
+
+    public String getSkillName() {
+        return skillName;
+    }
+
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
     }
 
     public Long getGroupId() {

@@ -8,6 +8,7 @@ import com.voice9.core.entity.AdminUser;
 import com.voice9.core.entity.AiEngine;
 import com.voice9.core.entity.BlackPhone;
 import com.voice9.core.entity.PhoneArea;
+import com.voice9.core.entity.Playback;
 import com.voice9.core.entity.SipGateway;
 import com.voice9.core.entity.Station;
 import com.voice9.core.enums.ErrorCode;
@@ -414,6 +415,23 @@ public class AdminController extends BaseController {
                                                   @PathVariable Long id) {
         return new CommonResponse<>(adminService.deleteStation(id));
     }
+
+    /**
+     * 语音文件列表
+     */
+    @GetMapping("playback")
+    public CommonResponse<PageInfo<Playback>> playbackList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                            PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        Integer pageNum = (Integer) params.get("pageNum");
+        Integer pageSize = (Integer) params.get("pageSize");
+        com.github.pagehelper.PageHelper.startPage(pageNum, pageSize);
+        com.github.pagehelper.PageHelper.orderBy("id desc");
+        return new CommonResponse<>(new PageInfo<>(playbackMapper.selectListByMap(params)));
+    }
+
+    @Autowired
+    private com.voice9.core.mapper.PlaybackMapper playbackMapper;
 
     /**
      * 黑名单列表

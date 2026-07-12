@@ -6,12 +6,20 @@
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
         <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="oss_id" jdbcType="VARCHAR" property="ossId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="engine_id" jdbcType="BIGINT" property="engineId"/>
+        <result column="engine_name" jdbcType="VARCHAR" property="engineName"/>
+        <result column="tts_params" jdbcType="VARCHAR" property="ttsParams"/>
+        <result column="hash_code" jdbcType="VARCHAR" property="hashCode"/>
+        <result column="speech_text" jdbcType="VARCHAR" property="speechText"/>
         <result column="playback" jdbcType="VARCHAR" property="playback"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id
-        , cts, uts, company_id, playback, status
+        id, cts, uts, company_id, name, oss_id, type, engine_id, engine_name,
+        tts_params, hash_code, speech_text, playback, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
