@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.BlackPhoneMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.BlackPhone">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="num_prefix" jdbcType="VARCHAR" property="numPrefix"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="thrid_url" jdbcType="VARCHAR" property="thridUrl"/>
+        <result column="thrid_method" jdbcType="VARCHAR" property="thridMethod"/>
+        <result column="request_body" jdbcType="VARCHAR" property="requestBody"/>
+        <result column="response_body" jdbcType="VARCHAR" property="responseBody"/>
+        <result column="call_direction" jdbcType="INTEGER" property="callDirection"/>
+        <result column="schedule_id" jdbcType="BIGINT" property="scheduleId"/>
+        <result column="schedule_name" jdbcType="VARCHAR" property="scheduleName"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, cts, uts, company_id, num_prefix, type, thrid_url, thrid_method,
+        request_body, response_body, call_direction, schedule_id, schedule_name, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_black_phone where id = #{id}
+    </select>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_black_phone
+        <where>
+            <if test="numPrefix != null and numPrefix != ''">
+                and num_prefix like concat('%', #{numPrefix}, '%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from cc_black_phone where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.BlackPhone">
+        insert into cc_black_phone
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="numPrefix != null">num_prefix,</if>
+            <if test="type != null">type,</if>
+            <if test="callDirection != null">call_direction,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="cts != null">#{cts},</if>
+            <if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="numPrefix != null">#{numPrefix},</if>
+            <if test="type != null">#{type},</if>
+            <if test="callDirection != null">#{callDirection},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.BlackPhone">
+        update cc_black_phone
+        <set>
+            <if test="numPrefix != null">num_prefix = #{numPrefix},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="callDirection != null">call_direction = #{callDirection},</if>
+            <if test="uts != null">uts = #{uts},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectCountByMap" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1) from cc_black_phone
+        <where>
+            <if test="numPrefix != null and numPrefix != ''">
+                and num_prefix like concat('%', #{numPrefix}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

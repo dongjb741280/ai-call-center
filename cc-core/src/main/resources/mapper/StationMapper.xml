@@ -6,6 +6,7 @@
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
         <result column="application_id" jdbcType="INTEGER" property="applicationId"/>
+        <result column="app_name" jdbcType="VARCHAR" property="appName"/>
         <result column="application_type" jdbcType="INTEGER" property="applicationType"/>
         <result column="application_group" jdbcType="VARCHAR" property="applicationGroup"/>
         <result column="application_host" jdbcType="VARCHAR" property="applicationHost"/>
@@ -16,7 +17,7 @@
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, application_id, application_type, application_group, application_host,
+        , cts, uts, application_id, app_name, application_type, application_group, application_host,
     application_port, username, pwd, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.PhoneAreaMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.PhoneArea">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="num_prefix" jdbcType="VARCHAR" property="numPrefix"/>
+        <result column="operator" jdbcType="VARCHAR" property="operator"/>
+        <result column="num_type" jdbcType="INTEGER" property="numType"/>
+        <result column="num_code" jdbcType="VARCHAR" property="numCode"/>
+        <result column="num_province" jdbcType="VARCHAR" property="numProvince"/>
+        <result column="num_city" jdbcType="VARCHAR" property="numCity"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, cts, uts, num_prefix, operator, num_type, num_code, num_province, num_city, status
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from cc_phone_area
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from cc_phone_area
+        <where>
+            <if test="numPrefix != null and numPrefix != ''">
+                and num_prefix like concat('%', #{numPrefix}, '%')
+            </if>
+        </where>
+        order by id
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from cc_phone_area where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.voice9.core.entity.PhoneArea">
+        insert into cc_phone_area (id, cts, uts, num_prefix, operator, num_type, num_code, num_province, num_city, status)
+        values (#{id,jdbcType=INTEGER}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT},
+                #{numPrefix,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{numType,jdbcType=INTEGER},
+                #{numCode,jdbcType=VARCHAR}, #{numProvince,jdbcType=VARCHAR}, #{numCity,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.PhoneArea">
+        insert into cc_phone_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="uts != null">uts,</if>
+            <if test="numPrefix != null">num_prefix,</if>
+            <if test="operator != null">operator,</if>
+            <if test="numType != null">num_type,</if>
+            <if test="numCode != null">num_code,</if>
+            <if test="numProvince != null">num_province,</if>
+            <if test="numCity != null">num_city,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id,jdbcType=INTEGER},</if>
+            <if test="cts != null">#{cts,jdbcType=BIGINT},</if>
+            <if test="uts != null">#{uts,jdbcType=BIGINT},</if>
+            <if test="numPrefix != null">#{numPrefix,jdbcType=VARCHAR},</if>
+            <if test="operator != null">#{operator,jdbcType=VARCHAR},</if>
+            <if test="numType != null">#{numType,jdbcType=INTEGER},</if>
+            <if test="numCode != null">#{numCode,jdbcType=VARCHAR},</if>
+            <if test="numProvince != null">#{numProvince,jdbcType=VARCHAR},</if>
+            <if test="numCity != null">#{numCity,jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.PhoneArea">
+        update cc_phone_area
+        <set>
+            <if test="cts != null">cts = #{cts,jdbcType=BIGINT},</if>
+            <if test="uts != null">uts = #{uts,jdbcType=BIGINT},</if>
+            <if test="numPrefix != null">num_prefix = #{numPrefix,jdbcType=VARCHAR},</if>
+            <if test="operator != null">operator = #{operator,jdbcType=VARCHAR},</if>
+            <if test="numType != null">num_type = #{numType,jdbcType=INTEGER},</if>
+            <if test="numCode != null">num_code = #{numCode,jdbcType=VARCHAR},</if>
+            <if test="numProvince != null">num_province = #{numProvince,jdbcType=VARCHAR},</if>
+            <if test="numCity != null">num_city = #{numCity,jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status,jdbcType=INTEGER},</if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.PhoneArea">
+        update cc_phone_area
+        set cts = #{cts,jdbcType=BIGINT},
+            uts = #{uts,jdbcType=BIGINT},
+            num_prefix = #{numPrefix,jdbcType=VARCHAR},
+            operator = #{operator,jdbcType=VARCHAR},
+            num_type = #{numType,jdbcType=INTEGER},
+            num_code = #{numCode,jdbcType=VARCHAR},
+            num_province = #{numProvince,jdbcType=VARCHAR},
+            num_city = #{numCity,jdbcType=VARCHAR},
+            status = #{status,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <select id="selectCountByMap" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1) from cc_phone_area
+        <where>
+            <if test="numPrefix != null and numPrefix != ''">
+                and num_prefix like concat('%', #{numPrefix}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

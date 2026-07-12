@@ -53,6 +53,18 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
     @Autowired
     private SipGatewayMapper sipGatewayMapper;
 
+    @Autowired
+    private PhoneAreaMapper phoneAreaMapper;
+
+    @Autowired
+    private BlackPhoneMapper blackPhoneMapper;
+
+    @Autowired
+    private StationMapper stationMapper;
+
+    @Autowired
+    private AiEngineMapper aiEngineMapper;
+
     @Override
     public AdminLoginResult login(AdminLogin adminLogin) {
         AdminUser adminUser = adminUserMapper.adminLogin(adminLogin.getUsername());
@@ -442,6 +454,96 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
     @Override
     BaseMapper<AdminUser> baseMapper() {
         return adminUserMapper;
+    }
+
+    @Override
+    public PageInfo<BlackPhone> blackPhoneList(Map<String, Object> params) {
+        Integer pageNum = (Integer) params.get(Constant.PAGE_NUM);
+        Integer pageSize = (Integer) params.get(Constant.PAGE_SIZE);
+        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.orderBy("id desc");
+        return new PageInfo<>(blackPhoneMapper.selectListByMap(params));
+    }
+
+    @Override
+    public int saveBlackPhone(BlackPhone blackPhone) {
+        long now = Instant.now().getEpochSecond();
+        if (blackPhone.getId() == null) {
+            blackPhone.setCts(now);
+            blackPhone.setUts(now);
+            if (blackPhone.getStatus() == null) blackPhone.setStatus(2);
+            return blackPhoneMapper.insertSelective(blackPhone);
+        }
+        blackPhone.setUts(now);
+        return blackPhoneMapper.updateByPrimaryKeySelective(blackPhone);
+    }
+
+    @Override
+    public int deleteBlackPhone(Long id) {
+        return blackPhoneMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public PageInfo<Station> stationList(Map<String, Object> params) {
+        Integer pageNum = (Integer) params.get(Constant.PAGE_NUM);
+        Integer pageSize = (Integer) params.get(Constant.PAGE_SIZE);
+        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.orderBy(Constant.ID_DESC);
+        return new PageInfo<>(stationMapper.selectListByMap(params));
+    }
+
+    @Override
+    public int saveStation(Station station) {
+        long now = Instant.now().getEpochSecond();
+        if (station.getId() == null) {
+            station.setCts(now);
+            station.setUts(now);
+            if (station.getStatus() == null) station.setStatus(2);
+            return stationMapper.insertSelective(station);
+        }
+        station.setUts(now);
+        return stationMapper.updateByPrimaryKeySelective(station);
+    }
+
+    @Override
+    public int deleteStation(Long id) {
+        return stationMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public PageInfo<AiEngine> engineList(Map<String, Object> params) {
+        Integer pageNum = (Integer) params.get(Constant.PAGE_NUM);
+        Integer pageSize = (Integer) params.get(Constant.PAGE_SIZE);
+        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.orderBy(Constant.ID_ASC);
+        return new PageInfo<>(aiEngineMapper.selectListByMap(params));
+    }
+
+    @Override
+    public int saveEngine(AiEngine engine) {
+        long now = Instant.now().getEpochSecond();
+        if (engine.getId() == null) {
+            engine.setCts(now);
+            engine.setUts(now);
+            if (engine.getStatus() == null) engine.setStatus(2);
+            return aiEngineMapper.insertSelective(engine);
+        }
+        engine.setUts(now);
+        return aiEngineMapper.updateByPrimaryKeySelective(engine);
+    }
+
+    @Override
+    public int deleteEngine(Long id) {
+        return aiEngineMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public PageInfo<PhoneArea> phoneAreaList(Map<String, Object> params) {
+        Integer pageNum = (Integer) params.get(Constant.PAGE_NUM);
+        Integer pageSize = (Integer) params.get(Constant.PAGE_SIZE);
+        PageHelper.startPage(pageNum, pageSize);
+        PageHelper.orderBy(Constant.ID_ASC);
+        return new PageInfo<>(phoneAreaMapper.selectListByMap(params));
     }
 
     @Override

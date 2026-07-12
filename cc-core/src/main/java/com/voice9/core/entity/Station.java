@@ -32,6 +32,11 @@ public class Station implements Serializable {
     /**
      *
      */
+    private String appName;
+
+    /**
+     *
+     */
     private Integer applicationType;
 
     /**
@@ -96,6 +101,14 @@ public class Station implements Serializable {
 
     public void setApplicationId(Integer applicationId) {
         this.applicationId = applicationId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public Integer getApplicationType() {

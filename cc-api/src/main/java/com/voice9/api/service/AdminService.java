@@ -4,7 +4,11 @@ import com.github.pagehelper.PageInfo;
 import com.voice9.core.entity.AdminMenu;
 import com.voice9.core.entity.AdminRole;
 import com.voice9.core.entity.AdminUser;
+import com.voice9.core.entity.AiEngine;
+import com.voice9.core.entity.BlackPhone;
+import com.voice9.core.entity.PhoneArea;
 import com.voice9.core.entity.SipGateway;
+import com.voice9.core.entity.Station;
 import com.voice9.core.po.AdminLoginResult;
 import com.voice9.core.po.MenusPo;
 import com.voice9.core.po.RolePo;
@@ -141,5 +145,54 @@ public interface AdminService extends BaseService<AdminUser> {
      */
     Integer saveUserRoles(Long userId, List<Long> roleIds, Long companyId);
 
+    /**
+     * 号码归属地列表
+     */
+    PageInfo<PhoneArea> phoneAreaList(Map<String, Object> params);
+
+    /**
+     * 黑名单列表
+     */
+    PageInfo<BlackPhone> blackPhoneList(Map<String, Object> params);
+
+    /**
+     * 保存黑名单
+     */
+    int saveBlackPhone(BlackPhone blackPhone);
+
+    /**
+     * 删除黑名单
+     */
+    int deleteBlackPhone(Long id);
+
+    /**
+     * 模块站点列表
+     */
+    PageInfo<Station> stationList(Map<String, Object> params);
+
+    /**
+     * 保存模块站点
+     */
+    int saveStation(Station station);
+
+    /**
+     * 删除模块站点
+     */
+    int deleteStation(Long id);
+
+    /**
+     * AI引擎列表
+     */
+    PageInfo<AiEngine> engineList(Map<String, Object> params);
+
+    /**
+     * 保存AI引擎
+     */
+    int saveEngine(AiEngine engine);
+
+    /**
+     * 删除AI引擎
+     */
+    int deleteEngine(Long id);
 
 }

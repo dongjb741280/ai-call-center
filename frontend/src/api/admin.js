@@ -163,3 +163,28 @@ export const deleteCompany = (id) => {
   })
 }
 
+// SIP网关管理
+export const getSipGatewayList = (params) => {
+  return request({
+    url: '/cc-api/admin/sipGateway',
+    method: 'get',
+    params
+  })
+}
+
+export const saveSipGateway = (data) => {
+  return request({
+    url: '/cc-api/admin/sipGateway',
+    method: 'post',
+    data
+  })
+}
+
+export const deleteSipGateway = (ids) => {
+  return request({
+    url: '/cc-api/admin/sipGateway',
+    method: 'delete',
+    data: ids
+  })
+}
+

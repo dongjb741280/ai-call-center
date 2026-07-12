@@ -9,6 +9,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/softphone',
+    name: 'SoftPhone',
+    component: () => import('@/views/SoftPhone.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/Login.vue'),
@@ -95,6 +101,24 @@ const routes = [
             name: 'AdminAiEngine',
             component: () => import('@/views/admin/AiEngine.vue'),
             meta: { title: 'ai引擎', icon: 'Cpu' }
+          },
+          {
+            path: 'sip-numbers',
+            name: 'AdminSipNumbers',
+            component: () => import('@/views/admin/SipNumbers.vue'),
+            meta: { title: 'SIP号码管理', icon: 'Phone' }
+          },
+          {
+            path: 'display-numbers',
+            name: 'AdminDisplayNumbers',
+            component: () => import('@/views/admin/DisplayNumbers.vue'),
+            meta: { title: '显号管理', icon: 'PhoneFilled' }
+          },
+          {
+            path: 'skills',
+            name: 'AdminSkills',
+            component: () => import('@/views/admin/Skills.vue'),
+            meta: { title: '技能管理', icon: 'MagicStick' }
           }
         ]
       },
@@ -116,6 +140,12 @@ const routes = [
             meta: { title: '技能组管理', icon: 'UserFilled' }
           }
         ]
+      },
+      {
+        path: '/softphone',
+        name: 'SoftPhoneMenu',
+        component: () => import('@/views/SoftPhone.vue'),
+        meta: { title: '软电话', icon: 'PhoneFilled' }
       },
       {
         path: '/call',

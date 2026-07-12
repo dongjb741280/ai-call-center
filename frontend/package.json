@@ -13,6 +13,7 @@
     "@element-plus/icons-vue": "^2.1.0",
     "axios": "^1.5.0",
     "bcryptjs": "^3.0.2",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.9",
     "echarts": "^5.4.3",
     "element-plus": "^2.3.8",
@@ -31,4 +32,3 @@
     "vite": "^4.4.9"
   }
 }
-

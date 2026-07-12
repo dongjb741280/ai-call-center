@@ -50,6 +50,36 @@ export const getCallDetail = (callId) => {
   })
 }
 
+// 保持/取消保持
+export const holdCall = () => {
+  return request({
+    url: '/fs-api/cti/call/hold',
+    method: 'post'
+  })
+}
+
+export const cancelHold = () => {
+  return request({
+    url: '/fs-api/cti/call/cancelHold',
+    method: 'post'
+  })
+}
+
+// 静音/取消静音
+export const readyMute = () => {
+  return request({
+    url: '/fs-api/cti/call/readyMute',
+    method: 'post'
+  })
+}
+
+export const cancelMute = () => {
+  return request({
+    url: '/fs-api/cti/call/cancelMute',
+    method: 'post'
+  })
+}
+
 // 呼叫统计
 export const getCallStatistics = (params) => {
   return request({

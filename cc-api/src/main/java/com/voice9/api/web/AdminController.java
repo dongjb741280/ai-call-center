@@ -5,7 +5,11 @@ import com.github.pagehelper.PageInfo;
 import com.voice9.core.entity.AdminRole;
 import com.voice9.core.entity.Company;
 import com.voice9.core.entity.AdminUser;
+import com.voice9.core.entity.AiEngine;
+import com.voice9.core.entity.BlackPhone;
+import com.voice9.core.entity.PhoneArea;
 import com.voice9.core.entity.SipGateway;
+import com.voice9.core.entity.Station;
 import com.voice9.core.enums.ErrorCode;
 import com.voice9.core.po.AdminAccountInfo;
 import com.voice9.core.po.CommonResponse;
@@ -354,6 +358,103 @@ public class AdminController extends BaseController {
         return new CommonResponse(adminService.deleteById(id));
     }
 
+
+    /**
+     * AI引擎列表
+     */
+    @GetMapping("engine")
+    public CommonResponse<PageInfo<AiEngine>> engineList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        return new CommonResponse<>(adminService.engineList(params));
+    }
+
+    /**
+     * 保存AI引擎
+     */
+    @PostMapping("engine")
+    public CommonResponse<Integer> saveEngine(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                               @RequestBody AiEngine engine) {
+        return new CommonResponse<>(adminService.saveEngine(engine));
+    }
+
+    /**
+     * 删除AI引擎
+     */
+    @DeleteMapping("engine/{id}")
+    public CommonResponse<Integer> deleteEngine(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                 @PathVariable Long id) {
+        return new CommonResponse<>(adminService.deleteEngine(id));
+    }
+
+    /**
+     * 模块站点列表
+     */
+    @GetMapping("station")
+    public CommonResponse<PageInfo<Station>> stationList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        return new CommonResponse<>(adminService.stationList(params));
+    }
+
+    /**
+     * 保存模块站点
+     */
+    @PostMapping("station")
+    public CommonResponse<Integer> saveStation(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                @RequestBody Station station) {
+        return new CommonResponse<>(adminService.saveStation(station));
+    }
+
+    /**
+     * 删除模块站点
+     */
+    @DeleteMapping("station/{id}")
+    public CommonResponse<Integer> deleteStation(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                  @PathVariable Long id) {
+        return new CommonResponse<>(adminService.deleteStation(id));
+    }
+
+    /**
+     * 黑名单列表
+     */
+    @GetMapping("blackPhone")
+    public CommonResponse<PageInfo<BlackPhone>> blackPhoneList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        return new CommonResponse<>(adminService.blackPhoneList(params));
+    }
+
+    /**
+     * 保存黑名单
+     */
+    @PostMapping("blackPhone")
+    public CommonResponse<Integer> saveBlackPhone(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                   @RequestBody BlackPhone blackPhone) {
+        if (adminAccountInfo.getCompanyId() != 1L) {
+            blackPhone.setCompanyId(adminAccountInfo.getBindCompanyId());
+        }
+        return new CommonResponse<>(adminService.saveBlackPhone(blackPhone));
+    }
+
+    /**
+     * 删除黑名单
+     */
+    @DeleteMapping("blackPhone/{id}")
+    public CommonResponse<Integer> deleteBlackPhone(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                     @PathVariable Long id) {
+        return new CommonResponse<>(adminService.deleteBlackPhone(id));
+    }
+
+    /**
+     * 号码归属地列表
+     */
+    @GetMapping("area")
+    public CommonResponse<PageInfo<PhoneArea>> areaList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                         PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        return new CommonResponse<>(adminService.phoneAreaList(params));
+    }
 
     /**
      * 1.5.5 上传头像
