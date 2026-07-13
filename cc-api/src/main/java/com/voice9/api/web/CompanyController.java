@@ -3,20 +3,30 @@ package com.voice9.api.web;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.voice9.api.vo.excel.AgentImportExcel;
 import com.voice9.core.entity.*;
+import com.voice9.core.mapper.VdnCodeMapper;
+import com.voice9.core.mapper.VdnConfigMapper;
+import com.voice9.core.mapper.VdnScheduleMapper;
+import com.voice9.core.mapper.VdnPhoneMapper;
+import com.voice9.core.mapper.OverflowConfigMapper;
+import com.voice9.core.mapper.OverflowExpMapper;
+import com.voice9.core.mapper.IvrWorkflowMapper;
 import com.voice9.core.po.*;
 import com.voice9.core.vo.*;
 import com.voice9.core.page.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +38,27 @@ import java.util.Map;
 @RequestMapping("config")
 public class CompanyController extends BaseController {
     protected Logger logger = LoggerFactory.getLogger(CompanyController.class);
+
+    @Autowired
+    private VdnCodeMapper vdnCodeMapper;
+
+    @Autowired
+    private VdnConfigMapper vdnConfigMapper;
+
+    @Autowired
+    private VdnScheduleMapper vdnScheduleMapper;
+
+    @Autowired
+    private VdnPhoneMapper vdnPhoneMapper;
+
+    @Autowired
+    private OverflowConfigMapper overflowConfigMapper;
+
+    @Autowired
+    private OverflowExpMapper overflowExpMapper;
+
+    @Autowired
+    private IvrWorkflowMapper ivrWorkflowMapper;
 
 
 
@@ -740,5 +771,444 @@ public class CompanyController extends BaseController {
         return new CommonResponse(agentService.agentImport(agentImportExcels, adminAccountInfo.getBindCompanyId()));
     }
 
+    // ==================== 路由子码(VDN)管理 ====================
+
+    /**
+     * VDN列表
+     */
+    @GetMapping("vdn")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<VdnCodePo>> vdnList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                        PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<VdnCodePo> list = (List<VdnCodePo>) (List<?>) vdnCodeMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    /**
+     * VDN详情
+     */
+    @GetMapping("vdn/{id}")
+    public CommonResponse<VdnCodePo> vdnDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                @PathVariable Long id) {
+        VdnCodePo po = (VdnCodePo) vdnCodeMapper.selectByPrimaryKey(id);
+        if (po == null) {
+            return new CommonResponse<>(com.voice9.core.enums.ErrorCode.DATA_NOT_EXIST);
+        }
+        return new CommonResponse<>(po);
+    }
+
+    /**
+     * 新增VDN
+     */
+    @PostMapping("vdn")
+    public CommonResponse addVdn(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                  @RequestBody VdnCode vdnCode) {
+        vdnCode.setId(null);
+        vdnCode.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnCode.setCts(Instant.now().getEpochSecond());
+        vdnCode.setStatus(vdnCode.getStatus() != null ? vdnCode.getStatus() : 1);
+        vdnCodeMapper.insertSelective(vdnCode);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改VDN
+     */
+    @PutMapping("vdn/{id}")
+    public CommonResponse updateVdn(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                     @PathVariable Long id, @RequestBody VdnCode vdnCode) {
+        vdnCode.setId(id);
+        vdnCode.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnCode.setUts(Instant.now().getEpochSecond());
+        vdnCodeMapper.updateByPrimaryKeySelective(vdnCode);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除VDN
+     */
+    @DeleteMapping("vdn/{id}")
+    public CommonResponse deleteVdn(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                     @PathVariable Long id) {
+        VdnCode vdnCode = new VdnCode();
+        vdnCode.setId(id);
+        vdnCode.setStatus(0);
+        vdnCode.setUts(Instant.now().getEpochSecond());
+        vdnCodeMapper.updateByPrimaryKeySelective(vdnCode);
+        return new CommonResponse<>();
+    }
+
+    // ==================== VDN子码配置管理 ====================
+
+    /**
+     * VDN子码配置列表
+     */
+    @GetMapping("vdn/{vdnId}/config")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<List<VdnSchedulePo>> vdnConfigList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                              @PathVariable Long vdnId) {
+        List<VdnSchedulePo> list = (List<VdnSchedulePo>) (List<?>) vdnConfigMapper.selectByVdn(vdnId);
+        return new CommonResponse<>(list);
+    }
+
+    /**
+     * 新增VDN子码配置
+     */
+    @PostMapping("vdn/{vdnId}/config")
+    public CommonResponse addVdnConfig(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                        @PathVariable Long vdnId, @RequestBody VdnConfig vdnConfig) {
+        vdnConfig.setId(null);
+        vdnConfig.setVdnId(vdnId);
+        vdnConfig.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnConfig.setCts(Instant.now().getEpochSecond());
+        vdnConfig.setStatus(vdnConfig.getStatus() != null ? vdnConfig.getStatus() : 1);
+        vdnConfigMapper.insertSelective(vdnConfig);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改VDN子码配置
+     */
+    @PutMapping("vdn/config/{id}")
+    public CommonResponse updateVdnConfig(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                           @PathVariable Long id, @RequestBody VdnConfig vdnConfig) {
+        vdnConfig.setId(id);
+        vdnConfig.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnConfig.setUts(Instant.now().getEpochSecond());
+        vdnConfigMapper.updateByPrimaryKeySelective(vdnConfig);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除VDN子码配置
+     */
+    @DeleteMapping("vdn/config/{id}")
+    public CommonResponse deleteVdnConfig(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                           @PathVariable Long id) {
+        VdnConfig vdnConfig = new VdnConfig();
+        vdnConfig.setId(id);
+        vdnConfig.setStatus(0);
+        vdnConfig.setUts(Instant.now().getEpochSecond());
+        vdnConfigMapper.updateByPrimaryKeySelective(vdnConfig);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 日程管理 ====================
+
+    /**
+     * 日程列表
+     */
+    @GetMapping("schedule")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<VdnSchedule>> scheduleList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                               PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<VdnSchedule> list = (List<VdnSchedule>) (List<?>) vdnScheduleMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    /**
+     * 日程详情
+     */
+    @GetMapping("schedule/{id}")
+    public CommonResponse<VdnSchedule> scheduleDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                       @PathVariable Long id) {
+        VdnSchedule schedule = vdnScheduleMapper.selectByPrimaryKey(id);
+        if (schedule == null) {
+            return new CommonResponse<>(com.voice9.core.enums.ErrorCode.DATA_NOT_EXIST);
+        }
+        return new CommonResponse<>(schedule);
+    }
+
+    /**
+     * 新增日程
+     */
+    @PostMapping("schedule")
+    public CommonResponse addSchedule(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                       @RequestBody VdnSchedule schedule) {
+        schedule.setId(null);
+        schedule.setCompanyId(adminAccountInfo.getBindCompanyId());
+        schedule.setCts(Instant.now().getEpochSecond());
+        schedule.setStatus(schedule.getStatus() != null ? schedule.getStatus() : 1);
+        vdnScheduleMapper.insertSelective(schedule);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改日程
+     */
+    @PutMapping("schedule/{id}")
+    public CommonResponse updateSchedule(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id, @RequestBody VdnSchedule schedule) {
+        schedule.setId(id);
+        schedule.setCompanyId(adminAccountInfo.getBindCompanyId());
+        schedule.setUts(Instant.now().getEpochSecond());
+        vdnScheduleMapper.updateByPrimaryKeySelective(schedule);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除日程
+     */
+    @DeleteMapping("schedule/{id}")
+    public CommonResponse deleteSchedule(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id) {
+        VdnSchedule schedule = new VdnSchedule();
+        schedule.setId(id);
+        schedule.setStatus(0);
+        schedule.setUts(Instant.now().getEpochSecond());
+        vdnScheduleMapper.updateByPrimaryKeySelective(schedule);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 接入号码管理 ====================
+
+    /**
+     * 接入号码列表
+     */
+    @GetMapping("vdnPhone")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<VdnPhone>> vdnPhoneList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                            PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<VdnPhone> list = (List<VdnPhone>) (List<?>) vdnPhoneMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    /**
+     * 接入号码详情
+     */
+    @GetMapping("vdnPhone/{id}")
+    public CommonResponse<VdnPhone> vdnPhoneDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                     @PathVariable Long id) {
+        VdnPhone phone = vdnPhoneMapper.selectByPrimaryKey(id);
+        if (phone == null) {
+            return new CommonResponse<>(com.voice9.core.enums.ErrorCode.DATA_NOT_EXIST);
+        }
+        return new CommonResponse<>(phone);
+    }
+
+    /**
+     * 新增接入号码
+     */
+    @PostMapping("vdnPhone")
+    public CommonResponse addVdnPhone(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                       @RequestBody VdnPhone vdnPhone) {
+        vdnPhone.setId(null);
+        vdnPhone.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnPhone.setCts(Instant.now().getEpochSecond());
+        vdnPhone.setStatus(vdnPhone.getStatus() != null ? vdnPhone.getStatus() : 1);
+        vdnPhoneMapper.insertSelective(vdnPhone);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改接入号码
+     */
+    @PutMapping("vdnPhone/{id}")
+    public CommonResponse updateVdnPhone(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id, @RequestBody VdnPhone vdnPhone) {
+        vdnPhone.setId(id);
+        vdnPhone.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnPhone.setUts(Instant.now().getEpochSecond());
+        vdnPhoneMapper.updateByPrimaryKeySelective(vdnPhone);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除接入号码
+     */
+    @DeleteMapping("vdnPhone/{id}")
+    public CommonResponse deleteVdnPhone(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id) {
+        VdnPhone vdnPhone = new VdnPhone();
+        vdnPhone.setId(id);
+        vdnPhone.setStatus(0);
+        vdnPhone.setUts(Instant.now().getEpochSecond());
+        vdnPhoneMapper.updateByPrimaryKeySelective(vdnPhone);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 排队策略管理 ====================
+
+    /**
+     * 排队策略列表
+     */
+    @GetMapping("overflow")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<OverflowConfig>> overflowList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                  PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<OverflowConfig> list = (List<OverflowConfig>) (List<?>) overflowConfigMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    /**
+     * 排队策略详情
+     */
+    @GetMapping("overflow/{id}")
+    public CommonResponse<OverflowConfig> overflowDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          @PathVariable Long id) {
+        return new CommonResponse<>(overflowConfigMapper.selectByPrimaryKey(id));
+    }
+
+    /**
+     * 新增排队策略
+     */
+    @PostMapping("overflow")
+    public CommonResponse addOverflow(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                       @RequestBody OverflowConfig config) {
+        config.setId(null);
+        config.setCompanyId(adminAccountInfo.getBindCompanyId());
+        config.setCts(Instant.now().getEpochSecond());
+        overflowConfigMapper.insertSelective(config);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改排队策略
+     */
+    @PutMapping("overflow/{id}")
+    public CommonResponse updateOverflow(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id, @RequestBody OverflowConfig config) {
+        config.setId(id);
+        config.setCompanyId(adminAccountInfo.getBindCompanyId());
+        config.setUts(Instant.now().getEpochSecond());
+        overflowConfigMapper.updateByPrimaryKeySelective(config);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除排队策略
+     */
+    @DeleteMapping("overflow/{id}")
+    public CommonResponse deleteOverflow(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id) {
+        overflowConfigMapper.deleteByPrimaryKey(id);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 排队策略前置条件 ====================
+
+    /**
+     * 前置条件列表
+     */
+    @GetMapping("overflow/{overflowId}/exp")
+    public CommonResponse<List<OverflowExp>> overflowExpList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                              @PathVariable Long overflowId) {
+        return new CommonResponse<>(overflowExpMapper.selectByOverflowId(overflowId));
+    }
+
+    /**
+     * 新增前置条件
+     */
+    @PostMapping("overflow/{overflowId}/exp")
+    public CommonResponse addOverflowExp(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long overflowId, @RequestBody OverflowExp exp) {
+        exp.setId(null);
+        exp.setOverflowId(overflowId);
+        exp.setCompanyId(adminAccountInfo.getBindCompanyId());
+        exp.setCts(Instant.now().getEpochSecond());
+        exp.setStatus(exp.getStatus() != null ? exp.getStatus() : 1);
+        overflowExpMapper.insertSelective(exp);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改前置条件
+     */
+    @PutMapping("overflow/exp/{id}")
+    public CommonResponse updateOverflowExp(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                             @PathVariable Long id, @RequestBody OverflowExp exp) {
+        exp.setId(id);
+        exp.setCompanyId(adminAccountInfo.getBindCompanyId());
+        exp.setUts(Instant.now().getEpochSecond());
+        overflowExpMapper.updateByPrimaryKeySelective(exp);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除前置条件
+     */
+    @DeleteMapping("overflow/exp/{id}")
+    public CommonResponse deleteOverflowExp(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                             @PathVariable Long id) {
+        OverflowExp exp = new OverflowExp();
+        exp.setId(id);
+        exp.setStatus(0);
+        exp.setUts(Instant.now().getEpochSecond());
+        overflowExpMapper.updateByPrimaryKeySelective(exp);
+        return new CommonResponse<>();
+    }
+
+    // ==================== IVR管理 ====================
+
+    /**
+     * IVR列表
+     */
+    @GetMapping("ivr")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<IvrWorkflow>> ivrList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<IvrWorkflow> list = (List<IvrWorkflow>) (List<?>) ivrWorkflowMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    /**
+     * IVR详情
+     */
+    @GetMapping("ivr/{id}")
+    public CommonResponse<IvrWorkflow> ivrDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                  @PathVariable Long id) {
+        return new CommonResponse<>(ivrWorkflowMapper.selectByPrimaryKey(id));
+    }
+
+    /**
+     * 新增IVR
+     */
+    @PostMapping("ivr")
+    public CommonResponse addIvr(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                  @RequestBody IvrWorkflow ivr) {
+        ivr.setId(null);
+        ivr.setCompanyId(adminAccountInfo.getBindCompanyId());
+        ivr.setCts(Instant.now().getEpochSecond());
+        ivrWorkflowMapper.insertSelective(ivr);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改IVR
+     */
+    @PutMapping("ivr/{id}")
+    public CommonResponse updateIvr(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                     @PathVariable Long id, @RequestBody IvrWorkflow ivr) {
+        ivr.setId(id);
+        ivr.setCompanyId(adminAccountInfo.getBindCompanyId());
+        ivr.setUts(Instant.now().getEpochSecond());
+        ivrWorkflowMapper.updateByPrimaryKeySelective(ivr);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除IVR
+     */
+    @DeleteMapping("ivr/{id}")
+    public CommonResponse deleteIvr(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                     @PathVariable Long id) {
+        ivrWorkflowMapper.deleteByPrimaryKey(id);
+        return new CommonResponse<>();
+    }
 
 }

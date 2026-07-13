@@ -44,6 +44,26 @@ public class VdnPhone implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 主叫前缀去除
+     */
+    private String callerPrefix;
+
+    /**
+     * 被叫前缀去除
+     */
+    private String calledPrefix;
+
+    /**
+     * 被叫后缀去除
+     */
+    private String calledSuffix;
+
+    /**
+     * ringing
+     */
+    private String ringing;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -101,6 +121,15 @@ public class VdnPhone implements Serializable {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    public String getCallerPrefix() { return callerPrefix; }
+    public void setCallerPrefix(String callerPrefix) { this.callerPrefix = callerPrefix == null ? null : callerPrefix.trim(); }
+    public String getCalledPrefix() { return calledPrefix; }
+    public void setCalledPrefix(String calledPrefix) { this.calledPrefix = calledPrefix == null ? null : calledPrefix.trim(); }
+    public String getCalledSuffix() { return calledSuffix; }
+    public void setCalledSuffix(String calledSuffix) { this.calledSuffix = calledSuffix == null ? null : calledSuffix.trim(); }
+    public String getRinging() { return ringing; }
+    public void setRinging(String ringing) { this.ringing = ringing == null ? null : ringing.trim(); }
 
     @Override
     public String toString() {

@@ -176,4 +176,15 @@
             lineup_expression = #{lineupExpression,jdbcType=VARCHAR}
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from cc_overflow_config
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="name!=null">and name like concat('%', #{name}, '%')</if>
+            <if test="handleType!=null">and handle_type = #{handleType}</if>
+        </where>
+        order by id desc
+    </select>
 </mapper>

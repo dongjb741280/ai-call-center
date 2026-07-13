@@ -104,6 +104,11 @@ public class VdnSchedule implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 时间类型(上班/下班/周末)
+     */
+    private String workType;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -256,6 +261,14 @@ public class VdnSchedule implements Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(String workType) {
+        this.workType = workType == null ? null : workType.trim();
     }
 
     @Override

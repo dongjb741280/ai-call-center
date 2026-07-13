@@ -21,11 +21,12 @@
         <result column="sat" jdbcType="INTEGER" property="sat"/>
         <result column="sun" jdbcType="INTEGER" property="sun"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="work_type" jdbcType="VARCHAR" property="workType"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
         , cts, uts, company_id, name, level_value, type, start_day, end_day, start_time,
-    end_time, mon, tue, wed, thu, fri, sat, sun, status
+    end_time, mon, tue, wed, thu, fri, sat, sun, status, work_type
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -45,13 +46,13 @@
                                         start_day, end_day, start_time,
                                         end_time, mon, tue,
                                         wed, thu, fri, sat,
-                                        sun, status)
+                                        sun, status, work_type)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
                 #{name,jdbcType=VARCHAR}, #{levelValue,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},
                 #{startDay,jdbcType=VARCHAR}, #{endDay,jdbcType=VARCHAR}, #{startTime,jdbcType=VARCHAR},
                 #{endTime,jdbcType=VARCHAR}, #{mon,jdbcType=INTEGER}, #{tue,jdbcType=INTEGER},
                 #{wed,jdbcType=INTEGER}, #{thu,jdbcType=INTEGER}, #{fri,jdbcType=INTEGER}, #{sat,jdbcType=INTEGER},
-                #{sun,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+                #{sun,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{workType,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.voice9.core.entity.VdnSchedule">
         insert into cc_vdn_schedule
@@ -113,6 +114,9 @@
             <if test="status != null">
                 status,
             </if>
+            <if test="workType != null">
+                work_type,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -171,6 +175,9 @@
             </if>
             <if test="status != null">
                 #{status,jdbcType=INTEGER},
+            </if>
+            <if test="workType != null">
+                #{workType,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -231,6 +238,9 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
+            <if test="workType != null">
+                work_type = #{workType,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -253,7 +263,21 @@
             fri         = #{fri,jdbcType=INTEGER},
             sat         = #{sat,jdbcType=INTEGER},
             sun         = #{sun,jdbcType=INTEGER},
-            status      = #{status,jdbcType=INTEGER}
+            status      = #{status,jdbcType=INTEGER},
+            work_type   = #{workType,jdbcType=VARCHAR}
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cc_vdn_schedule
+        <where>
+            <if test="companyId!=null">and company_id = #{companyId}</if>
+            <if test="name!=null">and name like concat('%', #{name}, '%')</if>
+            <if test="type!=null">and type = #{type}</if>
+            <if test="status!=null">and status = #{status}</if>
+        </where>
+        order by id desc
+    </select>
 </mapper>

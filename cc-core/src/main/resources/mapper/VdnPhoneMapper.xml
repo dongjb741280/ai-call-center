@@ -9,121 +9,89 @@
         <result column="vdn_id" jdbcType="BIGINT" property="vdnId"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="caller_prefix" jdbcType="VARCHAR" property="callerPrefix"/>
+        <result column="called_prefix" jdbcType="VARCHAR" property="calledPrefix"/>
+        <result column="called_suffix" jdbcType="VARCHAR" property="calledSuffix"/>
+        <result column="ringing" jdbcType="VARCHAR" property="ringing"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id
-        , cts, uts, company_id, vdn_id, phone, status
+        id, cts, uts, company_id, vdn_id, phone, status, caller_prefix, called_prefix, called_suffix, ringing
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from cc_vdn_phone
-        where id = #{id,jdbcType=BIGINT}
+        select <include refid="Base_Column_List"/>
+        from cc_vdn_phone where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete
-        from cc_vdn_phone
-        where id = #{id,jdbcType=BIGINT}
+        delete from cc_vdn_phone where id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" parameterType="com.voice9.core.entity.VdnPhone">
-        insert into cc_vdn_phone (id, cts, uts, company_id,
-                                  vdn_id, phone, status)
+        insert into cc_vdn_phone (id, cts, uts, company_id, vdn_id, phone, status, caller_prefix, called_prefix, called_suffix, ringing)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
-                #{vdnId,jdbcType=BIGINT}, #{phone,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER})
+                #{vdnId,jdbcType=BIGINT}, #{phone,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
+                #{callerPrefix,jdbcType=VARCHAR}, #{calledPrefix,jdbcType=VARCHAR}, #{calledSuffix,jdbcType=VARCHAR}, #{ringing,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.voice9.core.entity.VdnPhone">
         insert into cc_vdn_phone
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="cts != null">
-                cts,
-            </if>
-            <if test="uts != null">
-                uts,
-            </if>
-            <if test="companyId != null">
-                company_id,
-            </if>
-            <if test="vdnId != null">
-                vdn_id,
-            </if>
-            <if test="phone != null">
-                phone,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
+            <if test="id != null">id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="vdnId != null">vdn_id,</if>
+            <if test="phone != null">phone,</if>
+            <if test="status != null">status,</if>
+            <if test="callerPrefix != null">caller_prefix,</if>
+            <if test="calledPrefix != null">called_prefix,</if>
+            <if test="calledSuffix != null">called_suffix,</if>
+            <if test="ringing != null">ringing,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="cts != null">
-                #{cts,jdbcType=BIGINT},
-            </if>
-            <if test="uts != null">
-                #{uts,jdbcType=BIGINT},
-            </if>
-            <if test="companyId != null">
-                #{companyId,jdbcType=BIGINT},
-            </if>
-            <if test="vdnId != null">
-                #{vdnId,jdbcType=BIGINT},
-            </if>
-            <if test="phone != null">
-                #{phone,jdbcType=VARCHAR},
-            </if>
-            <if test="status != null">
-                #{status,jdbcType=INTEGER},
-            </if>
+            <if test="id != null">#{id,jdbcType=BIGINT},</if>
+            <if test="cts != null">#{cts,jdbcType=BIGINT},</if>
+            <if test="uts != null">#{uts,jdbcType=BIGINT},</if>
+            <if test="companyId != null">#{companyId,jdbcType=BIGINT},</if>
+            <if test="vdnId != null">#{vdnId,jdbcType=BIGINT},</if>
+            <if test="phone != null">#{phone,jdbcType=VARCHAR},</if>
+            <if test="status != null">#{status,jdbcType=INTEGER},</if>
+            <if test="callerPrefix != null">#{callerPrefix,jdbcType=VARCHAR},</if>
+            <if test="calledPrefix != null">#{calledPrefix,jdbcType=VARCHAR},</if>
+            <if test="calledSuffix != null">#{calledSuffix,jdbcType=VARCHAR},</if>
+            <if test="ringing != null">#{ringing,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.VdnPhone">
         update cc_vdn_phone
         <set>
-            <if test="cts != null">
-                cts = #{cts,jdbcType=BIGINT},
-            </if>
-            <if test="uts != null">
-                uts = #{uts,jdbcType=BIGINT},
-            </if>
-            <if test="companyId != null">
-                company_id = #{companyId,jdbcType=BIGINT},
-            </if>
-            <if test="vdnId != null">
-                vdn_id = #{vdnId,jdbcType=BIGINT},
-            </if>
-            <if test="phone != null">
-                phone = #{phone,jdbcType=VARCHAR},
-            </if>
-            <if test="status != null">
-                status = #{status,jdbcType=INTEGER},
-            </if>
+            <if test="cts != null">cts = #{cts,jdbcType=BIGINT},</if>
+            <if test="uts != null">uts = #{uts,jdbcType=BIGINT},</if>
+            <if test="companyId != null">company_id = #{companyId,jdbcType=BIGINT},</if>
+            <if test="vdnId != null">vdn_id = #{vdnId,jdbcType=BIGINT},</if>
+            <if test="phone != null">phone = #{phone,jdbcType=VARCHAR},</if>
+            <if test="status != null">status = #{status,jdbcType=INTEGER},</if>
+            <if test="callerPrefix != null">caller_prefix = #{callerPrefix,jdbcType=VARCHAR},</if>
+            <if test="calledPrefix != null">called_prefix = #{calledPrefix,jdbcType=VARCHAR},</if>
+            <if test="calledSuffix != null">called_suffix = #{calledSuffix,jdbcType=VARCHAR},</if>
+            <if test="ringing != null">ringing = #{ringing,jdbcType=VARCHAR},</if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.VdnPhone">
         update cc_vdn_phone
-        set cts        = #{cts,jdbcType=BIGINT},
-            uts        = #{uts,jdbcType=BIGINT},
-            company_id = #{companyId,jdbcType=BIGINT},
-            vdn_id     = #{vdnId,jdbcType=BIGINT},
-            phone      = #{phone,jdbcType=VARCHAR},
-            status     = #{status,jdbcType=INTEGER}
+        set cts = #{cts,jdbcType=BIGINT}, uts = #{uts,jdbcType=BIGINT}, company_id = #{companyId,jdbcType=BIGINT},
+            vdn_id = #{vdnId,jdbcType=BIGINT}, phone = #{phone,jdbcType=VARCHAR}, status = #{status,jdbcType=INTEGER},
+            caller_prefix = #{callerPrefix,jdbcType=VARCHAR}, called_prefix = #{calledPrefix,jdbcType=VARCHAR},
+            called_suffix = #{calledSuffix,jdbcType=VARCHAR}, ringing = #{ringing,jdbcType=VARCHAR}
         where id = #{id,jdbcType=BIGINT}
     </update>
-
     <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
+        select <include refid="Base_Column_List"/>
         from cc_vdn_phone
         <where>
             <if test="companyId!=null">company_id = #{companyId}</if>
-            <if test="vdnId!=null">vdn_id = #{vdnId}</if>
-            <if test="phone!=null">phone = #{phone}</if>
-            <if test="status!=null">status = #{status}</if>
+            <if test="vdnId!=null">and vdn_id = #{vdnId}</if>
+            <if test="phone!=null">and phone like concat('%', #{phone}, '%')</if>
+            <if test="status!=null">and status = #{status}</if>
         </where>
+        order by id desc
     </select>
 </mapper>

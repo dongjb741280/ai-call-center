@@ -245,3 +245,142 @@ export const getPlaybackList = (params) => {
 export const getPhoneAreaList = (params) => {
   return request({ url: '/cc-api/admin/area', method: 'get', params })
 }
+
+// ==================== 路由子码(VDN)管理 ====================
+export const getVdnList = (params) => {
+  return request({ url: '/cc-api/config/vdn', method: 'get', params })
+}
+
+export const getVdnDetail = (id) => {
+  return request({ url: `/cc-api/config/vdn/${id}`, method: 'get' })
+}
+
+export const saveVdn = (data) => {
+  return request({ url: '/cc-api/config/vdn', method: 'post', data })
+}
+
+export const updateVdn = (id, data) => {
+  return request({ url: `/cc-api/config/vdn/${id}`, method: 'put', data })
+}
+
+export const deleteVdn = (id) => {
+  return request({ url: `/cc-api/config/vdn/${id}`, method: 'delete' })
+}
+
+// ==================== VDN子码配置管理 ====================
+export const getVdnConfigList = (vdnId) => {
+  return request({ url: `/cc-api/config/vdn/${vdnId}/config`, method: 'get' })
+}
+
+export const saveVdnConfig = (vdnId, data) => {
+  return request({ url: `/cc-api/config/vdn/${vdnId}/config`, method: 'post', data })
+}
+
+export const updateVdnConfig = (id, data) => {
+  return request({ url: `/cc-api/config/vdn/config/${id}`, method: 'put', data })
+}
+
+export const deleteVdnConfig = (id) => {
+  return request({ url: `/cc-api/config/vdn/config/${id}`, method: 'delete' })
+}
+
+// ==================== 日程管理 ====================
+export const getScheduleList = (params) => {
+  return request({ url: '/cc-api/config/schedule', method: 'get', params })
+}
+
+export const getScheduleDetail = (id) => {
+  return request({ url: `/cc-api/config/schedule/${id}`, method: 'get' })
+}
+
+export const saveSchedule = (data) => {
+  return request({ url: '/cc-api/config/schedule', method: 'post', data })
+}
+
+export const updateSchedule = (id, data) => {
+  return request({ url: `/cc-api/config/schedule/${id}`, method: 'put', data })
+}
+
+export const deleteSchedule = (id) => {
+  return request({ url: `/cc-api/config/schedule/${id}`, method: 'delete' })
+}
+
+// ==================== 接入号码管理 ====================
+export const getVdnPhoneList = (params) => {
+  return request({ url: '/cc-api/config/vdnPhone', method: 'get', params })
+}
+
+export const getVdnPhoneDetail = (id) => {
+  return request({ url: `/cc-api/config/vdnPhone/${id}`, method: 'get' })
+}
+
+export const saveVdnPhone = (data) => {
+  return request({ url: '/cc-api/config/vdnPhone', method: 'post', data })
+}
+
+export const updateVdnPhone = (id, data) => {
+  return request({ url: `/cc-api/config/vdnPhone/${id}`, method: 'put', data })
+}
+
+export const deleteVdnPhone = (id) => {
+  return request({ url: `/cc-api/config/vdnPhone/${id}`, method: 'delete' })
+}
+
+// ==================== 排队策略管理 ====================
+export const getOverflowList = (params) => {
+  return request({ url: '/cc-api/config/overflow', method: 'get', params })
+}
+
+export const getOverflowDetail = (id) => {
+  return request({ url: `/cc-api/config/overflow/${id}`, method: 'get' })
+}
+
+export const saveOverflow = (data) => {
+  return request({ url: '/cc-api/config/overflow', method: 'post', data })
+}
+
+export const updateOverflow = (id, data) => {
+  return request({ url: `/cc-api/config/overflow/${id}`, method: 'put', data })
+}
+
+export const deleteOverflow = (id) => {
+  return request({ url: `/cc-api/config/overflow/${id}`, method: 'delete' })
+}
+
+// ==================== 排队策略前置条件 ====================
+export const getOverflowExpList = (overflowId) => {
+  return request({ url: `/cc-api/config/overflow/${overflowId}/exp`, method: 'get' })
+}
+
+export const saveOverflowExp = (overflowId, data) => {
+  return request({ url: `/cc-api/config/overflow/${overflowId}/exp`, method: 'post', data })
+}
+
+export const updateOverflowExp = (id, data) => {
+  return request({ url: `/cc-api/config/overflow/exp/${id}`, method: 'put', data })
+}
+
+export const deleteOverflowExp = (id) => {
+  return request({ url: `/cc-api/config/overflow/exp/${id}`, method: 'delete' })
+}
+
+// ==================== IVR管理 ====================
+export const getIvrList = (params) => {
+  return request({ url: '/cc-api/config/ivr', method: 'get', params })
+}
+
+export const getIvrDetail = (id) => {
+  return request({ url: `/cc-api/config/ivr/${id}`, method: 'get' })
+}
+
+export const saveIvr = (data) => {
+  return request({ url: '/cc-api/config/ivr', method: 'post', data })
+}
+
+export const updateIvr = (id, data) => {
+  return request({ url: `/cc-api/config/ivr/${id}`, method: 'put', data })
+}
+
+export const deleteIvr = (id) => {
+  return request({ url: `/cc-api/config/ivr/${id}`, method: 'delete' })
+}
