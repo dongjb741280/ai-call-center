@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.TaskStatMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskStat">
+        <result column="task_id" jdbcType="BIGINT" property="taskId"/>
+        <result column="task_name" jdbcType="VARCHAR" property="taskName"/>
+        <result column="transfer_name" jdbcType="VARCHAR" property="transferName"/>
+        <result column="stats_time" jdbcType="BIGINT" property="statsTime"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="list_total" jdbcType="INTEGER" property="listTotal"/>
+        <result column="dialed_count" jdbcType="INTEGER" property="dialedCount"/>
+        <result column="answered_count" jdbcType="INTEGER" property="answeredCount"/>
+        <result column="answer_rate" jdbcType="VARCHAR" property="answerRate"/>
+        <result column="pending_count" jdbcType="INTEGER" property="pendingCount"/>
+        <result column="in_call" jdbcType="INTEGER" property="inCall"/>
+        <result column="queue_count" jdbcType="INTEGER" property="queueCount"/>
+        <result column="signed_in_agents" jdbcType="INTEGER" property="signedInAgents"/>
+        <result column="idle_agents" jdbcType="INTEGER" property="idleAgents"/>
+        <result column="busy_agents" jdbcType="INTEGER" property="busyAgents"/>
+        <result column="after_call_agents" jdbcType="INTEGER" property="afterCallAgents"/>
+        <result column="abandoned_count" jdbcType="INTEGER" property="abandonedCount"/>
+    </resultMap>
+
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+            t.id as task_id,
+            t.name as task_name,
+            coalesce(t.transfer_name, t.transfer_type, '') as transfer_name,
+            greatest(t.uts, t.cts) as stats_time,
+            t.status,
+            t.total_count as list_total,
+            coalesce(t.dialed_count, 0) as dialed_count,
+            coalesce(t.answered_count, 0) as answered_count,
+            concat(
+                round(
+                    case when coalesce(t.dialed_count, 0) > 0
+                    then coalesce(t.answered_count, 0) * 100.0 / t.dialed_count
+                    else 0 end, 1
+                ), '%'
+            ) as answer_rate,
+            0 as pending_count,
+            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'OUT_CALL' and l.company_id = t.company_id), 0) as in_call,
+            0 as queue_count,
+            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state != 'LOGOUT' and l.company_id = t.company_id), 0) as signed_in_agents,
+            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'READY' and l.company_id = t.company_id), 0) as idle_agents,
+            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'NOT_READY' and l.company_id = t.company_id), 0) as busy_agents,
+            0 as after_call_agents,
+            0 as abandoned_count
+        from cc_task_config t
+        <where>
+            <if test="companyId!=null">t.company_id = #{companyId}</if>
+            <if test="taskId!=null">and t.id = #{taskId}</if>
+            <if test="status!=null">and t.status = #{status}</if>
+        </where>
+        order by t.id desc
+    </select>
+</mapper>

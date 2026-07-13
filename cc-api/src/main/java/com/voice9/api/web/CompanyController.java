@@ -14,6 +14,13 @@ import com.voice9.core.mapper.VdnPhoneMapper;
 import com.voice9.core.mapper.OverflowConfigMapper;
 import com.voice9.core.mapper.OverflowExpMapper;
 import com.voice9.core.mapper.IvrWorkflowMapper;
+import com.voice9.core.mapper.TaskConfigMapper;
+import com.voice9.core.mapper.TaskContactMapper;
+import com.voice9.core.mapper.TaskPauseMapper;
+import com.voice9.core.mapper.TaskSourceMapper;
+import com.voice9.core.mapper.TaskFieldMapper;
+import com.voice9.core.mapper.TaskStatMapper;
+import com.voice9.core.entity.TaskStat;
 import com.voice9.core.po.*;
 import com.voice9.core.vo.*;
 import com.voice9.core.page.Page;
@@ -59,6 +66,24 @@ public class CompanyController extends BaseController {
 
     @Autowired
     private IvrWorkflowMapper ivrWorkflowMapper;
+
+    @Autowired
+    private TaskConfigMapper taskConfigMapper;
+
+    @Autowired
+    private TaskContactMapper taskContactMapper;
+
+    @Autowired
+    private TaskPauseMapper taskPauseMapper;
+
+    @Autowired
+    private TaskSourceMapper taskSourceMapper;
+
+    @Autowired
+    private TaskFieldMapper taskFieldMapper;
+
+    @Autowired
+    private TaskStatMapper taskStatMapper;
 
 
 
@@ -1209,6 +1234,169 @@ public class CompanyController extends BaseController {
                                      @PathVariable Long id) {
         ivrWorkflowMapper.deleteByPrimaryKey(id);
         return new CommonResponse<>();
+    }
+
+    // ==================== 外呼任务管理 ====================
+
+    @GetMapping("task")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<TaskConfig>> taskList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<TaskConfig> list = (List<TaskConfig>) (List<?>) taskConfigMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    @GetMapping("task/{id}")
+    public CommonResponse<TaskConfig> taskDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                  @PathVariable Long id) {
+        return new CommonResponse<>(taskConfigMapper.selectByPrimaryKey(id));
+    }
+
+    @PostMapping("task")
+    public CommonResponse addTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                   @RequestBody TaskConfig config) {
+        config.setId(null);
+        config.setCompanyId(adminAccountInfo.getBindCompanyId());
+        config.setCts(Instant.now().getEpochSecond());
+        taskConfigMapper.insertSelective(config);
+        return new CommonResponse<>();
+    }
+
+    @PutMapping("task/{id}")
+    public CommonResponse updateTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                      @PathVariable Long id, @RequestBody TaskConfig config) {
+        config.setId(id);
+        config.setCompanyId(adminAccountInfo.getBindCompanyId());
+        config.setUts(Instant.now().getEpochSecond());
+        taskConfigMapper.updateByPrimaryKeySelective(config);
+        return new CommonResponse<>();
+    }
+
+    @DeleteMapping("task/{id}")
+    public CommonResponse deleteTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                      @PathVariable Long id) {
+        taskConfigMapper.deleteByPrimaryKey(id);
+        return new CommonResponse<>();
+    }
+
+    @GetMapping("task/{taskId}/contact")
+    public CommonResponse<List<TaskContact>> taskContactList(@PathVariable Long taskId) {
+        return new CommonResponse<>(taskContactMapper.selectByTaskId(taskId));
+    }
+
+    @GetMapping("task/{taskId}/pause")
+    public CommonResponse<List<TaskPause>> taskPauseList(@PathVariable Long taskId) {
+        return new CommonResponse<>(taskPauseMapper.selectByTaskId(taskId));
+    }
+
+    // ==================== 数据源管理 ====================
+
+    @GetMapping("taskSource")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<TaskSource>> taskSourceList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<TaskSource> list = (List<TaskSource>) (List<?>) taskSourceMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    @GetMapping("taskSource/{id}")
+    public CommonResponse<TaskSource> taskSourceDetail(@PathVariable Long id) {
+        return new CommonResponse<>(taskSourceMapper.selectByPrimaryKey(id));
+    }
+
+    @PostMapping("taskSource")
+    public CommonResponse addTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                         @RequestBody TaskSource source) {
+        source.setId(null); source.setCompanyId(adminAccountInfo.getBindCompanyId());
+        source.setCts(Instant.now().getEpochSecond());
+        taskSourceMapper.insertSelective(source);
+        return new CommonResponse<>();
+    }
+
+    @PutMapping("taskSource/{id}")
+    public CommonResponse updateTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                            @PathVariable Long id, @RequestBody TaskSource source) {
+        source.setId(id); source.setCompanyId(adminAccountInfo.getBindCompanyId());
+        source.setUts(Instant.now().getEpochSecond());
+        taskSourceMapper.updateByPrimaryKeySelective(source);
+        return new CommonResponse<>();
+    }
+
+    @DeleteMapping("taskSource/{id}")
+    public CommonResponse deleteTaskSource(@PathVariable Long id) {
+        taskSourceMapper.deleteByPrimaryKey(id);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 字段管理 ====================
+
+    @GetMapping("taskField")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<TaskField>> taskFieldList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                              PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<TaskField> list = (List<TaskField>) (List<?>) taskFieldMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    @PostMapping("taskField")
+    public CommonResponse addTaskField(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                        @RequestBody TaskField field) {
+        field.setId(null); field.setCompanyId(adminAccountInfo.getBindCompanyId());
+        field.setCts(Instant.now().getEpochSecond());
+        taskFieldMapper.insertSelective(field);
+        return new CommonResponse<>();
+    }
+
+    @PutMapping("taskField/{id}")
+    public CommonResponse updateTaskField(@PathVariable Long id, @RequestBody TaskField field) {
+        field.setId(id); field.setUts(Instant.now().getEpochSecond());
+        taskFieldMapper.updateByPrimaryKeySelective(field);
+        return new CommonResponse<>();
+    }
+
+    @DeleteMapping("taskField/{id}")
+    public CommonResponse deleteTaskField(@PathVariable Long id) {
+        taskFieldMapper.deleteByPrimaryKey(id);
+        return new CommonResponse<>();
+    }
+
+    @GetMapping("taskSource/{sourceId}/fields")
+    public CommonResponse<List<TaskField>> sourceFieldList(@PathVariable Long sourceId) {
+        return new CommonResponse<>(taskFieldMapper.selectBySourceId(sourceId));
+    }
+
+    @PutMapping("taskSource/{sourceId}/fields")
+    public CommonResponse updateSourceFields(@PathVariable Long sourceId, @RequestBody java.util.Map<String, Object> body) {
+        taskFieldMapper.clearSourceId(sourceId);
+        java.util.List<Integer> rawIds = (java.util.List<Integer>) body.get("fieldIds");
+        if (rawIds != null && !rawIds.isEmpty()) {
+            java.util.List<Long> fieldIds = new java.util.ArrayList<>();
+            for (Integer id : rawIds) { fieldIds.add(id.longValue()); }
+            taskFieldMapper.batchSetSourceId(sourceId, fieldIds);
+        }
+        return new CommonResponse<>();
+    }
+
+    // ==================== 任务监控 ====================
+
+    @GetMapping("taskStat")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<TaskStat>> taskStatList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                            PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("t.id desc");
+        List<TaskStat> list = (List<TaskStat>) (List<?>) taskStatMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
     }
 
 }

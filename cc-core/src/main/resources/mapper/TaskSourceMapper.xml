@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.TaskSourceMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskSource">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="field_count" jdbcType="INTEGER" property="fieldCount"/>
+        <result column="list_count" jdbcType="INTEGER" property="listCount"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, cts, uts, company_id, name, status</sql>
+    <select id="selectByPrimaryKey" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_source where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        delete from cc_task_source where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.TaskSource">
+        insert into cc_task_source
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="name != null">name,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="cts != null">#{cts},</if>
+            <if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.TaskSource">
+        update cc_task_source
+        <set>
+            <if test="cts != null">cts = #{cts},</if>
+            <if test="uts != null">uts = #{uts},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select s.*,
+            (select count(*) from cc_task_field where source_id = s.id and status = 1) as field_count,
+            0 as list_count
+        from cc_task_source s
+        <where>
+            <if test="companyId!=null">s.company_id = #{companyId}</if>
+            <if test="name!=null">and s.name like concat('%', #{name}, '%')</if>
+        </where>
+        order by s.id desc
+    </select>
+</mapper>

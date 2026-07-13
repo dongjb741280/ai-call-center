@@ -384,3 +384,72 @@ export const updateIvr = (id, data) => {
 export const deleteIvr = (id) => {
   return request({ url: `/cc-api/config/ivr/${id}`, method: 'delete' })
 }
+
+// ==================== 外呼任务管理 ====================
+export const getTaskList = (params) => {
+  return request({ url: '/cc-api/config/task', method: 'get', params })
+}
+
+export const getTaskDetail = (id) => {
+  return request({ url: `/cc-api/config/task/${id}`, method: 'get' })
+}
+
+export const saveTask = (data) => {
+  return request({ url: '/cc-api/config/task', method: 'post', data })
+}
+
+export const updateTask = (id, data) => {
+  return request({ url: `/cc-api/config/task/${id}`, method: 'put', data })
+}
+
+export const deleteTask = (id) => {
+  return request({ url: `/cc-api/config/task/${id}`, method: 'delete' })
+}
+
+export const getTaskContactList = (taskId) => {
+  return request({ url: `/cc-api/config/task/${taskId}/contact`, method: 'get' })
+}
+
+export const getTaskPauseList = (taskId) => {
+  return request({ url: `/cc-api/config/task/${taskId}/pause`, method: 'get' })
+}
+
+// ==================== 数据源管理 ====================
+export const getTaskSourceList = (params) => {
+  return request({ url: '/cc-api/config/taskSource', method: 'get', params })
+}
+export const saveTaskSource = (data) => {
+  return request({ url: '/cc-api/config/taskSource', method: 'post', data })
+}
+export const updateTaskSource = (id, data) => {
+  return request({ url: `/cc-api/config/taskSource/${id}`, method: 'put', data })
+}
+export const deleteTaskSource = (id) => {
+  return request({ url: `/cc-api/config/taskSource/${id}`, method: 'delete' })
+}
+
+// ==================== 字段管理 ====================
+export const getTaskFieldList = (params) => {
+  return request({ url: '/cc-api/config/taskField', method: 'get', params })
+}
+export const saveTaskField = (data) => {
+  return request({ url: '/cc-api/config/taskField', method: 'post', data })
+}
+export const updateTaskField = (id, data) => {
+  return request({ url: `/cc-api/config/taskField/${id}`, method: 'put', data })
+}
+export const deleteTaskField = (id) => {
+  return request({ url: `/cc-api/config/taskField/${id}`, method: 'delete' })
+}
+
+export const getSourceFieldList = (sourceId) => {
+  return request({ url: `/cc-api/config/taskSource/${sourceId}/fields`, method: 'get' })
+}
+export const updateSourceFields = (sourceId, data) => {
+  return request({ url: `/cc-api/config/taskSource/${sourceId}/fields`, method: 'put', data })
+}
+
+// ==================== 任务监控 ====================
+export const getTaskStatList = (params) => {
+  return request({ url: '/cc-api/config/taskStat', method: 'get', params })
+}

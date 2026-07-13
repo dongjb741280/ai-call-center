@@ -204,7 +204,7 @@ const routes = [
           {
             path: 'monitor',
             name: 'OutboundMonitor',
-            component: () => import('@/views/outbound/Monitor.vue'),
+            component: () => import('@/views/outbound/TaskStat.vue'),
             meta: { title: '任务监控', icon: 'Monitor' }
           }
         ]

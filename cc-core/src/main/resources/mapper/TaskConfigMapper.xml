@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.TaskConfigMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskConfig">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="call_start_time" jdbcType="VARCHAR" property="callStartTime"/>
+        <result column="call_end_time" jdbcType="VARCHAR" property="callEndTime"/>
+        <result column="close_time" jdbcType="BIGINT" property="closeTime"/>
+        <result column="transfer_type" jdbcType="VARCHAR" property="transferType"/>
+        <result column="total_count" jdbcType="INTEGER" property="totalCount"/>
+        <result column="completed_count" jdbcType="INTEGER" property="completedCount"/>
+        <result column="answered_count" jdbcType="INTEGER" property="answeredCount"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="display_number" jdbcType="VARCHAR" property="displayNumber"/>
+        <result column="call_rounds" jdbcType="INTEGER" property="callRounds"/>
+        <result column="current_round" jdbcType="INTEGER" property="currentRound"/>
+        <result column="data_source" jdbcType="VARCHAR" property="dataSource"/>
+        <result column="transfer_name" jdbcType="VARCHAR" property="transferName"/>
+        <result column="dialed_count" jdbcType="INTEGER" property="dialedCount"/>
+        <result column="cruise_type" jdbcType="VARCHAR" property="cruiseType"/>
+        <result column="concurrency" jdbcType="INTEGER" property="concurrency"/>
+        <result column="number_pool_name" jdbcType="VARCHAR" property="numberPoolName"/>
+        <result column="after_call_duration" jdbcType="INTEGER" property="afterCallDuration"/>
+        <result column="call_timeout" jdbcType="INTEGER" property="callTimeout"/>
+        <result column="status_notify" jdbcType="VARCHAR" property="statusNotify"/>
+        <result column="traffic_notify" jdbcType="VARCHAR" property="trafficNotify"/>
+        <result column="list_total" jdbcType="INTEGER" property="listTotal"/>
+        <result column="pause_start_time" jdbcType="BIGINT" property="pauseStartTime"/>
+        <result column="pause_end_time" jdbcType="BIGINT" property="pauseEndTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, cts, uts, company_id, name, call_start_time, call_end_time, close_time,
+        transfer_type, total_count, completed_count, answered_count, status,
+        display_number, call_rounds, current_round, data_source, transfer_name, dialed_count, cruise_type, concurrency, number_pool_name, after_call_duration, call_timeout, status_notify, traffic_notify, list_total, pause_start_time, pause_end_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_config where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from cc_task_config where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.TaskConfig">
+        insert into cc_task_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="cts != null">cts,</if>
+            <if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if>
+            <if test="name != null">name,</if>
+            <if test="callStartTime != null">call_start_time,</if>
+            <if test="callEndTime != null">call_end_time,</if>
+            <if test="closeTime != null">close_time,</if>
+            <if test="transferType != null">transfer_type,</if>
+            <if test="totalCount != null">total_count,</if>
+            <if test="completedCount != null">completed_count,</if>
+            <if test="answeredCount != null">answered_count,</if>
+            <if test="status != null">status,</if>
+            <if test="displayNumber != null">display_number,</if>
+            <if test="callRounds != null">call_rounds,</if>
+            <if test="currentRound != null">current_round,</if>
+            <if test="dataSource != null">data_source,</if>
+            <if test="transferName != null">transfer_name,</if>
+            <if test="dialedCount != null">dialed_count,</if>
+            <if test="cruiseType != null">cruise_type,</if>
+            <if test="concurrency != null">concurrency,</if>
+            <if test="numberPoolName != null">number_pool_name,</if>
+            <if test="afterCallDuration != null">after_call_duration,</if>
+            <if test="callTimeout != null">call_timeout,</if>
+            <if test="statusNotify != null">status_notify,</if>
+            <if test="trafficNotify != null">traffic_notify,</if>
+            <if test="listTotal != null">list_total,</if>
+            <if test="pauseStartTime != null">pause_start_time,</if>
+            <if test="pauseEndTime != null">pause_end_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="cts != null">#{cts},</if>
+            <if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="callStartTime != null">#{callStartTime},</if>
+            <if test="callEndTime != null">#{callEndTime},</if>
+            <if test="closeTime != null">#{closeTime},</if>
+            <if test="transferType != null">#{transferType},</if>
+            <if test="totalCount != null">#{totalCount},</if>
+            <if test="completedCount != null">#{completedCount},</if>
+            <if test="answeredCount != null">#{answeredCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="displayNumber != null">#{displayNumber},</if>
+            <if test="callRounds != null">#{callRounds},</if>
+            <if test="currentRound != null">#{currentRound},</if>
+            <if test="dataSource != null">#{dataSource},</if>
+            <if test="transferName != null">#{transferName},</if>
+            <if test="dialedCount != null">#{dialedCount},</if>
+            <if test="cruiseType != null">#{cruiseType},</if>
+            <if test="concurrency != null">#{concurrency},</if>
+            <if test="numberPoolName != null">#{numberPoolName},</if>
+            <if test="afterCallDuration != null">#{afterCallDuration},</if>
+            <if test="callTimeout != null">#{callTimeout},</if>
+            <if test="statusNotify != null">#{statusNotify},</if>
+            <if test="trafficNotify != null">#{trafficNotify},</if>
+            <if test="listTotal != null">#{listTotal},</if>
+            <if test="pauseStartTime != null">#{pauseStartTime},</if>
+            <if test="pauseEndTime != null">#{pauseEndTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.TaskConfig">
+        update cc_task_config
+        <set>
+            <if test="cts != null">cts = #{cts},</if>
+            <if test="uts != null">uts = #{uts},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="callStartTime != null">call_start_time = #{callStartTime},</if>
+            <if test="callEndTime != null">call_end_time = #{callEndTime},</if>
+            <if test="closeTime != null">close_time = #{closeTime},</if>
+            <if test="transferType != null">transfer_type = #{transferType},</if>
+            <if test="totalCount != null">total_count = #{totalCount},</if>
+            <if test="completedCount != null">completed_count = #{completedCount},</if>
+            <if test="answeredCount != null">answered_count = #{answeredCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="displayNumber != null">display_number = #{displayNumber},</if>
+            <if test="callRounds != null">call_rounds = #{callRounds},</if>
+            <if test="currentRound != null">current_round = #{currentRound},</if>
+            <if test="dataSource != null">data_source = #{dataSource},</if>
+            <if test="transferName != null">transfer_name = #{transferName},</if>
+            <if test="dialedCount != null">dialed_count = #{dialedCount},</if>
+            <if test="cruiseType != null">cruise_type = #{cruiseType},</if>
+            <if test="concurrency != null">concurrency = #{concurrency},</if>
+            <if test="numberPoolName != null">number_pool_name = #{numberPoolName},</if>
+            <if test="afterCallDuration != null">after_call_duration = #{afterCallDuration},</if>
+            <if test="callTimeout != null">call_timeout = #{callTimeout},</if>
+            <if test="statusNotify != null">status_notify = #{statusNotify},</if>
+            <if test="trafficNotify != null">traffic_notify = #{trafficNotify},</if>
+            <if test="listTotal != null">list_total = #{listTotal},</if>
+            <if test="pauseStartTime != null">pause_start_time = #{pauseStartTime},</if>
+            <if test="pauseEndTime != null">pause_end_time = #{pauseEndTime},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_config
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="name!=null">and name like concat('%', #{name}, '%')</if>
+            <if test="transferType!=null">and transfer_type = #{transferType}</if>
+            <if test="status!=null">and status = #{status}</if>
+            <if test="startTime!=null">and cts &gt;= #{startTime}</if>
+            <if test="endTime!=null">and cts &lt;= #{endTime}</if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

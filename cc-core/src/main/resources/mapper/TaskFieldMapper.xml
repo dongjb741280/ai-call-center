@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.TaskFieldMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskField">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="source_id" jdbcType="BIGINT" property="sourceId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="is_phone" jdbcType="INTEGER" property="isPhone"/>
+        <result column="field_type" jdbcType="VARCHAR" property="fieldType"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, cts, uts, company_id, source_id, name, is_phone, field_type, status</sql>
+    <select id="selectByPrimaryKey" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_field where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        delete from cc_task_field where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.TaskField">
+        insert into cc_task_field
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if><if test="sourceId != null">source_id,</if>
+            <if test="name != null">name,</if><if test="isPhone != null">is_phone,</if>
+            <if test="fieldType != null">field_type,</if><if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if><if test="cts != null">#{cts},</if><if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if><if test="sourceId != null">#{sourceId},</if>
+            <if test="name != null">#{name},</if><if test="isPhone != null">#{isPhone},</if>
+            <if test="fieldType != null">#{fieldType},</if><if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.TaskField">
+        update cc_task_field
+        <set>
+            <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>
+            <if test="name != null">name = #{name},</if><if test="isPhone != null">is_phone = #{isPhone},</if>
+            <if test="fieldType != null">field_type = #{fieldType},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_field
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="name!=null">and name like concat('%', #{name}, '%')</if>
+            <if test="fieldType!=null">and field_type = #{fieldType}</if>
+        </where>
+        order by id desc
+    </select>
+    <select id="selectBySourceId" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_field where source_id = #{sourceId} and status = 1 order by id
+    </select>
+    <update id="clearSourceId" parameterType="Long">
+        update cc_task_field set source_id = 0 where source_id = #{sourceId}
+    </update>
+    <update id="batchSetSourceId">
+        update cc_task_field set source_id = #{sourceId} where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

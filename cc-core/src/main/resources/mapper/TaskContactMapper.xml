@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.TaskContactMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskContact">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="task_id" jdbcType="BIGINT" property="taskId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="current_round" jdbcType="INTEGER" property="currentRound"/>
+        <result column="uuid" jdbcType="VARCHAR" property="uuid"/>
+        <result column="call_time" jdbcType="BIGINT" property="callTime"/>
+        <result column="answer_time" jdbcType="BIGINT" property="answerTime"/>
+        <result column="call_status" jdbcType="VARCHAR" property="callStatus"/>
+        <result column="call_result" jdbcType="VARCHAR" property="callResult"/>
+        <result column="agent_code" jdbcType="VARCHAR" property="agentCode"/>
+        <result column="bridge_time" jdbcType="BIGINT" property="bridgeTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, task_id, name, phone, current_round, uuid, call_time, answer_time, call_status, call_result, agent_code, bridge_time</sql>
+    <select id="selectByTaskId" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_task_contact where task_id = #{taskId} order by id
+    </select>
+</mapper>
