@@ -7,7 +7,10 @@
           <Fold v-if="!collapsed" />
           <Expand v-else />
         </el-icon>
-        <h1 class="title">AI呼叫中心管理系统</h1>
+        <div class="brand">
+          <span class="brand-icon">&#9670;</span>
+          <h1 class="title">AI 呼叫中心</h1>
+        </div>
       </div>
       <div class="header-right">
         <el-dropdown @command="handleCommand">
@@ -37,9 +40,9 @@
           :collapse="collapsed"
           :unique-opened="true"
           router
-          background-color="#304156"
-          text-color="#bfcbd9"
-          active-text-color="#409EFF"
+          background-color="transparent"
+          text-color="#94a3b8"
+          active-text-color="#a5b4fc"
         >
           <template v-for="route in menuRoutes" :key="route.path">
             <el-sub-menu v-if="route.children && route.children.length > 0" :index="route.path">
@@ -128,38 +131,60 @@ const handleCommand = async (command) => {
   flex-direction: column;
 }
 
+/* ---- Header ---- */
 .layout-header {
-  height: 60px;
-  background: #fff;
-  border-bottom: 1px solid #e4e7ed;
+  height: var(--header-height);
+  background: var(--bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0 var(--space-lg);
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .menu-toggle {
   font-size: 20px;
   cursor: pointer;
-  color: #606266;
+  color: var(--text-regular);
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
 }
 
 .menu-toggle:hover {
-  color: #409EFF;
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  font-size: 20px;
+  color: var(--color-primary);
+  line-height: 1;
 }
 
 .title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
   margin: 0;
+  white-space: nowrap;
 }
 
 .header-right {
@@ -172,61 +197,105 @@ const handleCommand = async (command) => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
 }
 
 .user-info:hover {
-  background-color: #f5f7fa;
+  background: var(--bg-body);
 }
 
 .username {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
+/* ---- Body ---- */
 .layout-main {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
+/* ---- Sidebar ---- */
 .layout-sidebar {
-  width: 240px;
-  background: #304156;
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
   overflow-y: auto;
-  transition: width 0.3s;
+  overflow-x: hidden;
+  transition: width var(--transition-smooth);
+  flex-shrink: 0;
+  padding: 8px 0;
 }
 
 .layout-sidebar.collapsed {
-  width: 64px;
+  width: var(--sidebar-collapsed-width);
 }
 
+.layout-sidebar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.layout-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+/* ---- Content ---- */
 .layout-content {
   flex: 1;
-  background: #f5f5f5;
+  background: var(--bg-body);
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--space-lg);
 }
 
-/* 菜单样式覆盖 */
+/* ---- Menu overrides ---- */
 :deep(.el-menu) {
-  border-right: none;
+  border-right: none !important;
+  background: transparent !important;
 }
 
 :deep(.el-menu--collapse) {
-  width: 64px;
+  width: var(--sidebar-collapsed-width);
 }
 
-:deep(.el-sub-menu__title) {
-  height: 50px;
-  line-height: 50px;
-}
-
+:deep(.el-sub-menu .el-sub-menu__title),
 :deep(.el-menu-item) {
-  height: 50px;
-  line-height: 50px;
+  height: 44px !important;
+  line-height: 44px !important;
+  margin: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+:deep(.el-sub-menu .el-sub-menu__title:hover),
+:deep(.el-menu-item:hover) {
+  background: var(--bg-sidebar-hover) !important;
+}
+
+:deep(.el-menu-item.is-active) {
+  background: var(--bg-sidebar-active) !important;
+  color: var(--color-primary-light) !important;
+  font-weight: 600;
+  border-right: 2px solid var(--color-primary);
+}
+
+:deep(.el-sub-menu.is-active > .el-sub-menu__title) {
+  color: var(--text-inverse) !important;
+  font-weight: 600;
+}
+
+:deep(.el-menu .el-icon) {
+  font-size: 18px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .layout-content {
+    padding: var(--space-md);
+  }
 }
 </style>
 
