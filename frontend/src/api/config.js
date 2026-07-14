@@ -453,3 +453,38 @@ export const updateSourceFields = (sourceId, data) => {
 export const getTaskStatList = (params) => {
   return request({ url: '/cc-api/config/taskStat', method: 'get', params })
 }
+
+// ==================== 操作日志 ====================
+export const getAdminLogList = (params) => {
+  return request({ url: '/cc-api/config/adminLog', method: 'get', params })
+}
+
+// ==================== 坐席状态详单 ====================
+export const getAgentStateList = (params) => {
+  return request({ url: '/cc-api/config/agentState', method: 'get', params })
+}
+
+// ==================== 坐席时报统计 ====================
+export const getAgentHourStatList = (params) => {
+  return request({ url: '/cc-api/config/agentHourStat', method: 'get', params })
+}
+
+// ==================== 坐席日报统计 ====================
+export const getAgentDayStatList = (params) => {
+  return request({ url: '/cc-api/config/agentDayStat', method: 'get', params })
+}
+
+// ==================== 企业话务统计 ====================
+export const getCompanyStatList = (params) => {
+  return request({ url: '/cc-api/config/companyStat', method: 'get', params })
+}
+
+// ==================== 坐席监控 ====================
+export const getAgentMonitorList = (params) => {
+  return request({ url: '/cc-api/config/agentMonitor', method: 'get', params })
+}
+
+// ==================== 话务监控 ====================
+export const getCallMonitorList = (params) => {
+  return request({ url: '/cc-api/config/callMonitor', method: 'get', params })
+}

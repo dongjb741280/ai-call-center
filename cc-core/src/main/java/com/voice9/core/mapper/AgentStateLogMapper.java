@@ -33,4 +33,6 @@ public interface AgentStateLogMapper extends BaseMapper<AgentStateLog> {
      * @return
      */
     List<StatHourAgent> statHour(Map<String, Object> params);
+
+    List<com.voice9.core.po.AgentMonitorVo> selectAgentMonitor(Map<String, Object> params);
 }

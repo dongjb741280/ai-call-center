@@ -21,6 +21,19 @@ import com.voice9.core.mapper.TaskSourceMapper;
 import com.voice9.core.mapper.TaskFieldMapper;
 import com.voice9.core.mapper.TaskStatMapper;
 import com.voice9.core.entity.TaskStat;
+import com.voice9.core.mapper.AdminLogMapper;
+import com.voice9.core.entity.AdminLog;
+import com.voice9.core.mapper.AgentStateLogMapper;
+import com.voice9.core.entity.AgentStateLog;
+import com.voice9.core.mapper.StatHourAgentMapper;
+import com.voice9.core.entity.StatHourAgent;
+import com.voice9.core.mapper.StatDayAgentMapper;
+import com.voice9.core.entity.StatDayAgent;
+import com.voice9.core.mapper.CompanyStatMapper;
+import com.voice9.core.entity.CompanyStat;
+import com.voice9.core.po.AgentMonitorVo;
+import com.voice9.core.mapper.CallLogMapper;
+import com.voice9.core.entity.CallLog;
 import com.voice9.core.po.*;
 import com.voice9.core.vo.*;
 import com.voice9.core.page.Page;
@@ -84,6 +97,24 @@ public class CompanyController extends BaseController {
 
     @Autowired
     private TaskStatMapper taskStatMapper;
+
+    @Autowired
+    private AdminLogMapper adminLogMapper;
+
+    @Autowired
+    private AgentStateLogMapper agentStateLogMapper;
+
+    @Autowired
+    private StatHourAgentMapper statHourAgentMapper;
+
+    @Autowired
+    private StatDayAgentMapper statDayAgentMapper;
+
+    @Autowired
+    private CompanyStatMapper companyStatMapper;
+
+    @Autowired
+    private CallLogMapper callLogMapper;
 
 
 
@@ -1396,6 +1427,95 @@ public class CompanyController extends BaseController {
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("t.id desc");
         List<TaskStat> list = (List<TaskStat>) (List<?>) taskStatMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 操作日志 ====================
+
+    @GetMapping("adminLog")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<AdminLog>> adminLogList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                            PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<AdminLog> list = (List<AdminLog>) (List<?>) adminLogMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 坐席状态详单 ====================
+
+    @GetMapping("agentState")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<AgentStateLog>> agentStateList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                   PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<AgentStateLog> list = (List<AgentStateLog>) (List<?>) agentStateLogMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 坐席时报统计 ====================
+
+    @GetMapping("agentHourStat")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<StatHourAgent>> agentHourStatList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                      PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("stat_time desc, agent_key");
+        List<StatHourAgent> list = (List<StatHourAgent>) (List<?>) statHourAgentMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 坐席日报统计 ====================
+
+    @GetMapping("agentDayStat")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<StatDayAgent>> agentDayStatList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                    PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("stat_time desc, agent_key");
+        List<StatDayAgent> list = (List<StatDayAgent>) (List<?>) statDayAgentMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 企业话务统计 ====================
+
+    @GetMapping("companyStat")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<CompanyStat>> companyStatList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                                  PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("stat_time desc");
+        List<CompanyStat> list = (List<CompanyStat>) (List<?>) companyStatMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    // ==================== 坐席监控 ====================
+
+    @GetMapping("agentMonitor")
+    public CommonResponse<List<AgentMonitorVo>> agentMonitor(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                              String agentKey) {
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("companyId", adminAccountInfo.getBindCompanyId());
+        if (agentKey != null && !agentKey.isEmpty()) params.put("agentKey", agentKey);
+        return new CommonResponse<>(agentStateLogMapper.selectAgentMonitor(params));
+    }
+
+    // ==================== 话务监控 ====================
+
+    @GetMapping("callMonitor")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<CallLog>> callMonitorList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                              PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("call_time desc");
+        List<CallLog> list = (List<CallLog>) (List<?>) callLogMapper.selectListByMap(params);
         return new CommonResponse<>(new PageInfo<>(list));
     }
 

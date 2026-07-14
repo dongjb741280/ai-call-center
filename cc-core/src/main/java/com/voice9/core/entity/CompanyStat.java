@@ -2,140 +2,115 @@ package com.voice9.core.entity;
 
 import java.io.Serializable;
 
-/**
- * 
- *
- * @author dongjb
- * @date   2025/09/03
- */
 public class CompanyStat implements Serializable {
-    /**
-     * PK
-     */
     private Long id;
-
-    /**
-     * 创建时间
-     */
     private Long cts;
-
-    /**
-     * 修改时间
-     */
     private Long uts;
-
-    /**
-     * 企业id
-     */
     private Long companyId;
-
-    /**
-     * 报表类型(1:坐席报表)
-     */
     private Integer type;
-
-    /**
-     * 是否企业(1:启用;0:不启用)
-     */
     private Integer status;
-
+    private Long statTime;
+    private Integer agentTotal;
+    private Integer agentUsed;
+    private Integer callTotal;
+    private Integer planTotal;
+    private Integer outboundTotal;
+    private Integer outboundAnswered;
+    private Integer taskOutbound;
+    private Integer agentOutboundAnswered;
+    private Integer inboundTotal;
+    private Integer inboundAssigned;
+    private Integer inboundAnswered;
+    private Integer ivrCalls;
+    private Integer abandonedCnt;
+    private Integer recordingCnt;
+    private Long recordingSize;
+    private Long callDuration;
+    private Long inboundDuration;
+    private Long outboundDuration;
+    private Integer queueCnt;
+    private Long queueDuration;
+    private Integer loginCnt;
+    private Long loginDuration;
+    private Integer idleCnt;
+    private Long idleDuration;
+    private Integer busyCnt;
+    private Long busyDuration;
+    private Integer afterCallCnt;
+    private Long afterCallDuration;
+    private Long customBusyDuration;
     private static final long serialVersionUID = 1L;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCts() {
-        return cts;
-    }
-
-    public void setCts(Long cts) {
-        this.cts = cts;
-    }
-
-    public Long getUts() {
-        return uts;
-    }
-
-    public void setUts(Long uts) {
-        this.uts = uts;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName());
-        sb.append(" [");
-        sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
-        sb.append(", cts=").append(cts);
-        sb.append(", uts=").append(uts);
-        sb.append(", companyId=").append(companyId);
-        sb.append(", type=").append(type);
-        sb.append(", status=").append(status);
-        sb.append(", serialVersionUID=").append(serialVersionUID);
-        sb.append("]");
-        return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object that) {
-        if (this == that) {
-            return true;
-        }
-        if (that == null) {
-            return false;
-        }
-        if (getClass() != that.getClass()) {
-            return false;
-        }
-        CompanyStat other = (CompanyStat) that;
-        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getCts() == null ? other.getCts() == null : this.getCts().equals(other.getCts()))
-            && (this.getUts() == null ? other.getUts() == null : this.getUts().equals(other.getUts()))
-            && (this.getCompanyId() == null ? other.getCompanyId() == null : this.getCompanyId().equals(other.getCompanyId()))
-            && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
-            && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()));
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getCts() == null) ? 0 : getCts().hashCode());
-        result = prime * result + ((getUts() == null) ? 0 : getUts().hashCode());
-        result = prime * result + ((getCompanyId() == null) ? 0 : getCompanyId().hashCode());
-        result = prime * result + ((getType() == null) ? 0 : getType().hashCode());
-        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
-        return result;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getCts() { return cts; }
+    public void setCts(Long cts) { this.cts = cts; }
+    public Long getUts() { return uts; }
+    public void setUts(Long uts) { this.uts = uts; }
+    public Long getCompanyId() { return companyId; }
+    public void setCompanyId(Long companyId) { this.companyId = companyId; }
+    public Integer getType() { return type; }
+    public void setType(Integer type) { this.type = type; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+    public Long getStatTime() { return statTime; }
+    public void setStatTime(Long v) { this.statTime = v; }
+    public Integer getAgentTotal() { return agentTotal; }
+    public void setAgentTotal(Integer v) { this.agentTotal = v; }
+    public Integer getAgentUsed() { return agentUsed; }
+    public void setAgentUsed(Integer v) { this.agentUsed = v; }
+    public Integer getCallTotal() { return callTotal; }
+    public void setCallTotal(Integer v) { this.callTotal = v; }
+    public Integer getPlanTotal() { return planTotal; }
+    public void setPlanTotal(Integer v) { this.planTotal = v; }
+    public Integer getOutboundTotal() { return outboundTotal; }
+    public void setOutboundTotal(Integer v) { this.outboundTotal = v; }
+    public Integer getOutboundAnswered() { return outboundAnswered; }
+    public void setOutboundAnswered(Integer v) { this.outboundAnswered = v; }
+    public Integer getTaskOutbound() { return taskOutbound; }
+    public void setTaskOutbound(Integer v) { this.taskOutbound = v; }
+    public Integer getAgentOutboundAnswered() { return agentOutboundAnswered; }
+    public void setAgentOutboundAnswered(Integer v) { this.agentOutboundAnswered = v; }
+    public Integer getInboundTotal() { return inboundTotal; }
+    public void setInboundTotal(Integer v) { this.inboundTotal = v; }
+    public Integer getInboundAssigned() { return inboundAssigned; }
+    public void setInboundAssigned(Integer v) { this.inboundAssigned = v; }
+    public Integer getInboundAnswered() { return inboundAnswered; }
+    public void setInboundAnswered(Integer v) { this.inboundAnswered = v; }
+    public Integer getIvrCalls() { return ivrCalls; }
+    public void setIvrCalls(Integer v) { this.ivrCalls = v; }
+    public Integer getAbandonedCnt() { return abandonedCnt; }
+    public void setAbandonedCnt(Integer v) { this.abandonedCnt = v; }
+    public Integer getRecordingCnt() { return recordingCnt; }
+    public void setRecordingCnt(Integer v) { this.recordingCnt = v; }
+    public Long getRecordingSize() { return recordingSize; }
+    public void setRecordingSize(Long v) { this.recordingSize = v; }
+    public Long getCallDuration() { return callDuration; }
+    public void setCallDuration(Long v) { this.callDuration = v; }
+    public Long getInboundDuration() { return inboundDuration; }
+    public void setInboundDuration(Long v) { this.inboundDuration = v; }
+    public Long getOutboundDuration() { return outboundDuration; }
+    public void setOutboundDuration(Long v) { this.outboundDuration = v; }
+    public Integer getQueueCnt() { return queueCnt; }
+    public void setQueueCnt(Integer v) { this.queueCnt = v; }
+    public Long getQueueDuration() { return queueDuration; }
+    public void setQueueDuration(Long v) { this.queueDuration = v; }
+    public Integer getLoginCnt() { return loginCnt; }
+    public void setLoginCnt(Integer v) { this.loginCnt = v; }
+    public Long getLoginDuration() { return loginDuration; }
+    public void setLoginDuration(Long v) { this.loginDuration = v; }
+    public Integer getIdleCnt() { return idleCnt; }
+    public void setIdleCnt(Integer v) { this.idleCnt = v; }
+    public Long getIdleDuration() { return idleDuration; }
+    public void setIdleDuration(Long v) { this.idleDuration = v; }
+    public Integer getBusyCnt() { return busyCnt; }
+    public void setBusyCnt(Integer v) { this.busyCnt = v; }
+    public Long getBusyDuration() { return busyDuration; }
+    public void setBusyDuration(Long v) { this.busyDuration = v; }
+    public Integer getAfterCallCnt() { return afterCallCnt; }
+    public void setAfterCallCnt(Integer v) { this.afterCallCnt = v; }
+    public Long getAfterCallDuration() { return afterCallDuration; }
+    public void setAfterCallDuration(Long v) { this.afterCallDuration = v; }
+    public Long getCustomBusyDuration() { return customBusyDuration; }
+    public void setCustomBusyDuration(Long v) { this.customBusyDuration = v; }
 }

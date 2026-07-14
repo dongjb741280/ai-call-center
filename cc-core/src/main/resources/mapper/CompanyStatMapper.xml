@@ -8,109 +8,144 @@
         <result column="company_id" jdbcType="BIGINT" property="companyId"/>
         <result column="type" jdbcType="INTEGER" property="type"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="stat_time" jdbcType="BIGINT" property="statTime"/>
+        <result column="agent_total" jdbcType="INTEGER" property="agentTotal"/>
+        <result column="agent_used" jdbcType="INTEGER" property="agentUsed"/>
+        <result column="call_total" jdbcType="INTEGER" property="callTotal"/>
+        <result column="plan_total" jdbcType="INTEGER" property="planTotal"/>
+        <result column="outbound_total" jdbcType="INTEGER" property="outboundTotal"/>
+        <result column="outbound_answered" jdbcType="INTEGER" property="outboundAnswered"/>
+        <result column="task_outbound" jdbcType="INTEGER" property="taskOutbound"/>
+        <result column="agent_outbound_answered" jdbcType="INTEGER" property="agentOutboundAnswered"/>
+        <result column="inbound_total" jdbcType="INTEGER" property="inboundTotal"/>
+        <result column="inbound_assigned" jdbcType="INTEGER" property="inboundAssigned"/>
+        <result column="inbound_answered" jdbcType="INTEGER" property="inboundAnswered"/>
+        <result column="ivr_calls" jdbcType="INTEGER" property="ivrCalls"/>
+        <result column="abandoned_cnt" jdbcType="INTEGER" property="abandonedCnt"/>
+        <result column="recording_cnt" jdbcType="INTEGER" property="recordingCnt"/>
+        <result column="recording_size" jdbcType="BIGINT" property="recordingSize"/>
+        <result column="call_duration" jdbcType="BIGINT" property="callDuration"/>
+        <result column="inbound_duration" jdbcType="BIGINT" property="inboundDuration"/>
+        <result column="outbound_duration" jdbcType="BIGINT" property="outboundDuration"/>
+        <result column="queue_cnt" jdbcType="INTEGER" property="queueCnt"/>
+        <result column="queue_duration" jdbcType="BIGINT" property="queueDuration"/>
+        <result column="login_cnt" jdbcType="INTEGER" property="loginCnt"/>
+        <result column="login_duration" jdbcType="BIGINT" property="loginDuration"/>
+        <result column="idle_cnt" jdbcType="INTEGER" property="idleCnt"/>
+        <result column="idle_duration" jdbcType="BIGINT" property="idleDuration"/>
+        <result column="busy_cnt" jdbcType="INTEGER" property="busyCnt"/>
+        <result column="busy_duration" jdbcType="BIGINT" property="busyDuration"/>
+        <result column="after_call_cnt" jdbcType="INTEGER" property="afterCallCnt"/>
+        <result column="after_call_duration" jdbcType="BIGINT" property="afterCallDuration"/>
+        <result column="custom_busy_duration" jdbcType="BIGINT" property="customBusyDuration"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id
-        , cts, uts, company_id, type, status
+        id, cts, uts, company_id, type, status, stat_time, agent_total, agent_used,
+        call_total, plan_total, outbound_total, outbound_answered, task_outbound, agent_outbound_answered,
+        inbound_total, inbound_assigned, inbound_answered, ivr_calls, abandoned_cnt,
+        recording_cnt, recording_size, call_duration, inbound_duration, outbound_duration,
+        queue_cnt, queue_duration, login_cnt, login_duration, idle_cnt, idle_duration,
+        busy_cnt, busy_duration, after_call_cnt, after_call_duration, custom_busy_duration
     </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from cc_company_stat
-        where id = #{id,jdbcType=BIGINT}
+
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_company_stat
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="startTime!=null">and stat_time &gt;= #{startTime}</if>
+            <if test="endTime!=null">and stat_time &lt;= #{endTime}</if>
+        </where>
+        order by stat_time desc
     </select>
 
-    <select id="selectByCompanyId" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from
-        cc_company_stat
-        where
-        company_id = #{companyId,jdbcType=BIGINT} and status = 1
+    <select id="selectByPrimaryKey" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_company_stat where id = #{id}
     </select>
-
-
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete
-        from cc_company_stat
-        where id = #{id,jdbcType=BIGINT}
+    <select id="selectByCompanyId" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_company_stat where company_id = #{companyId} and status = 1
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        delete from cc_company_stat where id = #{id}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.CompanyStat">
-        insert into cc_company_stat (id, cts, uts, company_id, type, status)
-        values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
-                #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
-    </insert>
     <insert id="insertSelective" parameterType="com.voice9.core.entity.CompanyStat">
         insert into cc_company_stat
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="cts != null">
-                cts,
-            </if>
-            <if test="uts != null">
-                uts,
-            </if>
-            <if test="companyId != null">
-                company_id,
-            </if>
-            <if test="type != null">
-                type,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
+            <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if><if test="type != null">type,</if>
+            <if test="status != null">status,</if><if test="statTime != null">stat_time,</if>
+            <if test="agentTotal != null">agent_total,</if><if test="agentUsed != null">agent_used,</if>
+            <if test="callTotal != null">call_total,</if><if test="planTotal != null">plan_total,</if>
+            <if test="outboundTotal != null">outbound_total,</if><if test="outboundAnswered != null">outbound_answered,</if>
+            <if test="taskOutbound != null">task_outbound,</if><if test="agentOutboundAnswered != null">agent_outbound_answered,</if>
+            <if test="inboundTotal != null">inbound_total,</if><if test="inboundAssigned != null">inbound_assigned,</if>
+            <if test="inboundAnswered != null">inbound_answered,</if><if test="ivrCalls != null">ivr_calls,</if>
+            <if test="abandonedCnt != null">abandoned_cnt,</if><if test="recordingCnt != null">recording_cnt,</if>
+            <if test="recordingSize != null">recording_size,</if><if test="callDuration != null">call_duration,</if>
+            <if test="inboundDuration != null">inbound_duration,</if><if test="outboundDuration != null">outbound_duration,</if>
+            <if test="queueCnt != null">queue_cnt,</if><if test="queueDuration != null">queue_duration,</if>
+            <if test="loginCnt != null">login_cnt,</if><if test="loginDuration != null">login_duration,</if>
+            <if test="idleCnt != null">idle_cnt,</if><if test="idleDuration != null">idle_duration,</if>
+            <if test="busyCnt != null">busy_cnt,</if><if test="busyDuration != null">busy_duration,</if>
+            <if test="afterCallCnt != null">after_call_cnt,</if><if test="afterCallDuration != null">after_call_duration,</if>
+            <if test="customBusyDuration != null">custom_busy_duration,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="cts != null">
-                #{cts,jdbcType=BIGINT},
-            </if>
-            <if test="uts != null">
-                #{uts,jdbcType=BIGINT},
-            </if>
-            <if test="companyId != null">
-                #{companyId,jdbcType=BIGINT},
-            </if>
-            <if test="type != null">
-                #{type,jdbcType=INTEGER},
-            </if>
-            <if test="status != null">
-                #{status,jdbcType=INTEGER},
-            </if>
+            <if test="id != null">#{id},</if><if test="cts != null">#{cts},</if><if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if><if test="type != null">#{type},</if>
+            <if test="status != null">#{status},</if><if test="statTime != null">#{statTime},</if>
+            <if test="agentTotal != null">#{agentTotal},</if><if test="agentUsed != null">#{agentUsed},</if>
+            <if test="callTotal != null">#{callTotal},</if><if test="planTotal != null">#{planTotal},</if>
+            <if test="outboundTotal != null">#{outboundTotal},</if><if test="outboundAnswered != null">#{outboundAnswered},</if>
+            <if test="taskOutbound != null">#{taskOutbound},</if><if test="agentOutboundAnswered != null">#{agentOutboundAnswered},</if>
+            <if test="inboundTotal != null">#{inboundTotal},</if><if test="inboundAssigned != null">#{inboundAssigned},</if>
+            <if test="inboundAnswered != null">#{inboundAnswered},</if><if test="ivrCalls != null">#{ivrCalls},</if>
+            <if test="abandonedCnt != null">#{abandonedCnt},</if><if test="recordingCnt != null">#{recordingCnt},</if>
+            <if test="recordingSize != null">#{recordingSize},</if><if test="callDuration != null">#{callDuration},</if>
+            <if test="inboundDuration != null">#{inboundDuration},</if><if test="outboundDuration != null">#{outboundDuration},</if>
+            <if test="queueCnt != null">#{queueCnt},</if><if test="queueDuration != null">#{queueDuration},</if>
+            <if test="loginCnt != null">#{loginCnt},</if><if test="loginDuration != null">#{loginDuration},</if>
+            <if test="idleCnt != null">#{idleCnt},</if><if test="idleDuration != null">#{idleDuration},</if>
+            <if test="busyCnt != null">#{busyCnt},</if><if test="busyDuration != null">#{busyDuration},</if>
+            <if test="afterCallCnt != null">#{afterCallCnt},</if><if test="afterCallDuration != null">#{afterCallDuration},</if>
+            <if test="customBusyDuration != null">#{customBusyDuration},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.CompanyStat">
         update cc_company_stat
         <set>
-            <if test="cts != null">
-                cts = #{cts,jdbcType=BIGINT},
-            </if>
-            <if test="uts != null">
-                uts = #{uts,jdbcType=BIGINT},
-            </if>
-            <if test="companyId != null">
-                company_id = #{companyId,jdbcType=BIGINT},
-            </if>
-            <if test="type != null">
-                type = #{type,jdbcType=INTEGER},
-            </if>
-            <if test="status != null">
-                status = #{status,jdbcType=INTEGER},
-            </if>
+            <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>
+            <if test="type != null">type = #{type},</if><if test="status != null">status = #{status},</if>
+            <if test="statTime != null">stat_time = #{statTime},</if>
+            <if test="agentTotal != null">agent_total = #{agentTotal},</if>
+            <if test="agentUsed != null">agent_used = #{agentUsed},</if>
+            <if test="callTotal != null">call_total = #{callTotal},</if>
+            <if test="planTotal != null">plan_total = #{planTotal},</if>
+            <if test="outboundTotal != null">outbound_total = #{outboundTotal},</if>
+            <if test="outboundAnswered != null">outbound_answered = #{outboundAnswered},</if>
+            <if test="taskOutbound != null">task_outbound = #{taskOutbound},</if>
+            <if test="agentOutboundAnswered != null">agent_outbound_answered = #{agentOutboundAnswered},</if>
+            <if test="inboundTotal != null">inbound_total = #{inboundTotal},</if>
+            <if test="inboundAssigned != null">inbound_assigned = #{inboundAssigned},</if>
+            <if test="inboundAnswered != null">inbound_answered = #{inboundAnswered},</if>
+            <if test="ivrCalls != null">ivr_calls = #{ivrCalls},</if>
+            <if test="abandonedCnt != null">abandoned_cnt = #{abandonedCnt},</if>
+            <if test="recordingCnt != null">recording_cnt = #{recordingCnt},</if>
+            <if test="recordingSize != null">recording_size = #{recordingSize},</if>
+            <if test="callDuration != null">call_duration = #{callDuration},</if>
+            <if test="inboundDuration != null">inbound_duration = #{inboundDuration},</if>
+            <if test="outboundDuration != null">outbound_duration = #{outboundDuration},</if>
+            <if test="queueCnt != null">queue_cnt = #{queueCnt},</if>
+            <if test="queueDuration != null">queue_duration = #{queueDuration},</if>
+            <if test="loginCnt != null">login_cnt = #{loginCnt},</if>
+            <if test="loginDuration != null">login_duration = #{loginDuration},</if>
+            <if test="idleCnt != null">idle_cnt = #{idleCnt},</if>
+            <if test="idleDuration != null">idle_duration = #{idleDuration},</if>
+            <if test="busyCnt != null">busy_cnt = #{busyCnt},</if>
+            <if test="busyDuration != null">busy_duration = #{busyDuration},</if>
+            <if test="afterCallCnt != null">after_call_cnt = #{afterCallCnt},</if>
+            <if test="afterCallDuration != null">after_call_duration = #{afterCallDuration},</if>
+            <if test="customBusyDuration != null">custom_busy_duration = #{customBusyDuration},</if>
         </set>
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.CompanyStat">
-        update cc_company_stat
-        set cts        = #{cts,jdbcType=BIGINT},
-            uts        = #{uts,jdbcType=BIGINT},
-            company_id = #{companyId,jdbcType=BIGINT},
-            type       = #{type,jdbcType=INTEGER},
-            status     = #{status,jdbcType=INTEGER}
-        where id = #{id,jdbcType=BIGINT}
+        where id = #{id}
     </update>
 </mapper>

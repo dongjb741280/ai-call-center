@@ -25,12 +25,33 @@
     <result column="callin_talk_time" jdbcType="BIGINT" property="callinTalkTime" />
     <result column="callout_talk_time" jdbcType="BIGINT" property="calloutTalkTime" />
     <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="logout_cnt" jdbcType="BIGINT" property="logoutCnt" />
+    <result column="talk_cnt" jdbcType="BIGINT" property="talkCnt" />
+    <result column="hold_time" jdbcType="BIGINT" property="holdTime" />
+    <result column="hold_cnt" jdbcType="BIGINT" property="holdCnt" />
+    <result column="conference_time" jdbcType="BIGINT" property="conferenceTime" />
+    <result column="conference_cnt" jdbcType="BIGINT" property="conferenceCnt" />
+    <result column="consult_time" jdbcType="BIGINT" property="consultTime" />
+    <result column="consult_cnt" jdbcType="BIGINT" property="consultCnt" />
+    <result column="consulted_time" jdbcType="BIGINT" property="consultedTime" />
+    <result column="consulted_cnt" jdbcType="BIGINT" property="consultedCnt" />
+    <result column="transferred_time" jdbcType="BIGINT" property="transferredTime" />
+    <result column="transferred_cnt" jdbcType="BIGINT" property="transferredCnt" />
+    <result column="transfer_cnt" jdbcType="BIGINT" property="transferCnt" />
+    <result column="call15s_cnt" jdbcType="BIGINT" property="call15sCnt" />
+    <result column="rating_very_satisfied" jdbcType="BIGINT" property="ratingVerySatisfied" />
+    <result column="rating_satisfied" jdbcType="BIGINT" property="ratingSatisfied" />
+    <result column="rating_normal" jdbcType="BIGINT" property="ratingNormal" />
+    <result column="rating_dissatisfied" jdbcType="BIGINT" property="ratingDissatisfied" />
+    <result column="rating_very_dissatisfied" jdbcType="BIGINT" property="ratingVeryDissatisfied" />
   </resultMap>
   <sql id="Base_Column_List">
     id, cts, company_id, agent_key, agent_name, stat_time, callout_cnt, callout_answer_cnt, 
-    callin_cnt, callin_answer_cnt, login_cnt, ready_cnt, not_ready_cnt, after_cnt, login_time, 
-    ready_time, not_ready_time, busy_time, after_time, talk_time, callin_talk_time, callout_talk_time, 
-    status
+    callin_cnt, callin_answer_cnt, login_cnt, ready_cnt, not_ready_cnt, after_cnt, login_time,
+    ready_time, not_ready_time, busy_time, after_time, talk_time, callin_talk_time, callout_talk_time,
+    status, logout_cnt, talk_cnt, hold_time, hold_cnt, conference_time, conference_cnt, consult_time, consult_cnt,
+    consulted_time, consulted_cnt, transferred_time, transferred_cnt, transfer_cnt, call15s_cnt,
+    rating_very_satisfied, rating_satisfied, rating_normal, rating_dissatisfied, rating_very_dissatisfied
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -303,4 +324,15 @@
       status = #{status,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from cc_stat_day_agent
+    <where>
+      <if test="companyId!=null">company_id = #{companyId}</if>
+      <if test="agentKey!=null and agentKey!=''">and agent_key = #{agentKey}</if>
+      <if test="startTime!=null">and stat_time &gt;= #{startTime}</if>
+      <if test="endTime!=null">and stat_time &lt;= #{endTime}</if>
+    </where>
+    order by stat_time desc, agent_key
+  </select>
 </mapper>

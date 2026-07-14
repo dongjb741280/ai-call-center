@@ -123,6 +123,25 @@ public class StatDayAgent implements Serializable {
      * 状态
      */
     private Integer status;
+    private Long logoutCnt;
+    private Long talkCnt;
+    private Long holdTime;
+    private Long holdCnt;
+    private Long conferenceTime;
+    private Long conferenceCnt;
+    private Long consultTime;
+    private Long consultCnt;
+    private Long consultedTime;
+    private Long consultedCnt;
+    private Long transferredTime;
+    private Long transferredCnt;
+    private Long transferCnt;
+    private Long call15sCnt;
+    private Long ratingVerySatisfied;
+    private Long ratingSatisfied;
+    private Long ratingNormal;
+    private Long ratingDissatisfied;
+    private Long ratingVeryDissatisfied;
 
     private static final long serialVersionUID = 1L;
 
@@ -306,9 +325,45 @@ public class StatDayAgent implements Serializable {
         return status;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
+    public void setStatus(Integer status) { this.status = status; }
+    public Long getLogoutCnt() { return logoutCnt == null ? 0L : logoutCnt; }
+    public void setLogoutCnt(Long v) { this.logoutCnt = v; }
+    public Long getTalkCnt() { return talkCnt == null ? 0L : talkCnt; }
+    public void setTalkCnt(Long v) { this.talkCnt = v; }
+    public Long getHoldTime() { return holdTime == null ? 0L : holdTime; }
+    public void setHoldTime(Long v) { this.holdTime = v; }
+    public Long getHoldCnt() { return holdCnt == null ? 0L : holdCnt; }
+    public void setHoldCnt(Long v) { this.holdCnt = v; }
+    public Long getConferenceTime() { return conferenceTime == null ? 0L : conferenceTime; }
+    public void setConferenceTime(Long v) { this.conferenceTime = v; }
+    public Long getConferenceCnt() { return conferenceCnt == null ? 0L : conferenceCnt; }
+    public void setConferenceCnt(Long v) { this.conferenceCnt = v; }
+    public Long getConsultTime() { return consultTime == null ? 0L : consultTime; }
+    public void setConsultTime(Long v) { this.consultTime = v; }
+    public Long getConsultCnt() { return consultCnt == null ? 0L : consultCnt; }
+    public void setConsultCnt(Long v) { this.consultCnt = v; }
+    public Long getConsultedTime() { return consultedTime == null ? 0L : consultedTime; }
+    public void setConsultedTime(Long v) { this.consultedTime = v; }
+    public Long getConsultedCnt() { return consultedCnt == null ? 0L : consultedCnt; }
+    public void setConsultedCnt(Long v) { this.consultedCnt = v; }
+    public Long getTransferredTime() { return transferredTime == null ? 0L : transferredTime; }
+    public void setTransferredTime(Long v) { this.transferredTime = v; }
+    public Long getTransferredCnt() { return transferredCnt == null ? 0L : transferredCnt; }
+    public void setTransferredCnt(Long v) { this.transferredCnt = v; }
+    public Long getTransferCnt() { return transferCnt == null ? 0L : transferCnt; }
+    public void setTransferCnt(Long v) { this.transferCnt = v; }
+    public Long getCall15sCnt() { return call15sCnt == null ? 0L : call15sCnt; }
+    public void setCall15sCnt(Long v) { this.call15sCnt = v; }
+    public Long getRatingVerySatisfied() { return ratingVerySatisfied == null ? 0L : ratingVerySatisfied; }
+    public void setRatingVerySatisfied(Long v) { this.ratingVerySatisfied = v; }
+    public Long getRatingSatisfied() { return ratingSatisfied == null ? 0L : ratingSatisfied; }
+    public void setRatingSatisfied(Long v) { this.ratingSatisfied = v; }
+    public Long getRatingNormal() { return ratingNormal == null ? 0L : ratingNormal; }
+    public void setRatingNormal(Long v) { this.ratingNormal = v; }
+    public Long getRatingDissatisfied() { return ratingDissatisfied == null ? 0L : ratingDissatisfied; }
+    public void setRatingDissatisfied(Long v) { this.ratingDissatisfied = v; }
+    public Long getRatingVeryDissatisfied() { return ratingVeryDissatisfied == null ? 0L : ratingVeryDissatisfied; }
+    public void setRatingVeryDissatisfied(Long v) { this.ratingVeryDissatisfied = v; }
 
     @Override
     public String toString() {

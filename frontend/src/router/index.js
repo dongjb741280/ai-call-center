@@ -227,6 +227,12 @@ const routes = [
             meta: { title: '操作日志', icon: 'Document' }
           },
           {
+            path: 'agent-state',
+            name: 'ReportAgentState',
+            component: () => import('@/views/report/AgentState.vue'),
+            meta: { title: '坐席状态详单', icon: 'List' }
+          },
+          {
             path: 'agent-hour',
             name: 'ReportAgentHour',
             component: () => import('@/views/report/AgentHour.vue'),

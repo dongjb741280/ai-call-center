@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.AdminLogMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.AdminLog">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="op_time" jdbcType="BIGINT" property="opTime"/>
+        <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId"/>
+        <result column="request_url" jdbcType="VARCHAR" property="requestUrl"/>
+        <result column="duration" jdbcType="INTEGER" property="duration"/>
+        <result column="user_ip" jdbcType="VARCHAR" property="userIp"/>
+        <result column="region" jdbcType="VARCHAR" property="region"/>
+        <result column="isp" jdbcType="VARCHAR" property="isp"/>
+        <result column="server_addr" jdbcType="VARCHAR" property="serverAddr"/>
+        <result column="request_params" jdbcType="LONGVARCHAR" property="requestParams"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, cts, uts, company_id, account, op_time, enterprise_id, request_url, duration, user_ip, region, isp, server_addr, request_params, status</sql>
+    <select id="selectByPrimaryKey" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_admin_log where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        delete from cc_admin_log where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminLog">
+        insert into cc_admin_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if><if test="account != null">account,</if>
+            <if test="opTime != null">op_time,</if><if test="enterpriseId != null">enterprise_id,</if>
+            <if test="requestUrl != null">request_url,</if><if test="duration != null">duration,</if>
+            <if test="userIp != null">user_ip,</if><if test="region != null">region,</if>
+            <if test="isp != null">isp,</if><if test="serverAddr != null">server_addr,</if>
+            <if test="requestParams != null">request_params,</if><if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if><if test="cts != null">#{cts},</if><if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if><if test="account != null">#{account},</if>
+            <if test="opTime != null">#{opTime},</if><if test="enterpriseId != null">#{enterpriseId},</if>
+            <if test="requestUrl != null">#{requestUrl},</if><if test="duration != null">#{duration},</if>
+            <if test="userIp != null">#{userIp},</if><if test="region != null">#{region},</if>
+            <if test="isp != null">#{isp},</if><if test="serverAddr != null">#{serverAddr},</if>
+            <if test="requestParams != null">#{requestParams},</if><if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.AdminLog">
+        update cc_admin_log
+        <set>
+            <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>
+            <if test="account != null">account = #{account},</if>
+            <if test="opTime != null">op_time = #{opTime},</if>
+            <if test="enterpriseId != null">enterprise_id = #{enterpriseId},</if>
+            <if test="requestUrl != null">request_url = #{requestUrl},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="userIp != null">user_ip = #{userIp},</if>
+            <if test="region != null">region = #{region},</if>
+            <if test="isp != null">isp = #{isp},</if>
+            <if test="serverAddr != null">server_addr = #{serverAddr},</if>
+            <if test="requestParams != null">request_params = #{requestParams},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_admin_log
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="account!=null and account!=''">and account = #{account}</if>
+            <if test="userIp!=null and userIp!=''">and user_ip = #{userIp}</if>
+            <if test="startTime!=null">and op_time &gt;= #{startTime}</if>
+            <if test="endTime!=null">and op_time &lt;= #{endTime}</if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

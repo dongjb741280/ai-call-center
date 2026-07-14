@@ -460,6 +460,19 @@
         create table cc_agent_state_log${month} like cc_agent_state_log
     </update>
 
+    <!-- 坐席监控：查询每个坐席的最新状态 -->
+    <select id="selectAgentMonitor" parameterType="java.util.Map" resultType="com.voice9.core.po.AgentMonitorVo">
+        select a.agent_key as agentKey, a.agent_name as agentName, a.agent_type as loginType,
+               1 as workType, a.host,
+               coalesce(l.state, 'LOGOUT') as state, coalesce(l.state_time, 0) as stateTime
+        from cc_agent a
+        left join cc_agent_state_log l on l.agent_id = a.agent_id
+            and l.state_time = (select max(state_time) from cc_agent_state_log where agent_id = a.agent_id)
+        where a.company_id = #{companyId} and a.status = 1
+        <if test="agentKey!=null and agentKey!=''">and a.agent_key like concat('%', #{agentKey}, '%')</if>
+        order by a.agent_key
+    </select>
+
     <!-- 坐席状态和话务统计 -->
     <select id="statHour" parameterType="java.util.Map" resultType="com.voice9.core.entity.StatHourAgent" >
         select
