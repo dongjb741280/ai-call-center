@@ -34,6 +34,14 @@ import com.voice9.core.entity.CompanyStat;
 import com.voice9.core.po.AgentMonitorVo;
 import com.voice9.core.mapper.CallLogMapper;
 import com.voice9.core.entity.CallLog;
+import com.voice9.core.mapper.CallDeviceMapper;
+import com.voice9.core.entity.CallDevice;
+import com.voice9.core.mapper.CallDetailMapper;
+import com.voice9.core.entity.CallDetail;
+import com.voice9.core.mapper.IvrFlowMapper;
+import com.voice9.core.entity.IvrFlow;
+import com.voice9.core.mapper.PushLogMapper;
+import com.voice9.core.entity.PushLog;
 import com.voice9.core.po.*;
 import com.voice9.core.vo.*;
 import com.voice9.core.page.Page;
@@ -115,6 +123,18 @@ public class CompanyController extends BaseController {
 
     @Autowired
     private CallLogMapper callLogMapper;
+
+    @Autowired
+    private CallDeviceMapper callDeviceMapper;
+
+    @Autowired
+    private CallDetailMapper callDetailMapper;
+
+    @Autowired
+    private IvrFlowMapper ivrFlowMapper;
+
+    @Autowired
+    private PushLogMapper pushLogMapper;
 
 
 
@@ -1516,6 +1536,38 @@ public class CompanyController extends BaseController {
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("call_time desc");
         List<CallLog> list = (List<CallLog>) (List<?>) callLogMapper.selectListByMap(params);
+        return new CommonResponse<>(new PageInfo<>(list));
+    }
+
+    @GetMapping("callDevice/{callId}")
+    public CommonResponse<List<CallDevice>> callDeviceList(@PathVariable String callId) {
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("callId", Long.parseLong(callId));
+        params.put("monthTime", "");
+        List<CallDevice> list = callDeviceMapper.selectListByMap(params);
+        return new CommonResponse<>(list);
+    }
+
+    @GetMapping("callDetail/{callId}")
+    public CommonResponse<List<CallDetail>> callDetailList(@PathVariable String callId) {
+        return new CommonResponse<>(callDetailMapper.selectListByCallId(Long.parseLong(callId), ""));
+    }
+
+    @GetMapping("ivrFlow/{callId}")
+    public CommonResponse<List<IvrFlow>> ivrFlowList(@PathVariable String callId) {
+        return new CommonResponse<>(ivrFlowMapper.selectByCallId(Long.parseLong(callId)));
+    }
+
+    // ==================== 话单推送 ====================
+
+    @GetMapping("pushLog")
+    @SuppressWarnings("unchecked")
+    public CommonResponse<PageInfo<PushLog>> pushLogList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                          PageInfo pageInfo, String query) {
+        Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
+        PageHelper.orderBy("id desc");
+        List<PushLog> list = (List<PushLog>) (List<?>) pushLogMapper.selectListByMap(params);
         return new CommonResponse<>(new PageInfo<>(list));
     }
 

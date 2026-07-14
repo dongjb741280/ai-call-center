@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.PushLogMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.PushLog">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="uts" jdbcType="BIGINT" property="uts"/>
+        <result column="company_id" jdbcType="BIGINT" property="companyId"/>
+        <result column="call_id" jdbcType="BIGINT" property="callId"/>
+        <result column="cdr_notify_url" jdbcType="VARCHAR" property="cdrNotifyUrl"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="push_times" jdbcType="INTEGER" property="pushTimes"/>
+        <result column="push_response" jdbcType="VARCHAR" property="pushResponse"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+    </resultMap>
+    <sql id="Base_Column_List">id, cts, uts, company_id, call_id, cdr_notify_url, content, push_times, push_response, status</sql>
+
+    <select id="selectByPrimaryKey" parameterType="Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_push_log where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="Long">
+        delete from cc_push_log where id = #{id}
+    </delete>
+    <insert id="insertSelective" parameterType="com.voice9.core.entity.PushLog">
+        insert into cc_push_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if><if test="callId != null">call_id,</if>
+            <if test="cdrNotifyUrl != null">cdr_notify_url,</if><if test="content != null">content,</if>
+            <if test="pushTimes != null">push_times,</if><if test="pushResponse != null">push_response,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if><if test="cts != null">#{cts},</if><if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if><if test="callId != null">#{callId},</if>
+            <if test="cdrNotifyUrl != null">#{cdrNotifyUrl},</if><if test="content != null">#{content},</if>
+            <if test="pushTimes != null">#{pushTimes},</if><if test="pushResponse != null">#{pushResponse},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.PushLog">
+        update cc_push_log
+        <set>
+            <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>
+            <if test="cdrNotifyUrl != null">cdr_notify_url = #{cdrNotifyUrl},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="pushTimes != null">push_times = #{pushTimes},</if>
+            <if test="pushResponse != null">push_response = #{pushResponse},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_push_log
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="callId!=null">and call_id = #{callId}</if>
+            <if test="status!=null">and status = #{status}</if>
+            <if test="startTime!=null">and cts &gt;= #{startTime}</if>
+            <if test="endTime!=null">and cts &lt;= #{endTime}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectCountByMap" parameterType="java.util.Map" resultType="int">
+        select count(*) from cc_push_log
+        <where>
+            <if test="companyId!=null">company_id = #{companyId}</if>
+            <if test="callId!=null">and call_id = #{callId}</if>
+            <if test="status!=null">and status = #{status}</if>
+        </where>
+    </select>
+    <insert id="insert" parameterType="com.voice9.core.entity.PushLog">
+        insert into cc_push_log (id, cts, uts, company_id, call_id, cdr_notify_url, content, push_times, push_response, status)
+        values (#{id}, #{cts}, #{uts}, #{companyId}, #{callId}, #{cdrNotifyUrl}, #{content}, #{pushTimes}, #{pushResponse}, #{status})
+    </insert>
+    <insert id="insertMonthSelective" parameterType="com.voice9.core.entity.PushLog">
+        insert into cc_push_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
+            <if test="companyId != null">company_id,</if><if test="callId != null">call_id,</if>
+            <if test="cdrNotifyUrl != null">cdr_notify_url,</if><if test="content != null">content,</if>
+            <if test="pushTimes != null">push_times,</if><if test="pushResponse != null">push_response,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if><if test="cts != null">#{cts},</if><if test="uts != null">#{uts},</if>
+            <if test="companyId != null">#{companyId},</if><if test="callId != null">#{callId},</if>
+            <if test="cdrNotifyUrl != null">#{cdrNotifyUrl},</if><if test="content != null">#{content},</if>
+            <if test="pushTimes != null">#{pushTimes},</if><if test="pushResponse != null">#{pushResponse},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.PushLog">
+        update cc_push_log set cts=#{cts}, uts=#{uts}, company_id=#{companyId}, call_id=#{callId},
+        cdr_notify_url=#{cdrNotifyUrl}, content=#{content}, push_times=#{pushTimes},
+        push_response=#{pushResponse}, status=#{status} where id=#{id}
+    </update>
+    <select id="selectById" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from cc_push_log where company_id=#{companyId} and id=#{id}
+    </select>
+
+    <delete id="deletePushLog" parameterType="Long">
+        delete from cc_push_log where cts &lt; #{cts}
+    </delete>
+    <update id="pushSuccess" parameterType="com.voice9.core.entity.PushLog">
+        update cc_push_log set push_times = push_times + 1, push_response = #{pushResponse}, uts = #{uts}, status = #{status} where id = #{id}
+    </update>
+</mapper>

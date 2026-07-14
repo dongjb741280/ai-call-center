@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voice9.core.mapper.IvrFlowMapper">
+    <resultMap id="BaseResultMap" type="com.voice9.core.entity.IvrFlow">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cts" jdbcType="BIGINT" property="cts"/>
+        <result column="call_id" jdbcType="BIGINT" property="callId"/>
+        <result column="ivr_id" jdbcType="BIGINT" property="ivrId"/>
+        <result column="node_id" jdbcType="VARCHAR" property="nodeId"/>
+        <result column="node_type" jdbcType="VARCHAR" property="nodeType"/>
+        <result column="node_name" jdbcType="VARCHAR" property="nodeName"/>
+        <result column="key_press" jdbcType="VARCHAR" property="keyPress"/>
+        <result column="start_time" jdbcType="BIGINT" property="startTime"/>
+        <result column="end_time" jdbcType="BIGINT" property="endTime"/>
+    </resultMap>
+
+    <select id="selectByCallId" resultMap="BaseResultMap">
+        select * from cc_ivr_flow where call_id = #{callId} order by start_time asc
+    </select>
+</mapper>

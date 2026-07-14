@@ -271,6 +271,12 @@
         create table cc_call_detail${month} like cc_call_detail
     </update>
 
+    <select id="selectListByCallId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from cc_call_detail${monthTime}
+        where call_id = #{callId,jdbcType=BIGINT} order by start_time asc
+    </select>
+
     <delete id="clearTable">
         delete
         from cc_call_detail

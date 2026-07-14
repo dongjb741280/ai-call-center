@@ -666,6 +666,7 @@
             cc_call_device${monthTime}
         <where>
             <if test="id!=null"> id > #{id,jdbcType=BIGINT}</if>
+            <if test="callId!=null"> and call_id = #{callId,jdbcType=BIGINT}</if>
             <if test="companyId!=null"> and company_id = #{companyId,jdbcType=BIGINT}</if>
             <if test="start!=null"> and call_time >= #{start,jdbcType=BIGINT}</if>
             <if test="end!=null"> and call_time &lt; #{end,jdbcType=BIGINT}</if>

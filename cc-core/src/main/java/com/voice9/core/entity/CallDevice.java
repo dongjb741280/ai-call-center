@@ -32,6 +32,7 @@ public class CallDevice implements Serializable {
     /**
      * 通话ID
      */
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
     private Long callId;
 
     /**

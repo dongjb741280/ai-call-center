@@ -32,6 +32,7 @@ public class CallLog implements Serializable {
     /**
      * 话单id
      */
+    @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)
     private Long callId;
 
     /**

@@ -291,7 +291,7 @@ const routes = [
             path: 'predict-outbound',
             name: 'CallPredictOutbound',
             component: () => import('@/views/call/PredictOutbound.vue'),
-            meta: { title: '预出外呼', icon: 'Warning' }
+            meta: { title: '预测外呼', icon: 'Warning' }
           },
           {
             path: 'push',

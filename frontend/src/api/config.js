@@ -488,3 +488,17 @@ export const getAgentMonitorList = (params) => {
 export const getCallMonitorList = (params) => {
   return request({ url: '/cc-api/config/callMonitor', method: 'get', params })
 }
+export const getCallDeviceList = (callId) => {
+  return request({ url: `/cc-api/config/callDevice/${callId}`, method: 'get' })
+}
+export const getCallDetailList = (callId) => {
+  return request({ url: `/cc-api/config/callDetail/${callId}`, method: 'get' })
+}
+export const getIvrFlowList = (callId) => {
+  return request({ url: `/cc-api/config/ivrFlow/${callId}`, method: 'get' })
+}
+
+// ==================== 话单推送 ====================
+export const getPushLogList = (params) => {
+  return request({ url: '/cc-api/config/pushLog', method: 'get', params })
+}
