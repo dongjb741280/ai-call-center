@@ -233,6 +233,9 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
      * @param deviceInfo
      */
     private void outboundCall(AgentInfo agentInfo, MakeCallVo makeCallVo, GroupInfo groupInfo, CallInfo callInfo, DeviceInfo deviceInfo) {
+        if (agentInfo.getLoginType() == null) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR, "loginType未设置");
+        }
         String caller = null, callerDisplay = null, calledDisplay = null;
         switch (agentInfo.getLoginType()) {
             case 1:

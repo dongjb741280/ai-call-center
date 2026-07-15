@@ -138,6 +138,7 @@ public class IndexController {
         agentInfo.setWorkType(agentLoginVo.getWorkType());
         agentInfo.setWebHook(agentLoginVo.getWebHook());
         agentInfo.setToken(token);
+        agentInfo.setLoginType(agentLoginVo.getLoginType()); // 设置登录类型
         cacheService.refleshAgentToken(agentInfo.getAgentKey(), token);
         cacheService.addAgentInfo(agentInfo);
         AgentInfo agentInfo1 = new AgentInfo();

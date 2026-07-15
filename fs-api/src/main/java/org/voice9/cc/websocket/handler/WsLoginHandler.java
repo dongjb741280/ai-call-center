@@ -181,8 +181,12 @@ public class WsLoginHandler extends WsBaseHandler<WsLoginEvnet> {
      * @param event
      */
     private void agentLogin(AgentInfo agentInfo, WsLoginEvnet event) {
-        agentInfo.setLoginType(event.getLoginType());
-        agentInfo.setWorkType(event.getWorkType());
+        if (event.getLoginType() != null) {
+            agentInfo.setLoginType(event.getLoginType());
+        }
+        if (event.getWorkType() != null) {
+            agentInfo.setWorkType(event.getWorkType());
+        }
         if (StringUtils.isNotBlank(event.getAgentName())) {
             agentInfo.setAgentName(event.getAgentName());
         }

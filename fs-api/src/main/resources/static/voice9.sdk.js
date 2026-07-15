@@ -62,6 +62,8 @@
       this._httpBase = this._options.httpBase || '/fs-api';
       this._heartbeatMs = this._options.heartbeatMs || 15000;
       this._hb = null;
+      this._loginType = null;
+      this._workType = null;
 
       // Media elements (optional, for WebRTC use-cases)
       this._media = {
@@ -79,6 +81,8 @@
     init(config) {
       const cfg = typeof config === 'string' ? { token: config } : (config || {});
       this._token = cfg.token || this._options.token || this._token;
+      this._loginType = cfg.loginType != null ? cfg.loginType : this._options.loginType;
+      this._workType = cfg.workType != null ? cfg.workType : this._options.workType;
       this._httpBase = cfg.httpBase || this._httpBase;
       this._wsUrl = buildWsUrl({
         protocol: cfg.protocol,
@@ -103,7 +107,7 @@
       ws.onopen = () => {
         this._startHeartbeat();
         // 完成鉴权后发送登录命令，触发后端 WS_LOGIN，便于后端返回初始化状态
-        this._send({ cmd: 'login', time: Date.now() });
+        this._send({ cmd: 'login', time: Date.now(), loginType: this._loginType, workType: this._workType });
         this._bus.emit('open');
       };
 

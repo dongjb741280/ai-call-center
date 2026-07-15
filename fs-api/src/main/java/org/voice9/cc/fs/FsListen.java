@@ -435,7 +435,9 @@ public class FsListen {
         }
         client = fsClient.get(media);
 
-        called = called + Constant.AT + routeGetway.getMediaHost() + Constant.CO + routeGetway.getMediaPort();
+        if (StringUtils.isNotBlank(routeGetway.getMediaHost())) {
+            called = called + Constant.AT + routeGetway.getMediaHost() + Constant.CO + routeGetway.getMediaPort();
+        }
         if (StringUtils.isNotBlank(routeGetway.getCallerPrefix())) {
             display = routeGetway.getCallerPrefix() + display;
         }
@@ -486,7 +488,11 @@ public class FsListen {
         if (StringUtils.isNoneBlank(sipBuffer)) {
             builder.append(FsConstant.SPLIT).append(sipBuffer);
         }
-        builder.append("}").append(FsConstant.SOFIA + Constant.SK + routeGetway.getProfile() + Constant.SK).append(called).append(FsConstant.PARK);
+        if (StringUtils.isNotBlank(routeGetway.getMediaHost())) {
+            builder.append("}").append(FsConstant.SOFIA + Constant.SK + routeGetway.getProfile() + Constant.SK).append(called).append(FsConstant.PARK);
+        } else {
+            builder.append("}user/").append(called).append(FsConstant.PARK);
+        }
         client.sendBackgroundApiCommand(FsConstant.ORIGINATE, builder.toString());
     }
 

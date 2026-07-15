@@ -76,6 +76,8 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
         BeanUtils.copyProperties(agent, agentInfo);
         agentInfo.setSips(this.getAgentSips(agent.getId()));
         agentInfo.setGroupIds(agentGroupMapper.selectByAgent(agent.getId()));
+        agentInfo.setGroupId(agentGroupMapper.selectByAgent(agent.getId()).get(0));
+        agentInfo.setLoginType(1);
         return agentInfo;
     }
 
