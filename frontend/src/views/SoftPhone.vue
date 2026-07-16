@@ -13,7 +13,7 @@
           </template>
           <el-form :model="loginForm" label-width="72px" size="default">
             <el-form-item label="账号">
-              <el-input v-model="loginForm.agentKey" placeholder="1001@test" />
+              <el-input v-model="loginForm.agentKey" placeholder="agent1001" />
             </el-form-item>
             <el-form-item label="密码">
               <el-input v-model="loginForm.passwd" type="password" show-password placeholder="请输入密码" />
@@ -174,9 +174,9 @@ const agentToken = ref('')
 let voice9Instance = null
 
 const loginForm = reactive({
-  agentKey: '1001@test',
+  agentKey: 'agent1001',
   passwd: '12345678',
-  loginType: 2,
+  loginType: 1,
   workType: 1
 })
 
@@ -449,40 +449,52 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .softphone-page {
-  height: calc(100vh - 60px - 40px);
+  height: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .softphone-container {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 12px;
   height: 100%;
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
+/* ---- 左侧控制面板 ---- */
 .panel-left {
-  width: 460px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  min-width: 0;
   overflow-y: auto;
+  padding-right: 2px;
+}
+
+.panel-left .el-card {
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+
+.panel-left .el-card:last-child {
+  margin-bottom: 0;
 }
 
 .panel-left :deep(.el-card__body) {
-  padding: 14px;
+  padding: 12px 14px;
 }
 
+.panel-left :deep(.el-card__header) {
+  padding: 10px 14px;
+}
+
+/* ---- 右侧消息面板 ---- */
 .panel-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+  min-width: 280px;
+  min-height: 0;
 }
 
 .message-card {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -491,13 +503,18 @@ onBeforeUnmount(() => {
   flex: 1;
   overflow: hidden;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
+/* ---- 卡片组件 ---- */
 .card-header {
   display: flex;
   align-items: center;
   gap: 6px;
   font-weight: 600;
+  font-size: var(--font-size-sm);
 }
 
 .card-actions {
@@ -506,96 +523,150 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
 }
 
+.card-actions .el-button {
+  font-size: var(--font-size-xs);
+}
+
+/* ---- 呼叫控制 ---- */
 .call-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .call-row {
   display: flex;
   gap: 6px;
   align-items: center;
-  flex-wrap: wrap;
 }
 
 .call-row .el-button {
   flex-shrink: 0;
   white-space: nowrap;
+  font-size: var(--font-size-xs);
 }
 
 .panel-left :deep(.el-form-item) {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+}
+
+.panel-left :deep(.el-form-item__label) {
+  font-size: var(--font-size-xs);
 }
 
 .panel-left :deep(.el-divider) {
-  margin: 8px 0;
+  margin: 6px 0;
 }
 
+.panel-left :deep(.el-select .el-input__inner) {
+  font-size: var(--font-size-xs);
+}
+
+/* ---- 消息日志 ---- */
 .message-body {
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 10px 12px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .message-empty {
-  color: #909399;
+  color: var(--text-secondary);
   text-align: center;
   padding-top: 40px;
+  font-size: var(--font-size-sm);
 }
 
 .message-item {
-  padding: 4px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .message-time {
-  color: #909399;
-  margin-right: 8px;
+  color: var(--text-secondary);
+  margin-right: 6px;
 }
 
 .message-type {
   display: inline-block;
-  padding: 0 6px;
+  padding: 0 5px;
   border-radius: 3px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   margin-right: 6px;
 }
 
 .message-type.info {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .message-type.warning {
-  background: #fff7e6;
-  color: #fa8c16;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .message-type.error {
-  background: #fff2f0;
-  color: #ff4d4f;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 .message-content {
   margin: 2px 0 0 0;
   white-space: pre-wrap;
   word-break: break-all;
-  color: #303133;
+  color: var(--text-primary);
+  font-size: 11px;
 }
 
-/* 响应式 */
-@media (max-width: 900px) {
+/* ---- 响应式 ---- */
+@media (max-width: 1100px) {
   .softphone-container {
-    flex-direction: column;
-  }
-  .panel-left {
-    width: 100%;
-    flex-shrink: 1;
+    grid-template-columns: 340px 1fr;
   }
 }
+
+@media (max-width: 900px) {
+  .softphone-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+    overflow-y: auto;
+  }
+
+  .panel-left {
+    overflow-y: visible;
+  }
+
+  .panel-right {
+    min-width: 0;
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-left {
+    gap: 6px;
+  }
+
+  .call-row {
+    flex-wrap: wrap;
+  }
+
+  .call-row .el-button {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .card-actions {
+    gap: 4px;
+  }
+
+  .card-actions .el-button {
+    padding: 6px 10px;
+  }
+}
+
 </style>
