@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.voice9.core.entity.CallDevice;
 import com.voice9.core.entity.CallLog;
+import com.voice9.core.po.AgentInfo;
+import com.voice9.core.po.AgentState;
 import com.voice9.core.po.CallInfo;
 import com.voice9.core.po.CallLogPo;
 import com.voice9.core.po.CompanyInfo;
@@ -161,6 +163,16 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
 
         CompanyInfo companyInfo = cacheService.getCompany(callInfo.getCompanyId());
 
+        //清空坐席通话状态
+        if (callInfo.getAgentKey() != null) {
+            AgentInfo agentInfo = cacheService.getAgentInfo(callInfo.getAgentKey());
+            if (agentInfo != null) {
+                agentInfo.setCallId(null);
+                agentInfo.setDeviceId(null);
+                agentInfo.setAgentState(AgentState.NOT_READY);
+                cacheService.addAgentInfo(agentInfo);
+            }
+        }
         //清空电话信息
         cacheService.removeCallInfo(callInfo.getCallId());
         String notifyUrl = companyInfo.getNotifyUrl();

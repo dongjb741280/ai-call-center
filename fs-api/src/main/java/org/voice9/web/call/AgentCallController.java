@@ -50,8 +50,10 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("makeCall")
     public CommonResponse makeCall(@ModelAttribute("agentInfo") AgentInfo agentInfo, @RequestBody @Validated MakeCallVo makeCallVo) {
-        if (agentInfo.getAgentState() != null) {
-            if (agentInfo.getCallId() != null || agentInfo.getAgentState() == AgentState.TALKING) {
+        // 从缓存获取实时坐席状态，认证主体可能残留上次通话的callId
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        if (cached != null && cached.getAgentState() != null) {
+            if (cached.getCallId() != null || cached.getAgentState() == AgentState.TALKING) {
                 return new CommonResponse(ErrorCode.AGENT_CALLING);
             }
         }
@@ -71,13 +73,17 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("hangup")
     public CommonResponse hangup(@ModelAttribute("agentInfo") AgentInfo agentInfo) {
-        Long callId = agentInfo.getCallId();
+        // 从缓存获取实时callId，认证主体可能已过期
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        Long callId = cached != null ? cached.getCallId() : agentInfo.getCallId();
         CallInfo callInfo = cacheService.getCallInfo(callId);
         if (callId == null || callInfo == null) {
             throw new BusinessException(ErrorCode.CALL_NOT_EXIST);
         }
-        callCdrService.hangupCall(callInfo, agentInfo.getDeviceId());
-        logger.info("agent:{} hangupCall callId:{}  deviceId:{}", agentInfo.getAgentKey(), agentInfo.getCallId(), agentInfo.getDeviceId());
+        callCdrService.hangupCall(callInfo, cached != null ? cached.getDeviceId() : agentInfo.getDeviceId());
+        agentInfo.setCallId(null);
+        agentInfo.setDeviceId(null);
+        logger.info("agent:{} hangupCall callId:{}  deviceId:{}", agentInfo.getAgentKey(), callId, agentInfo.getDeviceId());
         return new CommonResponse();
     }
 
