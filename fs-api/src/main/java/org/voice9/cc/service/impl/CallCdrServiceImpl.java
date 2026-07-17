@@ -313,6 +313,7 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
         agentInfo.setAgentState(AgentState.OUT_CALL);
         agentInfo.setCallId(callInfo.getCallId());
         agentInfo.setDeviceId(deviceInfo.getDeviceId());
+        cacheService.addAgentInfo(agentInfo);
 
         agentService.saveAgentLog(agentInfo);
     }

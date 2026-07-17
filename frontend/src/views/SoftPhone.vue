@@ -13,7 +13,7 @@
           </template>
           <el-form :model="loginForm" label-width="72px" size="default">
             <el-form-item label="账号">
-              <el-input v-model="loginForm.agentKey" placeholder="agent1001" />
+              <el-input v-model="loginForm.agentKey" placeholder="agent1002" />
             </el-form-item>
             <el-form-item label="密码">
               <el-input v-model="loginForm.passwd" type="password" show-password placeholder="请输入密码" />
@@ -30,6 +30,9 @@
                 <el-option label="普通" :value="1" />
                 <el-option label="预测" :value="2" />
               </el-select>
+            </el-form-item>
+            <el-form-item label="FS地址">
+              <el-input v-model="loginForm.fsHost" placeholder="FreeSWITCH IP" />
             </el-form-item>
           </el-form>
           <div class="card-actions">
@@ -51,6 +54,8 @@
               <el-tag v-if="connected" :type="agentState === 'READY' ? 'success' : 'warning'" size="small" style="margin-left: 8px">
                 {{ agentState === 'READY' ? '空闲' : agentState === 'BUSY' ? '忙碌' : agentState || '未知' }}
               </el-tag>
+              <el-tag v-if="sipRegistered" type="success" size="small" style="margin-left: 4px">SIP已注册</el-tag>
+              <el-tag v-else-if="connected" type="info" size="small" style="margin-left: 4px">SIP未注册</el-tag>
             </div>
           </template>
           <div class="card-actions">
@@ -151,6 +156,7 @@
         </el-card>
       </div>
     </div>
+    <audio id="sipRemoteAudio" autoplay hidden></audio>
   </div>
 </template>
 
@@ -158,6 +164,7 @@
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { agentLogin } from '@/api/softphone'
+import { UA, WebSocketInterface } from 'jssip'
 
 const connecting = ref(false)
 const connected = ref(false)
@@ -170,14 +177,19 @@ const consultTransferNum = ref('1002@test')
 const messages = ref([])
 const messageBodyRef = ref(null)
 const agentToken = ref('')
+const sipRegistered = ref(false)
+const sipSession = ref(null)   // 当前 JsSIP 通话 session
 
 let voice9Instance = null
+let sipUa = null
 
 const loginForm = reactive({
-  agentKey: 'agent1001',
+  agentKey: 'agent1002',
   passwd: '12345678',
-  loginType: 1,
-  workType: 1
+  loginType: 2,
+  workType: 1,
+  fsHost: '192.168.1.4',
+  fsPort: 5066
 })
 
 const addMessage = (type, content, level = 'info') => {
@@ -272,11 +284,16 @@ const handleConnect = async () => {
     addMessage('LOGIN', JSON.stringify(res.data))
     ElMessage.success('登录成功')
 
-    // 3. 保存 token 并初始化 WebRTC SDK
+    // 3. 保存 token 并初始化 SDK
     agentToken.value = res.data.token
     initVoice9(res.data)
     connected.value = true
     agentState.value = 'LOGIN'
+
+    // 4. SIP 注册到 FS (loginType=1 SIP / loginType=2 WebRTC)
+    if (loginForm.loginType <= 2) {
+      registerSip(res.data, loginForm.passwd)
+    }
   } catch (e) {
     ElMessage.error('连接失败: ' + (e.message || '未知错误'))
   } finally {
@@ -289,12 +306,106 @@ const handleLogout = () => {
   if (voice9Instance) {
     voice9Instance.logout()
   }
+  if (sipUa) {
+    sipUa.stop()
+    sipUa = null
+    sipRegistered.value = false
+    addMessage('SIP', '已注销')
+  }
   connected.value = false
   agentState.value = ''
   callState.value = ''
   voice9Instance = null
   agentToken.value = ''
   addMessage('EVENT', '手动登出', 'warning')
+}
+
+// SIP 注册到 FreeSWITCH
+const registerSip = (loginData, passwd) => {
+  const sipNum = loginData.sips?.[0]
+  if (!sipNum) {
+    addMessage('SIP', '没有 SIP 号，跳过注册', 'warning')
+    return
+  }
+  // 销毁旧 UA（如果存在）
+  if (sipUa) {
+    sipUa.stop()
+    sipUa = null
+  }
+  const fsHost = loginForm.fsHost || window.location.hostname
+  const wsPort = loginForm.fsPort || 5066
+  try {
+    const socket = new WebSocketInterface(`ws://${fsHost}:${wsPort}`)
+    sipUa = new UA({
+      sockets: [socket],
+      uri: `sip:${sipNum}@${fsHost}`,
+      password: passwd,
+      register: true,
+      session_timers: false,
+      register_expires: 3600
+    })
+
+    sipUa.on('registered', () => {
+      sipRegistered.value = true
+      addMessage('SIP', `分机 ${sipNum}@${fsHost} 注册成功`)
+    })
+    sipUa.on('unregistered', () => {
+      sipRegistered.value = false
+      addMessage('SIP', '注册已取消')
+    })
+    sipUa.on('registrationFailed', (e) => {
+      sipRegistered.value = false
+      addMessage('SIP', `注册失败: ${e.cause}`, 'error')
+    })
+    sipUa.on('connected', () => {
+      addMessage('SIP', `WebSocket 已连接 FS:5066`)
+    })
+    sipUa.on('disconnected', () => {
+      sipRegistered.value = false
+      addMessage('SIP', 'WebSocket 断开，将自动重连', 'warning')
+    })
+    sipUa.on('newRTCSession', (data) => {
+      const session = data.session
+      if (data.originator === 'remote') {
+        // 来电：FS 通过 WebSocket 发来 INVITE
+        sipSession.value = session
+        callState.value = 'RINGING'
+        addMessage('SIP', `来电: ${session.remote_identity.uri.user}`, 'warning')
+        // 自动应答
+        session.answer({
+          mediaConstraints: { audio: true, video: false }
+        })
+      }
+      session.on('accepted', () => {
+        callState.value = 'TALKING'
+        addMessage('SIP', '通话已建立')
+      })
+      session.on('ended', () => {
+        sipSession.value = null
+        callState.value = ''
+        addMessage('SIP', '通话结束')
+      })
+      session.on('failed', (e) => {
+        sipSession.value = null
+        callState.value = ''
+        addMessage('SIP', `通话失败: ${e.cause}`, 'error')
+      })
+      session.on('peerconnection', (pc) => {
+        // 绑定远端音频到 <audio> 元素
+        pc.ontrack = (ev) => {
+          const audio = document.getElementById('sipRemoteAudio')
+          if (audio && ev.streams[0]) {
+            audio.srcObject = ev.streams[0]
+          }
+        }
+      })
+    })
+
+    sipUa.start()
+    addMessage('SIP', `正在注册 ${sipNum}@${fsHost}:${wsPort} ...`)
+  } catch (e) {
+    addMessage('SIP', `初始化失败: ${e.message}`, 'error')
+  }
 }
 
 // 忙碌
@@ -330,6 +441,13 @@ const handleMakeCall = () => {
 
 // 应答
 const handleAcceptCall = () => {
+  if (sipSession.value) {
+    sipSession.value.answer({
+      mediaConstraints: { audio: true, video: false }
+    })
+    addMessage('CMD', 'sipAnswer')
+    return
+  }
   if (voice9Instance) {
     voice9Instance.acceptCall()
     callState.value = 'TALKING'
@@ -339,6 +457,13 @@ const handleAcceptCall = () => {
 
 // 挂机
 const handleHangup = () => {
+  if (sipSession.value) {
+    sipSession.value.terminate()
+    sipSession.value = null
+    callState.value = ''
+    addMessage('CMD', 'sipTerminate')
+    return
+  }
   if (voice9Instance) {
     voice9Instance.closeCall()
     callState.value = ''
@@ -443,6 +568,10 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   if (voice9Instance) {
     voice9Instance.logout()
+  }
+  if (sipUa) {
+    sipUa.stop()
+    sipUa = null
   }
 })
 </script>
