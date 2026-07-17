@@ -28,7 +28,7 @@ import org.voice9.cc.fs.esl.transport.SendMsg;
 public class BaseHandler {
     protected Logger logger = LoggerFactory.getLogger(BaseHandler.class);
 
-    @Value("${record.path:/usr/local/freeswitch/}")
+    @Value("${record.path:/Users/dongjb/soft/freeswitch/}")
     protected String recordPath;
 
     @Autowired

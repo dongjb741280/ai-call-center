@@ -104,6 +104,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
          * 一般情况下，挂断其他所有设备
          */
         if (deviceInfo.getCdrType() <= 3 && callInfo.getEndTime() == null) {
+            callInfo.setEndTime(deviceInfo.getEndTime());
             if (!CollectionUtils.isEmpty(callInfo.getDeviceList())) {
                 callInfo.getDeviceList().forEach(s -> {
                     super.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), s);

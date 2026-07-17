@@ -109,12 +109,12 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
         callInfo.getDeviceList().add(deviceId);
         String called = callInfo.getCalled();
 
-        //被叫是坐席时，设置callId/deviceId，支持被叫坐席应答
-        AgentInfo calledAgent = cacheService.getAgentInfo(called);
-        if (calledAgent != null) {
-            called = calledAgent.getCalled();
-            calledAgent.setCallId(callInfo.getCallId());
-            calledAgent.setDeviceId(deviceId);
+        //坐席内呼
+        if (callInfo.getCallType() == CallType.INNER_CALL) {
+            AgentInfo agentInfo = cacheService.getAgentInfo(called);
+            called = agentInfo.getCalled();
+            agentInfo.setCallId(callInfo.getCallId());
+            agentInfo.setDeviceId(deviceId);
         }
         RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), called);
         if (routeGetway == null) {
