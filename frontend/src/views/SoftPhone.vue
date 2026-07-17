@@ -179,9 +179,12 @@ const messageBodyRef = ref(null)
 const agentToken = ref('')
 const sipRegistered = ref(false)
 const sipSession = ref(null)   // 当前 JsSIP 通话 session
+const isOutgoingCall = ref(false) // 标记是否是主动外呼（A-leg），需自动接听
 
 let voice9Instance = null
 let sipUa = null
+let ringbackCtx = null      // 本地振铃音AudioContext
+let ringbackTimer = null     // 振铃音定时器
 
 const loginForm = reactive({
   agentKey: 'agent1002',
@@ -228,6 +231,39 @@ const loadVoice9Sdk = () => {
   })
 }
 
+// 本地振铃音（浏览器端生成）
+const startLocalRingback = () => {
+  if (ringbackCtx) return
+  try {
+    ringbackCtx = new (window.AudioContext || window.webkitAudioContext)()
+    const playTone = () => {
+      if (!ringbackCtx) return
+      const gain = ringbackCtx.createGain()
+      gain.gain.value = 0.25
+      gain.connect(ringbackCtx.destination)
+      const o1 = ringbackCtx.createOscillator()
+      const o2 = ringbackCtx.createOscillator()
+      o1.type = 'sine'; o1.frequency.value = 440
+      o2.type = 'sine'; o2.frequency.value = 480
+      o1.connect(gain); o2.connect(gain)
+      o1.start(); o2.start()
+      o1.stop(ringbackCtx.currentTime + 2)
+      o2.stop(ringbackCtx.currentTime + 2)
+    }
+    playTone()
+    ringbackTimer = setInterval(playTone, 6000)
+    addMessage('SIP', '本地振铃音开始')
+  } catch (e) {
+    addMessage('SIP', `振铃音失败: ${e.message}`, 'error')
+  }
+}
+
+const stopLocalRingback = () => {
+  if (ringbackTimer) { clearInterval(ringbackTimer); ringbackTimer = null }
+  // 不close AudioContext，避免浏览器音频系统被挂起影响后续WebRTC播放
+  ringbackCtx = null
+}
+
 // 初始化 Voice9 事件监听
 const initVoice9 = (loginData) => {
   voice9Instance = new window.Voice9()
@@ -240,6 +276,13 @@ const initVoice9 = (loginData) => {
     if (data.type === 'stateChange') {
       agentState.value = data.agentState || ''
       callState.value = data.callState || ''
+    }
+
+    // B-leg振铃时播放本地振铃音，接通/挂断后停止
+    if (data.type === 'OUT_CALLED_RING') {
+      startLocalRingback()
+    } else if (data.type === 'TALKING' || data.agentState === 'AFTER' || data.type === 'AFTER') {
+      stopLocalRingback()
     }
 
     addMessage('RECV', msg)
@@ -369,16 +412,47 @@ const registerSip = (loginData, passwd) => {
       if (data.originator === 'remote') {
         // 来电：FS 通过 WebSocket 发来 INVITE
         sipSession.value = session
-        callState.value = 'RINGING'
         addMessage('SIP', `来电: ${session.remote_identity.uri.user}`, 'warning')
-        // 自动应答
-        session.answer({
-          mediaConstraints: { audio: true, video: false }
-        })
+        if (isOutgoingCall.value) {
+          // 自己发起的外呼A-leg，自动接听
+          isOutgoingCall.value = false
+          session.answer({
+            mediaConstraints: { audio: true, video: false }
+          })
+        } else {
+          // 被叫B-leg，等待手动点击"应答"
+          callState.value = 'RINGING'
+        }
       }
+      const bindRemoteAudio = (pc) => {
+        if (!pc) return
+        // 处理已存在的receivers
+        const receivers = pc.getReceivers()
+        if (receivers && receivers.length > 0) {
+          const stream = new MediaStream(receivers.map(r => r.track).filter(Boolean))
+          if (stream.getTracks().length > 0) {
+            const audio = document.getElementById('sipRemoteAudio')
+            audio.srcObject = stream
+            audio.play().catch(() => {})
+            addMessage('SIP', '远端音频已绑定')
+          }
+        }
+        // 处理未来的track
+        pc.ontrack = (ev) => {
+          const audio = document.getElementById('sipRemoteAudio')
+          if (audio && ev.streams[0]) {
+            audio.srcObject = ev.streams[0]
+            audio.play().catch(() => {})
+            addMessage('SIP', 'ontrack远端音频已绑定')
+          }
+        }
+      }
+
       session.on('accepted', () => {
         callState.value = 'TALKING'
         addMessage('SIP', '通话已建立')
+        // 通过session.connection获取PeerConnection绑定音频
+        setTimeout(() => bindRemoteAudio(session.connection), 100)
       })
       session.on('ended', () => {
         sipSession.value = null
@@ -389,15 +463,6 @@ const registerSip = (loginData, passwd) => {
         sipSession.value = null
         callState.value = ''
         addMessage('SIP', `通话失败: ${e.cause}`, 'error')
-      })
-      session.on('peerconnection', (pc) => {
-        // 绑定远端音频到 <audio> 元素
-        pc.ontrack = (ev) => {
-          const audio = document.getElementById('sipRemoteAudio')
-          if (audio && ev.streams[0]) {
-            audio.srcObject = ev.streams[0]
-          }
-        }
       })
     })
 
@@ -433,6 +498,7 @@ const handleMakeCall = () => {
     return
   }
   if (voice9Instance) {
+    isOutgoingCall.value = true
     voice9Instance.makeCall(phoneNum.value)
     callState.value = 'CALLING'
     addMessage('CMD', `makeCall: ${phoneNum.value}`)
@@ -457,6 +523,7 @@ const handleAcceptCall = () => {
 
 // 挂机
 const handleHangup = () => {
+  stopLocalRingback()
   if (sipSession.value) {
     sipSession.value.terminate()
     sipSession.value = null
