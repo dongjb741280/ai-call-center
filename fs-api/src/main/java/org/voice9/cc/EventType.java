@@ -147,6 +147,11 @@ public enum EventType {
     WS_HANGUP_CALL(2070, WsHangupCallEvent.class),
 
     /**
+     * 转接
+     */
+    WS_TRANSFER(2072, WsTransferEvent.class),
+
+    /**
      * 坐席退出系统
      */
     WS_LOGOUT(2071, WsLogoutEvent.class),

@@ -327,7 +327,8 @@ const handleConnect = async () => {
       agentKey: loginForm.agentKey,
       passwd: loginForm.passwd,
       loginType: loginForm.loginType,
-      workType: loginForm.workType
+      workType: loginForm.workType,
+      forceLogin: true
     })
 
     if (res.code !== 0) {

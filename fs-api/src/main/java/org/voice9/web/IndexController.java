@@ -131,6 +131,8 @@ public class IndexController {
         agentInfo.setBeforeTime(agentInfo.getLogoutTime());
         agentInfo.setStateTime(agentInfo.getLoginTime());
         agentInfo.setLoginTime(Instant.now().getEpochSecond());
+        agentInfo.setCallId(null);
+        agentInfo.setDeviceId(null);
         agentInfo.setAgentState(AgentState.LOGIN);
         agentInfo.setHost(request.getLocalAddr());
         agentInfo.setGroupIds(agentService.getAgentGroups(agentInfo.getId()));

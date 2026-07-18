@@ -109,12 +109,20 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
         callInfo.getDeviceList().add(deviceId);
         String called = callInfo.getCalled();
 
-        //坐席内呼
-        if (callInfo.getCallType() == CallType.INNER_CALL) {
-            AgentInfo agentInfo = cacheService.getAgentInfo(called);
-            called = agentInfo.getCalled();
-            agentInfo.setCallId(callInfo.getCallId());
-            agentInfo.setDeviceId(deviceId);
+        //被叫是坐席时设置callId/deviceId，支持被叫接听、挂机、转接
+        AgentInfo calledAgent = cacheService.getAgentInfo(called);
+        if (calledAgent == null) {
+            // 通过SIP号查找坐席
+            com.voice9.core.entity.Agent agent = agentService.getAgentBySip(called);
+            if (agent != null) {
+                calledAgent = cacheService.getAgentInfo(agent.getAgentKey());
+            }
+        }
+        if (calledAgent != null) {
+            called = calledAgent.getCalled();
+            calledAgent.setCallId(callInfo.getCallId());
+            calledAgent.setDeviceId(deviceId);
+            cacheService.addAgentInfo(calledAgent);
         }
         RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), called);
         if (routeGetway == null) {
@@ -174,18 +182,12 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
      */
     private void transferCall(CallInfo callInfo, NextCommand nextCommand, FsAnswerEvent event) {
         /**
-         * 转接电话 deviceInfo为被转接设备
+         * 转接电话，桥接坐席leg和转接目标leg
          */
-        String fromDeviceId = nextCommand.getDeviceId();
-        callInfo.getNextCommands().add(new NextCommand(event.getDeviceId(), NextType.NEXT_TRANSFER_SUCCESS, callInfo.getDeviceList().get(1)));
-        logger.info("转接电话中 callId:{} from:{} to:{} ", callInfo.getCallId(), fromDeviceId, event.getDeviceId());
-        try {
-            transferCall(callInfo.getMediaHost(), event.getDeviceId(), nextCommand.getNextValue());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        //挂掉原有的电话
-        hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), fromDeviceId);
+        String agentDeviceId = nextCommand.getDeviceId();
+        String targetDeviceId = event.getDeviceId();
+        logger.info("转接桥接 callId:{} agentDevice:{} targetDevice:{}", callInfo.getCallId(), agentDeviceId, targetDeviceId);
+        bridgeCall(callInfo.getMediaHost(), callInfo.getCallId(), agentDeviceId, targetDeviceId);
         callInfo.getNextCommands().add(new NextCommand(NextType.NORNAL));
     }
 

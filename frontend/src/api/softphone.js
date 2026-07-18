@@ -7,7 +7,8 @@ export const agentLogin = (data) => {
     agentKey: data.agentKey,
     passwd: CryptoJS.SHA256(data.passwd).toString(),
     loginType: data.loginType,
-    workType: data.workType
+    workType: data.workType,
+    forceLogin: data.forceLogin || false
   }
   return request({
     url: '/fs-api/index/login',
