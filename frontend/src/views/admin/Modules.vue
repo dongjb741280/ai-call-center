@@ -30,31 +30,31 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
-      <el-table-column label="模块名称" width="140">
+      <el-table-column label="模块名称" min-width="120">
         <template #default="{ row }">{{ row.appName || typeMap[row.applicationId || row.appType] || '' }}</template>
       </el-table-column>
-      <el-table-column label="模块类型" width="100">
+      <el-table-column label="模块类型" min-width="90">
         <template #default="{ row }">{{ typeMap[row.applicationId || row.appType] || '' }}</template>
       </el-table-column>
-      <el-table-column prop="applicationGroup" label="所在组" width="120">
+      <el-table-column prop="applicationGroup" label="所在组" min-width="110">
         <template #default="{ row }">{{ row.applicationGroup || row.appGroup || '' }}</template>
       </el-table-column>
-      <el-table-column label="操作时间" width="180">
+      <el-table-column label="操作时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
-      <el-table-column label="地址" width="160">
+      <el-table-column label="地址" min-width="140">
         <template #default="{ row }">{{ row.applicationHost || row.appHost || '' }}</template>
       </el-table-column>
-      <el-table-column label="端口" width="80" align="center">
+      <el-table-column label="端口" min-width="80" align="center">
         <template #default="{ row }">{{ row.applicationPort || row.appPort || '' }}</template>
       </el-table-column>
-      <el-table-column label="用户名" width="100">
+      <el-table-column label="用户名" min-width="90">
         <template #default="{ row }">{{ row.username || '-' }}</template>
       </el-table-column>
-      <el-table-column label="密码" width="140" show-overflow-tooltip>
+      <el-table-column label="密码" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.pwd || '-' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="状态" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 2 ? 'success' : 'danger'" size="small">
             {{ row.status === 2 ? '启用' : '禁用' }}

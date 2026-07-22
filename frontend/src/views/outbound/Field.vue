@@ -26,17 +26,17 @@
         <template #default="{ $index }">{{ (pagination.currentPage-1)*pagination.pageSize + $index + 1 }}</template>
       </el-table-column>
       <el-table-column prop="name" label="字段名称" min-width="160" show-overflow-tooltip />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="号码字段" width="90" align="center">
+      <el-table-column label="号码字段" min-width="90" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="row.isPhone === 1 ? 'success' : 'info'">
             {{ row.isPhone === 1 ? '是' : '否' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="字段类型" width="120" align="center">
+      <el-table-column label="字段类型" min-width="110" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="row.fieldType === '系统字段' ? 'warning' : 'primary'">
             {{ row.fieldType || '-' }}

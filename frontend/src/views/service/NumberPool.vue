@@ -26,21 +26,21 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="name" label="号码池名称" min-width="160" />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="180">
+      <el-table-column label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
-      <el-table-column label="号码策略" width="100" align="center">
+      <el-table-column label="号码策略" min-width="90" align="center">
         <template #default="{ row }">
           <el-tag size="small">{{ row.strategy || row.displayStrategy || '随机' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="归属地" width="100">
+      <el-table-column label="归属地" min-width="90">
         <template #default="{ row }">{{ row.location || row.province || '-' }}</template>
       </el-table-column>
-      <el-table-column label="号码数量" width="100" align="center">
+      <el-table-column label="号码数量" min-width="90" align="center">
         <template #default="{ row }">{{ row.phoneCount || row.count || 0 }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">

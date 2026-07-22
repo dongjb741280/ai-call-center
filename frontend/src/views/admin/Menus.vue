@@ -33,9 +33,9 @@
       row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-      <el-table-column prop="name" label="菜单名称" width="200" />
-      <el-table-column prop="path" label="路径" width="200" />
-      <el-table-column prop="icon" label="图标" width="100">
+      <el-table-column prop="name" label="菜单名称" min-width="180" />
+      <el-table-column prop="path" label="路径" min-width="180" />
+      <el-table-column prop="icon" label="图标" min-width="90">
         <template #default="{ row }">
           <el-icon v-if="row.icon">
             <component :is="row.icon" />
@@ -43,21 +43,21 @@
         </template>
       </el-table-column>
       <el-table-column prop="sort" label="排序" width="80" />
-      <el-table-column prop="type" label="类型" width="100">
+      <el-table-column prop="type" label="类型" min-width="90">
         <template #default="{ row }">
           <el-tag :type="row.type === 1 ? 'primary' : 'success'">
             {{ row.type === 1 ? '菜单' : '按钮' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column prop="status" label="状态" min-width="90">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">
             {{ row.status === 1 ? '启用' : '禁用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" width="160" />
+      <el-table-column prop="createTime" label="创建时间" min-width="150" />
       <el-table-column label="操作" width="250" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" size="small" @click="handleEdit(row)">

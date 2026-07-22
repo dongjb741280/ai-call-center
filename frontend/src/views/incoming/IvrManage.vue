@@ -35,23 +35,23 @@
         <template #default="{ $index }">{{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}</template>
       </el-table-column>
       <el-table-column prop="name" label="IVR名称" min-width="200" show-overflow-tooltip />
-      <el-table-column label="IVR类型" width="100" align="center">
+      <el-table-column label="IVR类型" min-width="90" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="row.type === 1 ? 'primary' : 'warning'">
             {{ row.type === 1 ? '转接' : row.type === 2 ? '咨询' : '-' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="110" align="center">
+      <el-table-column label="状态" min-width="100" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="statusTag(row.status)">{{ statusMap[row.status] || '-' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createUser" label="发布人" width="120" show-overflow-tooltip />
-      <el-table-column label="创建时间" width="170">
+      <el-table-column prop="createUser" label="发布人" min-width="110" show-overflow-tooltip />
+      <el-table-column label="创建时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="170">
+      <el-table-column label="修改时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" fixed="right" align="center">

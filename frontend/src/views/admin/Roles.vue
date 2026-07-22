@@ -38,10 +38,10 @@
     <!-- 角色表格 -->
     <el-table :data="roleList" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="100" />
-      <el-table-column prop="cts" label="创建时间" width="180">
+      <el-table-column prop="cts" label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatDateTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column prop="uts" label="修改时间" width="180">
+      <el-table-column prop="uts" label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatDateTime(row.uts) }}</template>
       </el-table-column>
       <el-table-column label="企业名称" min-width="160">

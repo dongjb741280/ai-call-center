@@ -18,30 +18,30 @@
       <el-table-column prop="taskId" label="任务id" width="100" />
       <el-table-column prop="taskName" label="任务名称" min-width="120" show-overflow-tooltip />
       <el-table-column prop="transferName" label="转接名称" min-width="120" show-overflow-tooltip />
-      <el-table-column label="统计时间" width="180">
+      <el-table-column label="统计时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.statsTime) }}</template>
       </el-table-column>
-      <el-table-column label="任务状态" width="100" align="center">
+      <el-table-column label="任务状态" min-width="90" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="listTotal" label="名单数量" width="100" align="center" />
-      <el-table-column prop="dialedCount" label="已拨数" width="90" align="center" />
-      <el-table-column prop="answeredCount" label="接听数" width="90" align="center" />
-      <el-table-column label="接通率" width="100" align="center">
+      <el-table-column prop="listTotal" label="名单数量" min-width="90" align="center" />
+      <el-table-column prop="dialedCount" label="已拨数" min-width="80" align="center" />
+      <el-table-column prop="answeredCount" label="接听数" min-width="80" align="center" />
+      <el-table-column label="接通率" min-width="90" align="center">
         <template #default="{ row }">
           <span :style="{ color: rateColor(row.answerRate) }">{{ row.answerRate || '0%' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="pendingCount" label="待接听数" width="100" align="center" />
-      <el-table-column prop="inCall" label="通话中" width="80" align="center" />
-      <el-table-column prop="queueCount" label="排队数" width="80" align="center" />
-      <el-table-column prop="signedInAgents" label="签入坐席" width="100" align="center" />
-      <el-table-column prop="idleAgents" label="空闲坐席" width="100" align="center" />
-      <el-table-column prop="busyAgents" label="忙碌坐席" width="100" align="center" />
-      <el-table-column prop="afterCallAgents" label="话后坐席" width="100" align="center" />
-      <el-table-column prop="abandonedCount" label="弃线数" width="90" align="center" />
+      <el-table-column prop="pendingCount" label="待接听数" min-width="90" align="center" />
+      <el-table-column prop="inCall" label="通话中" min-width="70" align="center" />
+      <el-table-column prop="queueCount" label="排队数" min-width="70" align="center" />
+      <el-table-column prop="signedInAgents" label="签入坐席" min-width="90" align="center" />
+      <el-table-column prop="idleAgents" label="空闲坐席" min-width="90" align="center" />
+      <el-table-column prop="busyAgents" label="忙碌坐席" min-width="90" align="center" />
+      <el-table-column prop="afterCallAgents" label="话后坐席" min-width="90" align="center" />
+      <el-table-column prop="abandonedCount" label="弃线数" min-width="80" align="center" />
     </el-table>
 
     <div class="pagination">

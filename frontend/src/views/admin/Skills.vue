@@ -58,19 +58,19 @@
             <el-button size="small" @click="resetAgentSearch">重置</el-button>
           </div>
           <el-table :data="filteredAgentList" v-loading="agentLoading" size="small" max-height="500">
-            <el-table-column label="坐席账号" width="120">
+            <el-table-column label="坐席账号" min-width="110">
               <template #default="{ row }">{{ row.agentKey || row.agent?.agentKey || '' }}</template>
             </el-table-column>
-            <el-table-column label="坐席名称" width="120">
+            <el-table-column label="坐席名称" min-width="110">
               <template #default="{ row }">{{ row.agentName || row.agent?.name || '' }}</template>
             </el-table-column>
-            <el-table-column label="等级类型" width="100">
+            <el-table-column label="等级类型" min-width="90">
               <template #default="{ row }">{{ rankTypeMap[row.rankType] || row.rankValue || row.skillLevel || '-' }}</template>
             </el-table-column>
-            <el-table-column label="匹配规则" width="100">
+            <el-table-column label="匹配规则" min-width="90">
               <template #default="{ row }">{{ row.matchType === 1 ? '低到高' : row.matchType === 2 ? '高到低' : row.matchType || '-' }}</template>
             </el-table-column>
-            <el-table-column label="占用率" width="80" align="center">
+            <el-table-column label="占用率" min-width="80" align="center">
               <template #default="{ row }">{{ row.shareValue || row.rankValue || '-' }}</template>
             </el-table-column>
             <el-table-column label="操作" width="120" align="center">

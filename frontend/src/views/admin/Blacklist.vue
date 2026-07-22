@@ -25,21 +25,21 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
-      <el-table-column prop="numPrefix" label="号码" width="180" />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column prop="numPrefix" label="号码" min-width="160" />
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="黑名单类型" width="120">
+      <el-table-column label="黑名单类型" min-width="110">
         <template #default="{ row }">
           <el-tag :type="row.type === 1 ? 'danger' : 'warning'" size="small">{{ row.type === 1 ? '黑名单' : '灰名单' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="呼叫方向" width="100">
+      <el-table-column label="呼叫方向" min-width="90">
         <template #default="{ row }">
           <el-tag size="small">{{ directionMap[row.callDirection] || row.callDirection }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="状态" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 2 ? 'success' : 'danger'" size="small">
             {{ row.status === 2 ? '启用' : '禁用' }}

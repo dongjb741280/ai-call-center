@@ -34,20 +34,20 @@
 
     <div class="table-wrapper">
       <el-table :data="list" v-loading="loading" size="small" style="width:100%">
-        <el-table-column prop="callId" label="callId" width="200" show-overflow-tooltip />
-        <el-table-column label="结束时间" width="170">
+        <el-table-column prop="callId" label="callId" min-width="180" show-overflow-tooltip />
+        <el-table-column label="结束时间" min-width="160">
           <template #default="{ row }">{{ formatTime(row.cts) }}</template>
         </el-table-column>
-        <el-table-column label="推送时间" width="170">
+        <el-table-column label="推送时间" min-width="160">
           <template #default="{ row }">{{ formatTime(row.uts) }}</template>
         </el-table-column>
         <el-table-column prop="cdrNotifyUrl" label="推送地址" min-width="260" show-overflow-tooltip />
-        <el-table-column prop="pushTimes" label="推送次数" width="90" align="center" />
-        <el-table-column label="加密" width="80" align="center">
+        <el-table-column prop="pushTimes" label="推送次数" min-width="80" align="center" />
+        <el-table-column label="加密" min-width="70" align="center">
           <template #default="{ row }">{{ row.content ? '不加密' : '-' }}</template>
         </el-table-column>
         <el-table-column prop="pushResponse" label="返回值" min-width="200" show-overflow-tooltip />
-        <el-table-column label="状态" width="100" align="center">
+        <el-table-column label="状态" min-width="90" align="center">
           <template #default="{ row }">
             <el-tag size="small" :type="row.status === 2 ? 'success' : 'danger'">
               {{ row.status === 2 ? '推送成功' : '推送失败' }}

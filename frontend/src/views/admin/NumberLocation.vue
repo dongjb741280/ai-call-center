@@ -22,16 +22,16 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="80" />
-      <el-table-column label="修改时间" width="180">
+      <el-table-column label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column prop="numPrefix" label="号码" width="100" />
-      <el-table-column label="运营商" width="100">
+      <el-table-column prop="numPrefix" label="号码" min-width="100" />
+      <el-table-column label="运营商" min-width="100">
         <template #default="{ row }">{{ operatorMap[row.operator] || row.operator }}</template>
       </el-table-column>
-      <el-table-column prop="numCode" label="区号" width="100" />
-      <el-table-column prop="numProvince" label="省" width="140" show-overflow-tooltip />
-      <el-table-column prop="numCity" label="市" width="140" show-overflow-tooltip />
+      <el-table-column prop="numCode" label="区号" min-width="90" />
+      <el-table-column prop="numProvince" label="省" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="numCity" label="市" min-width="120" show-overflow-tooltip />
     </el-table>
 
     <div class="pagination">

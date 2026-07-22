@@ -34,15 +34,15 @@
     <!-- 用户表格 -->
     <el-table :data="userList" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="80" />
-      <el-table-column prop="username" label="账号" width="140" />
-      <el-table-column prop="nickname" label="昵称" width="140" />
-      <el-table-column prop="phone" label="电话" width="160" />
-      <el-table-column prop="email" label="邮箱" width="200" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
-      <el-table-column prop="updateTime" label="修改时间" width="180" />
-      <el-table-column prop="companyName" label="企业名称" width="160" />
-      <el-table-column prop="roleName" label="角色" width="240" />
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column prop="username" label="账号" min-width="120" />
+      <el-table-column prop="nickname" label="昵称" min-width="120" />
+      <el-table-column prop="phone" label="电话" min-width="140" />
+      <el-table-column prop="email" label="邮箱" min-width="180" />
+      <el-table-column prop="createTime" label="创建时间" min-width="160" />
+      <el-table-column prop="updateTime" label="修改时间" min-width="160" />
+      <el-table-column prop="companyName" label="企业名称" min-width="140" />
+      <el-table-column prop="roleName" label="角色" min-width="200" />
+      <el-table-column prop="status" label="状态" min-width="90">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">
             {{ row.status === 1 ? '启用' : '禁用' }}

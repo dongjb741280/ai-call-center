@@ -36,28 +36,28 @@
         <template #default="{ $index }">{{ (pagination.currentPage - 1) * pagination.pageSize + $index + 1 }}</template>
       </el-table-column>
       <el-table-column prop="name" label="策略名称" min-width="160" show-overflow-tooltip />
-      <el-table-column label="策略类型" width="90" align="center">
+      <el-table-column label="策略类型" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="handleTypeTag(row.handleType)">{{ handleTypeMap[row.handleType] || '-' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="排队方式" width="110" align="center">
+      <el-table-column label="排队方式" min-width="100" align="center">
         <template #default="{ row }">
           <el-tag size="small" :type="busyTypeTag(row.busyType)">{{ busyTypeMap[row.busyType] || '-' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="排队超时" width="100" align="center">
+      <el-table-column label="排队超时" min-width="90" align="center">
         <template #default="{ row }">{{ row.queueTimeout ? row.queueTimeout + 's' : '-' }}</template>
       </el-table-column>
-      <el-table-column label="超时处理" width="90" align="center">
+      <el-table-column label="超时处理" min-width="80" align="center">
         <template #default="{ row }">
           {{ row.busyTimeoutType === 1 ? '溢出' : row.busyTimeoutType === 2 ? '挂机' : '-' }}
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="170">
+      <el-table-column label="创建时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="170">
+      <el-table-column label="修改时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" fixed="right" align="center">

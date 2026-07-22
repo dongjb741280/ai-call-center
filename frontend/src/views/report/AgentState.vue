@@ -27,37 +27,37 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width:100%" size="small">
-      <el-table-column prop="agentKey" label="坐席账号" width="140" />
-      <el-table-column prop="agentName" label="坐席名称" width="120" />
-      <el-table-column label="当前状态" width="140">
+      <el-table-column prop="agentKey" label="坐席账号" min-width="120" />
+      <el-table-column prop="agentName" label="坐席名称" min-width="110" />
+      <el-table-column label="当前状态" min-width="120">
         <template #default="{ row }">
           <el-tag size="small" :type="stateTag(row.state)">{{ row.state || '-' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="当前时间" width="180">
+      <el-table-column label="当前时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.stateTime) }}</template>
       </el-table-column>
-      <el-table-column label="之前状态" width="140">
+      <el-table-column label="之前状态" min-width="120">
         <template #default="{ row }">
           <el-tag size="small" :type="stateTag(row.beforeState)">{{ row.beforeState || '-' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="之前时间" width="180">
+      <el-table-column label="之前时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.beforeTime) }}</template>
       </el-table-column>
-      <el-table-column label="持续时间" width="100" align="center">
+      <el-table-column label="持续时间" min-width="90" align="center">
         <template #default="{ row }">{{ formatDuration(row.duration) }}</template>
       </el-table-column>
-      <el-table-column prop="callId" label="callId" width="200" show-overflow-tooltip />
-      <el-table-column label="登录类型" width="100" align="center">
+      <el-table-column prop="callId" label="callId" min-width="180" show-overflow-tooltip />
+      <el-table-column label="登录类型" min-width="90" align="center">
         <template #default="{ row }">{{ loginTypeLabel(row.loginType) }}</template>
       </el-table-column>
-      <el-table-column label="工作类型" width="100" align="center">
+      <el-table-column label="工作类型" min-width="90" align="center">
         <template #default="{ row }">{{ workTypeLabel(row.workType) }}</template>
       </el-table-column>
-      <el-table-column prop="groupId" label="技能组id" width="120" />
+      <el-table-column prop="groupId" label="技能组id" min-width="110" />
       <el-table-column prop="host" label="cti地址" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="remoteAddress" label="坐席端地址" width="150" show-overflow-tooltip />
+      <el-table-column prop="remoteAddress" label="坐席端地址" min-width="140" show-overflow-tooltip />
     </el-table>
 
     <div class="pagination">

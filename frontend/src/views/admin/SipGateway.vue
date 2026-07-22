@@ -28,24 +28,24 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
-      <el-table-column prop="username" label="网关账号" width="140" />
-      <el-table-column prop="passwd" label="网关密码" width="120" show-overflow-tooltip />
-      <el-table-column prop="companyCode" label="企业编码" width="100" />
+      <el-table-column prop="username" label="网关账号" min-width="120" />
+      <el-table-column prop="passwd" label="网关密码" min-width="110" show-overflow-tooltip />
+      <el-table-column prop="companyCode" label="企业编码" min-width="90" />
       <el-table-column prop="companyName" label="企业名称" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="registerAddr" label="注册地址" width="180" show-overflow-tooltip />
-      <el-table-column prop="external" label="网关外网" width="140" show-overflow-tooltip>
+      <el-table-column prop="registerAddr" label="注册地址" min-width="160" show-overflow-tooltip />
+      <el-table-column prop="external" label="网关外网" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.external || '-' }}</template>
       </el-table-column>
-      <el-table-column prop="internal" label="网关内网" width="140" show-overflow-tooltip>
+      <el-table-column prop="internal" label="网关内网" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.internal || '-' }}</template>
       </el-table-column>
-      <el-table-column label="注册时间" width="100" align="center">
+      <el-table-column label="注册时间" min-width="90" align="center">
         <template #default="{ row }">{{ row.registerTime ? formatTime(row.registerTime) : '-' }}</template>
       </el-table-column>
-      <el-table-column prop="expire" label="注册周期" width="90" align="center">
+      <el-table-column prop="expire" label="注册周期" min-width="80" align="center">
         <template #default="{ row }">{{ row.expire ?? 0 }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="状态" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 2 ? 'success' : 'danger'" size="small">
             {{ row.status === 2 ? '在线' : '下线' }}

@@ -30,18 +30,18 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width:100%" size="small">
-      <el-table-column prop="account" label="账号" width="90" />
-      <el-table-column label="操作时间" width="180">
+      <el-table-column prop="account" label="账号" min-width="80" />
+      <el-table-column label="操作时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.opTime) }}</template>
       </el-table-column>
-      <el-table-column prop="enterpriseId" label="企业ID" width="90" align="center" />
+      <el-table-column prop="enterpriseId" label="企业ID" min-width="80" align="center" />
       <el-table-column prop="requestUrl" label="请求地址" min-width="200" show-overflow-tooltip />
-      <el-table-column prop="duration" label="耗时" width="80" align="center">
+      <el-table-column prop="duration" label="耗时" min-width="80" align="center">
         <template #default="{ row }">{{ row.duration }}ms</template>
       </el-table-column>
-      <el-table-column prop="userIp" label="用户IP" width="140" />
+      <el-table-column prop="userIp" label="用户IP" min-width="130" />
       <el-table-column prop="region" label="地域" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="isp" label="运营商" width="100" />
+      <el-table-column prop="isp" label="运营商" min-width="90" />
       <el-table-column prop="serverAddr" label="服务地址" min-width="200" show-overflow-tooltip />
       <el-table-column prop="requestParams" label="请求参数" min-width="150" show-overflow-tooltip />
     </el-table>

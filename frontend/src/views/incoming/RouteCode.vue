@@ -26,13 +26,13 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="name" label="子码名称" min-width="140" show-overflow-tooltip />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="180">
+      <el-table-column label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
-      <el-table-column label="子码日程个数" width="120" align="center">
+      <el-table-column label="子码日程个数" min-width="110" align="center">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ row.vdnSchedulePoList?.length || 0 }}</el-tag>
         </template>

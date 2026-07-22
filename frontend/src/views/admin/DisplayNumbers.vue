@@ -36,16 +36,16 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column prop="phone" label="号码" width="140" />
-      <el-table-column label="号码类型" width="120">
+      <el-table-column prop="phone" label="号码" min-width="130" />
+      <el-table-column label="号码类型" min-width="110">
         <template #default="{ row }">
           <el-tag size="small">{{ row.type || row.phoneType || '外显号码' }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="归属地" width="100">
+      <el-table-column label="归属地" min-width="90">
         <template #default="{ row }">{{ row.location || row.province || row.city || '-' }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">

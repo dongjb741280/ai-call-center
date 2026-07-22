@@ -64,31 +64,31 @@
 
     <!-- 通话记录表格 -->
     <el-table :data="callLogs" v-loading="loading" style="width: 100%">
-      <el-table-column prop="callId" label="通话ID" width="120" />
-      <el-table-column prop="agentKey" label="坐席工号" width="120" />
-      <el-table-column prop="agentName" label="坐席姓名" width="120" />
-      <el-table-column prop="phoneNumber" label="电话号码" width="130" />
-      <el-table-column prop="callType" label="通话类型" width="100">
+      <el-table-column prop="callId" label="通话ID" min-width="110" />
+      <el-table-column prop="agentKey" label="坐席工号" min-width="110" />
+      <el-table-column prop="agentName" label="坐席姓名" min-width="110" />
+      <el-table-column prop="phoneNumber" label="电话号码" min-width="120" />
+      <el-table-column prop="callType" label="通话类型" min-width="90">
         <template #default="{ row }">
           <el-tag :type="row.callType === 'INBOUND' ? 'success' : 'primary'">
             {{ row.callType === 'INBOUND' ? '呼入' : '呼出' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="callStatus" label="通话状态" width="100">
+      <el-table-column prop="callStatus" label="通话状态" min-width="90">
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.callStatus)">
             {{ getStatusText(row.callStatus) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="duration" label="通话时长" width="100">
+      <el-table-column prop="duration" label="通话时长" min-width="90">
         <template #default="{ row }">
           {{ formatDuration(row.duration) }}
         </template>
       </el-table-column>
-      <el-table-column prop="startTime" label="开始时间" width="160" />
-      <el-table-column prop="endTime" label="结束时间" width="160" />
+      <el-table-column prop="startTime" label="开始时间" min-width="150" />
+      <el-table-column prop="endTime" label="结束时间" min-width="150" />
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" size="small" @click="handleView(row)">

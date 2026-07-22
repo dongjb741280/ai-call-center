@@ -29,20 +29,20 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="60" />
-      <el-table-column label="修改时间" width="170">
+      <el-table-column label="修改时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
       <el-table-column prop="companyId" label="企业ID" width="80" />
-      <el-table-column prop="name" label="名称" width="160" show-overflow-tooltip />
-      <el-table-column prop="mrcpProfile" label="profile" width="130" show-overflow-tooltip />
-      <el-table-column label="ai引擎" width="80">
+      <el-table-column prop="name" label="名称" min-width="140" show-overflow-tooltip />
+      <el-table-column prop="mrcpProfile" label="profile" min-width="120" show-overflow-tooltip />
+      <el-table-column label="ai引擎" min-width="80">
         <template #default="{ row }">{{ row.aiType === 1 ? 'tts' : 'asr' }}</template>
       </el-table-column>
-      <el-table-column prop="aiProduct" label="服务商名称" width="110" />
-      <el-table-column prop="voice" label="发音音色" width="100">
+      <el-table-column prop="aiProduct" label="服务商名称" min-width="100" />
+      <el-table-column prop="voice" label="发音音色" min-width="90">
         <template #default="{ row }">{{ row.voice || '-' }}</template>
       </el-table-column>
-      <el-table-column prop="grammar" label="grammar" width="120" show-overflow-tooltip>
+      <el-table-column prop="grammar" label="grammar" min-width="110" show-overflow-tooltip>
         <template #default="{ row }">{{ row.grammar || '-' }}</template>
       </el-table-column>
       <el-table-column prop="aiParams" label="参数集" min-width="220" show-overflow-tooltip />

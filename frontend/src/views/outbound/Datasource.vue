@@ -18,16 +18,16 @@
     <el-table :data="list" v-loading="loading" style="width:100%">
       <el-table-column prop="id" label="id" width="80" />
       <el-table-column prop="name" label="数据源名称" min-width="180" show-overflow-tooltip />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="180">
+      <el-table-column label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
-      <el-table-column label="名单数量" width="100" align="center">
+      <el-table-column label="名单数量" min-width="90" align="center">
         <template #default="{ row }">{{ row.listCount ?? 0 }}</template>
       </el-table-column>
-      <el-table-column label="字段数量" width="100" align="center">
+      <el-table-column label="字段数量" min-width="90" align="center">
         <template #default="{ row }">{{ row.fieldCount ?? 0 }}</template>
       </el-table-column>
       <el-table-column label="操作" width="240" fixed="right" align="center">

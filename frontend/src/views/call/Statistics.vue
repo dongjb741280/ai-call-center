@@ -95,21 +95,21 @@
         <h3>坐席统计</h3>
       </div>
       <el-table :data="agentStats" v-loading="agentLoading" style="width: 100%">
-        <el-table-column prop="agentKey" label="坐席工号" width="120" />
-        <el-table-column prop="agentName" label="坐席姓名" width="120" />
-        <el-table-column prop="totalCalls" label="总通话数" width="100" />
-        <el-table-column prop="answeredCalls" label="已接通数" width="100" />
-        <el-table-column prop="answerRate" label="接通率" width="100">
+        <el-table-column prop="agentKey" label="坐席工号" min-width="110" />
+        <el-table-column prop="agentName" label="坐席姓名" min-width="110" />
+        <el-table-column prop="totalCalls" label="总通话数" min-width="90" />
+        <el-table-column prop="answeredCalls" label="已接通数" min-width="90" />
+        <el-table-column prop="answerRate" label="接通率" min-width="90">
           <template #default="{ row }">
             {{ row.answerRate }}%
           </template>
         </el-table-column>
-        <el-table-column prop="avgDuration" label="平均时长" width="120">
+        <el-table-column prop="avgDuration" label="平均时长" min-width="110">
           <template #default="{ row }">
             {{ formatDuration(row.avgDuration) }}
           </template>
         </el-table-column>
-        <el-table-column prop="totalDuration" label="总时长" width="120">
+        <el-table-column prop="totalDuration" label="总时长" min-width="110">
           <template #default="{ row }">
             {{ formatDuration(row.totalDuration) }}
           </template>

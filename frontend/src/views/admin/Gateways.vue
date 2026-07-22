@@ -64,7 +64,7 @@
         <el-table :data="groupList" v-loading="rgLoading" border size="small">
           <el-table-column prop="id" label="ID" width="80" />
           <el-table-column prop="routeGroup" label="组名称" min-width="180" />
-          <el-table-column prop="status" label="状态" width="100">
+          <el-table-column prop="status" label="状态" min-width="90">
             <template #default="{ row }">
               <el-tag size="small" :type="row.status === 1 ? 'success' : 'danger'">
                 {{ row.status === 1 ? '启用' : '禁用' }}

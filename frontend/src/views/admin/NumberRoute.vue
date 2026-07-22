@@ -29,28 +29,28 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="80" />
-      <el-table-column label="修改时间" width="180">
+      <el-table-column label="修改时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
-      <el-table-column prop="companyId" label="企业ID" width="100" />
-      <el-table-column label="路由号码" width="140">
+      <el-table-column prop="companyId" label="企业ID" min-width="90" />
+      <el-table-column label="路由号码" min-width="120">
         <template #default="{ row }">{{ row.routeNum || '' }}</template>
       </el-table-column>
-      <el-table-column prop="numMin" label="最小长度" width="100" align="center" />
-      <el-table-column prop="numMax" label="最大长度" width="100" align="center" />
-      <el-table-column label="主叫号码规则" width="120" align="center">
+      <el-table-column prop="numMin" label="最小长度" min-width="90" align="center" />
+      <el-table-column prop="numMax" label="最大长度" min-width="90" align="center" />
+      <el-table-column label="主叫号码规则" min-width="110" align="center">
         <template #default="{ row }">{{ row.callerChange ?? '' }}</template>
       </el-table-column>
-      <el-table-column label="主叫替换号码" width="130" show-overflow-tooltip>
+      <el-table-column label="主叫替换号码" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">{{ row.callerChangeNum || '' }}</template>
       </el-table-column>
-      <el-table-column label="被叫号码规则" width="120" align="center">
+      <el-table-column label="被叫号码规则" min-width="110" align="center">
         <template #default="{ row }">{{ row.calledChange ?? '' }}</template>
       </el-table-column>
-      <el-table-column label="被叫替换号码" width="130" show-overflow-tooltip>
+      <el-table-column label="被叫替换号码" min-width="120" show-overflow-tooltip>
         <template #default="{ row }">{{ row.calledChangeNum || '' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="状态" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
             {{ row.status === 1 ? '启用' : '禁用' }}

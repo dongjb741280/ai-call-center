@@ -32,29 +32,29 @@
       <el-table-column label="路由子码" min-width="140" show-overflow-tooltip>
         <template #default="{ row }">{{ getVdnName(row.vdnId) }}</template>
       </el-table-column>
-      <el-table-column label="主叫前缀去除" width="120" align="center">
+      <el-table-column label="主叫前缀去除" min-width="110" align="center">
         <template #default="{ row }">{{ row.callerPrefix || '-' }}</template>
       </el-table-column>
-      <el-table-column label="被叫前缀去除" width="120" align="center">
+      <el-table-column label="被叫前缀去除" min-width="110" align="center">
         <template #default="{ row }">{{ row.calledPrefix || '-' }}</template>
       </el-table-column>
-      <el-table-column label="被叫后缀去除" width="120" align="center">
+      <el-table-column label="被叫后缀去除" min-width="110" align="center">
         <template #default="{ row }">{{ row.calledSuffix || '-' }}</template>
       </el-table-column>
-      <el-table-column label="ringing" width="100" align="center">
+      <el-table-column label="ringing" min-width="90" align="center">
         <template #default="{ row }">{{ row.ringing || '不开启' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="状态" min-width="80" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
             {{ row.status === 1 ? '启用' : '禁用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" width="170">
+      <el-table-column label="创建时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
-      <el-table-column label="修改时间" width="170">
+      <el-table-column label="修改时间" min-width="160">
         <template #default="{ row }">{{ formatTime(row.uts) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="160" fixed="right" align="center">

@@ -31,34 +31,34 @@
     </el-form>
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
-      <el-table-column label="sip号" width="120">
+      <el-table-column label="sip号" min-width="110">
         <template #default="{ row }">{{ row.sip }}</template>
       </el-table-column>
-      <el-table-column prop="sipPwd" label="sip密码" width="120" show-overflow-tooltip />
+      <el-table-column prop="sipPwd" label="sip密码" min-width="110" show-overflow-tooltip />
       <el-table-column prop="companyId" label="企业ID" width="80" />
-      <el-table-column label="在线" width="80" align="center">
+      <el-table-column label="在线" min-width="70" align="center">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
             {{ row.status === 1 ? '在线' : '离线' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="坐席账号" width="120">
+      <el-table-column label="坐席账号" min-width="110">
         <template #default="{ row }">{{ row.agentKey || (row.agent && row.agent.agentKey) || '' }}</template>
       </el-table-column>
-      <el-table-column label="注册时间" width="170">
+      <el-table-column label="注册时间" min-width="160">
         <template #default="{ row }">{{ row.registerTime ? formatTime(row.registerTime) : formatTime(row.cts) }}</template>
       </el-table-column>
       <el-table-column label="expires" width="80" align="center">
         <template #default="{ row }">{{ row.expires || '-' }}</template>
       </el-table-column>
-      <el-table-column label="注册地址" width="200" show-overflow-tooltip>
+      <el-table-column label="注册地址" min-width="180" show-overflow-tooltip>
         <template #default="{ row }">{{ row.registerAddr || '-' }}</template>
       </el-table-column>
-      <el-table-column label="客户端地址" width="180" show-overflow-tooltip>
+      <el-table-column label="客户端地址" min-width="160" show-overflow-tooltip>
         <template #default="{ row }">{{ row.clientAddr || '-' }}</template>
       </el-table-column>
-      <el-table-column label="userAgent" width="160" show-overflow-tooltip>
+      <el-table-column label="userAgent" min-width="140" show-overflow-tooltip>
         <template #default="{ row }">{{ row.userAgent || '-' }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">

@@ -7,22 +7,22 @@
 
     <el-table :data="list" v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="id" width="70" />
-      <el-table-column label="创建时间" width="180">
+      <el-table-column label="创建时间" min-width="170">
         <template #default="{ row }">{{ formatTime(row.cts) }}</template>
       </el-table-column>
       <el-table-column prop="name" label="文件名称" min-width="180" show-overflow-tooltip />
-      <el-table-column label="文件类型" width="100">
+      <el-table-column label="文件类型" min-width="90">
         <template #default="{ row }">
           <el-tag size="small">{{ row.type === 1 ? '文件上传' : row.type === 2 ? '语音合成' : row.type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="engineName" label="tts引擎" width="140" show-overflow-tooltip>
+      <el-table-column prop="engineName" label="tts引擎" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.engineName || '-' }}</template>
       </el-table-column>
       <el-table-column prop="speechText" label="文件内容" min-width="200" show-overflow-tooltip>
         <template #default="{ row }">{{ row.speechText || row.name || '-' }}</template>
       </el-table-column>
-      <el-table-column label="录音" width="140" align="center">
+      <el-table-column label="录音" min-width="120" align="center">
         <template #default="{ row }">
           <div class="play-cell">
             <el-button :icon="VideoPlay" circle size="small" type="primary" class="play-btn" @click="handlePlay(row)" />
