@@ -8,7 +8,7 @@
           <Expand v-else />
         </el-icon>
         <div class="brand">
-          <span class="brand-icon">&#9670;</span>
+          <img src="/logo.svg" class="brand-logo" alt="AI呼叫中心" />
           <h1 class="title">AI 呼叫中心</h1>
         </div>
       </div>
@@ -170,6 +170,12 @@ const handleCommand = async (command) => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .brand-icon {

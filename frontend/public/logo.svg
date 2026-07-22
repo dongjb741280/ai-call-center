@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="crystal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22D3EE"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#A5B4FC" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#4F46E5" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4F46E5" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Glow behind -->
+  <circle cx="100" cy="100" r="80" fill="url(#glow)" opacity="0.5"/>
+
+  <!-- Main crystal shield -->
+  <path d="M100 12 L170 50 V150 L100 188 L30 150 V50 Z"
+        fill="url(#crystal)" filter="url(#shadow)"/>
+
+  <!-- Inner facets for depth -->
+  <path d="M100 30 L155 62 V138 L100 170 L45 138 V62 Z"
+        stroke="rgba(255,255,255,0.12)" stroke-width="1.5" fill="none"/>
+  <path d="M100 50 L140 72 V128 L100 150 L60 128 V72 Z"
+        stroke="rgba(255,255,255,0.10)" stroke-width="1" fill="none"/>
+
+  <!-- Sound wave arcs (voice/call) -->
+  <g fill="none" stroke="white" stroke-linecap="round">
+    <path d="M62,90 Q100,65 138,90" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+    <path d="M70,105 Q100,82 130,105" stroke-width="4.5" stroke-opacity="0.8"/>
+    <path d="M78,118 Q100,98 122,118" stroke-width="4" stroke-opacity="0.6"/>
+  </g>
+
+  <!-- Central AI sparkle -->
+  <path d="M100,92 L101.8,86.8 L107,85 L101.8,83.2 L100,78 L98.2,83.2 L93,85 L98.2,86.8 Z"
+        fill="url(#accent)" opacity="0.95"/>
+
+  <!-- Vertex accent dots -->
+  <circle cx="100" cy="24" r="4" fill="url(#accent)" opacity="0.9"/>
+  <circle cx="162" cy="56" r="3.5" fill="white" opacity="0.4"/>
+  <circle cx="162" cy="144" r="3.5" fill="white" opacity="0.3"/>
+  <circle cx="38" cy="144" r="3.5" fill="white" opacity="0.3"/>
+  <circle cx="38" cy="56" r="3.5" fill="white" opacity="0.4"/>
+</svg>

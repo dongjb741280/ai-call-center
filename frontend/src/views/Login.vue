@@ -7,7 +7,7 @@
     <div class="login-card">
       <div class="login-header">
         <div class="login-logo">
-          <span class="logo-icon">&#9670;</span>
+          <img src="/logo.svg" class="logo-img" alt="AI呼叫中心" />
         </div>
         <h1>AI 呼叫中心</h1>
         <p>智能话务管理平台</p>
@@ -161,10 +161,18 @@ const handleLogin = async () => {
   margin-bottom: 36px;
 }
 
+.logo-img {
+  width: 64px;
+  height: 64px;
+  display: block;
+  margin: 0 auto;
+}
+
 .login-logo {
   margin-bottom: 16px;
 }
 
+/* kept for backward compatibility */
 .logo-icon {
   display: inline-flex;
   align-items: center;
