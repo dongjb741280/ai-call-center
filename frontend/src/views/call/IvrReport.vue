@@ -62,12 +62,90 @@
         </el-table-column>
         <el-table-column prop="record" label="录音" width="120" show-overflow-tooltip />
         <el-table-column label="操作" width="80" fixed="right" align="center">
-          <template #default>
-            <el-button size="small" type="primary" link>详情</el-button>
+          <template #default="{ row }">
+            <el-button size="small" type="primary" link @click="handleDetail(row)">详情</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+
+    <el-dialog v-model="detailVisible" title="IVR通话详情" width="900px" top="5vh" @close="detailVisible = false">
+      <template v-if="detailRow">
+        <el-descriptions :column="3" border size="small" style="margin-bottom: 20px">
+          <el-descriptions-item label="Call ID">{{ detailRow.callId }}</el-descriptions-item>
+          <el-descriptions-item label="IVR ID">{{ detailRow.ivrId }}</el-descriptions-item>
+          <el-descriptions-item label="任务ID">{{ detailRow.taskId || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="外显号码">{{ detailRow.callerDisplay || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="被叫号码">{{ detailRow.called || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="归属地">{{ detailRow.numberLocation || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="拨打时间">{{ formatTime(detailRow.callTime) }}</el-descriptions-item>
+          <el-descriptions-item label="应答时间">{{ formatTime(detailRow.answerTime) }}</el-descriptions-item>
+          <el-descriptions-item label="结束时间">{{ formatTime(detailRow.endTime) }}</el-descriptions-item>
+          <el-descriptions-item label="呼叫结果">
+            <el-tag size="small" :type="detailRow.answerFlag === 1 ? 'success' : 'danger'">
+              {{ detailRow.answerFlag === 1 ? '接通' : '未接通' }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="通话时长">{{ fmtDur(detailRow.talkTime) }}</el-descriptions-item>
+          <el-descriptions-item label="挂机方">
+            {{ detailRow.hangupDir === 1 ? '主叫' : detailRow.hangupDir === 2 ? '被叫' : '-' }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <div class="detail-section">
+          <div class="detail-section-title">IVR 流程节点</div>
+          <el-table :data="ivrFlowList" v-loading="flowLoading" size="small" max-height="260">
+            <el-table-column label="序号" width="60" align="center">
+              <template #default="{ $index }">{{ $index + 1 }}</template>
+            </el-table-column>
+            <el-table-column prop="nodeName" label="节点名称" min-width="120" show-overflow-tooltip />
+            <el-table-column prop="nodeType" label="节点类型" width="100" align="center">
+              <template #default="{ row: r }">
+                <el-tag size="small">{{ r.nodeType || '-' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="进入时间" min-width="150">
+              <template #default="{ row: r }">{{ formatTime(r.enterTime) }}</template>
+            </el-table-column>
+            <el-table-column label="离开时间" min-width="150">
+              <template #default="{ row: r }">{{ formatTime(r.leaveTime) }}</template>
+            </el-table-column>
+            <el-table-column label="停留时长" width="100" align="center">
+              <template #default="{ row: r }">{{ fmtDur(r.duration) }}</template>
+            </el-table-column>
+            <el-table-column prop="result" label="执行结果" min-width="120" show-overflow-tooltip>
+              <template #default="{ row: r }">{{ r.result || '-' }}</template>
+            </el-table-column>
+          </el-table>
+          <div v-if="!flowLoading && !ivrFlowList.length" class="empty-hint">暂无 IVR 流程数据</div>
+        </div>
+
+        <div class="detail-section" style="margin-top: 20px">
+          <div class="detail-section-title">通话明细</div>
+          <el-table :data="callDetailList" v-loading="detailLoading" size="small" max-height="260">
+            <el-table-column label="序号" width="60" align="center">
+              <template #default="{ $index }">{{ $index + 1 }}</template>
+            </el-table-column>
+            <el-table-column label="事件时间" min-width="150">
+              <template #default="{ row: r }">{{ formatTime(r.eventTime) }}</template>
+            </el-table-column>
+            <el-table-column prop="eventType" label="事件类型" width="120" align="center">
+              <template #default="{ row: r }">
+                <el-tag size="small" :type="eventTagType(r.eventType)">{{ r.eventType || '-' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="eventDesc" label="事件描述" min-width="200" show-overflow-tooltip />
+            <el-table-column prop="detail" label="详情" min-width="160" show-overflow-tooltip>
+              <template #default="{ row: r }">{{ r.detail || r.eventValue || '-' }}</template>
+            </el-table-column>
+          </el-table>
+          <div v-if="!detailLoading && !callDetailList.length" class="empty-hint">暂无通话明细</div>
+        </div>
+      </template>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
 
     <div class="pagination">
       <el-pagination v-model:current-page="pagination.currentPage" v-model:page-size="pagination.pageSize"
@@ -80,9 +158,15 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getCallMonitorList } from '@/api/config'
+import { getCallMonitorList, getIvrFlowList, getCallDetailList } from '@/api/config'
 
 const loading = ref(false)
+const flowLoading = ref(false)
+const detailLoading = ref(false)
+const detailVisible = ref(false)
+const detailRow = ref(null)
+const ivrFlowList = ref([])
+const callDetailList = ref([])
 const list = ref([])
 const searchForm = reactive({ callId: '', called: '', timeRange: null })
 const pagination = reactive({ currentPage: 1, pageSize: 10, total: 0 })
@@ -96,6 +180,34 @@ const fmtDur = (sec) => {
   const m = Math.floor(sec / 60)
   const s = sec % 60
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+}
+const eventTagType = (type) => {
+  if (!type) return 'info'
+  if (type.includes('answer') || type.includes('ANSWER')) return 'success'
+  if (type.includes('hangup') || type.includes('HANGUP')) return 'danger'
+  if (type.includes('bridge') || type.includes('BRIDGE')) return 'primary'
+  return 'info'
+}
+
+const handleDetail = async (row) => {
+  detailRow.value = row
+  detailVisible.value = true
+  ivrFlowList.value = []
+  callDetailList.value = []
+  flowLoading.value = true
+  detailLoading.value = true
+  try {
+    const [flowRes, detailRes] = await Promise.all([
+      getIvrFlowList(row.callId),
+      getCallDetailList(row.callId)
+    ])
+    if (flowRes.code === 0) ivrFlowList.value = flowRes.data || []
+    if (detailRes.code === 0) callDetailList.value = detailRes.data || []
+  } catch { /* empty */ }
+  finally {
+    flowLoading.value = false
+    detailLoading.value = false
+  }
 }
 
 const loadData = async () => {
@@ -130,4 +242,7 @@ onMounted(loadData)
 .search-form { margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
 .table-wrapper { overflow-x: auto; }
 .pagination { margin-top: 20px; display: flex; justify-content: center; }
+.detail-section { margin-top: 10px; }
+.detail-section-title { font-size: 14px; font-weight: 600; color: #303133; padding-left: 10px; border-left: 3px solid #409eff; margin-bottom: 12px; line-height: 1.3; }
+.empty-hint { text-align: center; color: #c0c4cc; font-size: 13px; padding: 30px 0; }
 </style>
