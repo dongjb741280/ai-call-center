@@ -72,20 +72,160 @@
         <router-view />
       </main>
     </div>
+
+    <!-- 个人设置弹窗 -->
+    <el-dialog v-model="profileVisible" title="个人设置" width="520px" @close="resetProfile">
+      <el-tabs v-model="profileTab">
+        <el-tab-pane label="个人信息" name="info">
+          <el-form ref="profileFormRef" :model="profileForm" :rules="profileRules" label-width="80px">
+            <el-form-item label="头像">
+              <div class="avatar-row">
+                <el-avatar :size="64" :src="profileForm.avatar">
+                  {{ userStore.userInfo?.username?.charAt(0) }}
+                </el-avatar>
+                <el-upload
+                  :show-file-list="false"
+                  :http-request="handleAvatarUpload"
+                  accept="image/*"
+                >
+                  <el-button size="small" type="primary" plain>更换头像</el-button>
+                </el-upload>
+              </div>
+            </el-form-item>
+            <el-form-item label="账号">
+              <el-input :model-value="userStore.userInfo?.username" disabled />
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickname">
+              <el-input v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="32" />
+            </el-form-item>
+            <el-form-item label="电话" prop="phone">
+              <el-input v-model="profileForm.phone" placeholder="请输入电话号码" maxlength="20" />
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+              <el-input v-model="profileForm.email" placeholder="请输入邮箱" maxlength="64" />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="修改密码" name="password">
+          <el-form ref="pwdFormRef" :model="pwdForm" :rules="pwdRules" label-width="80px">
+            <el-form-item label="新密码" prop="newPasswd">
+              <el-input v-model="pwdForm.newPasswd" type="password" placeholder="请输入新密码" show-password />
+            </el-form-item>
+            <el-form-item label="确认密码" prop="confirmPasswd">
+              <el-input v-model="pwdForm.confirmPasswd" type="password" placeholder="请再次输入新密码" show-password />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+      <template #footer>
+        <el-button @click="profileVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleProfileSubmit" :loading="profileLoading">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { updateUser, uploadUserAvatar } from '@/api/admin'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
 const collapsed = ref(false)
+
+// 个人设置
+const profileVisible = ref(false)
+const profileTab = ref('info')
+const profileLoading = ref(false)
+const profileFormRef = ref()
+const pwdFormRef = ref()
+const profileForm = reactive({ nickname: '', phone: '', email: '', avatar: '' })
+const pwdForm = reactive({ newPasswd: '', confirmPasswd: '' })
+const profileRules = {
+  email: [{ type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }]
+}
+const validateConfirmPasswd = (rule, value, callback) => {
+  if (value !== pwdForm.newPasswd) callback(new Error('两次输入的密码不一致'))
+  else callback()
+}
+const pwdRules = {
+  newPasswd: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+  ],
+  confirmPasswd: [
+    { required: true, message: '请确认新密码', trigger: 'blur' },
+    { validator: validateConfirmPasswd, trigger: 'blur' }
+  ]
+}
+
+const initProfileForm = () => {
+  const info = userStore.userInfo || {}
+  Object.assign(profileForm, {
+    nickname: info.nickname || '',
+    phone: info.phone || '',
+    email: info.email || '',
+    avatar: info.avatar || ''
+  })
+  pwdForm.newPasswd = ''
+  pwdForm.confirmPasswd = ''
+  profileTab.value = 'info'
+}
+
+const resetProfile = () => {
+  profileFormRef.value?.resetFields()
+  pwdFormRef.value?.resetFields()
+}
+
+const handleAvatarUpload = async ({ file }) => {
+  try {
+    const res = await uploadUserAvatar(file)
+    if (res.code === 0) {
+      profileForm.avatar = res.data || ''
+      ElMessage.success('头像上传成功')
+    }
+  } catch { ElMessage.error('头像上传失败') }
+}
+
+const handleProfileSubmit = async () => {
+  if (profileTab.value === 'info') {
+    if (!profileFormRef.value) return
+    try { await profileFormRef.value.validate() } catch { return }
+  } else {
+    if (!pwdFormRef.value) return
+    try { await pwdFormRef.value.validate() } catch { return }
+  }
+  profileLoading.value = true
+  try {
+    const data = { id: userStore.userInfo?.id }
+    if (profileTab.value === 'info') {
+      data.nickname = profileForm.nickname || undefined
+      data.phone = profileForm.phone || undefined
+      data.email = profileForm.email || undefined
+      data.avatar = profileForm.avatar || undefined
+    } else {
+      data.passwd = pwdForm.newPasswd
+    }
+    const res = await updateUser(data)
+    if (res.code === 0) {
+      if (profileTab.value === 'info') {
+        const info = { ...userStore.userInfo, ...data }
+        userStore.userInfo = info
+        localStorage.setItem('userInfo', JSON.stringify(info))
+      }
+      ElMessage.success('保存成功')
+      profileVisible.value = false
+    } else {
+      ElMessage.error(res.message || '保存失败')
+    }
+  } catch { ElMessage.error('保存失败') }
+  finally { profileLoading.value = false }
+}
 
 // 当前激活的菜单
 const activeMenu = computed(() => route.path)
@@ -105,7 +245,8 @@ const toggleSidebar = () => {
 const handleCommand = async (command) => {
   switch (command) {
     case 'profile':
-      // 个人设置
+      initProfileForm()
+      profileVisible.value = true
       break
     case 'logout':
       try {
@@ -295,6 +436,13 @@ const handleCommand = async (command) => {
 
 :deep(.el-menu .el-icon) {
   font-size: 18px;
+}
+
+/* ---- Profile Dialog ---- */
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 /* ---- Responsive ---- */
