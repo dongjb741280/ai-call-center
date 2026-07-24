@@ -5,6 +5,7 @@ import org.voice9.cc.tcp.event.SubLoginEvent;
 import org.voice9.cc.tcp.event.SubMakeCallEvent;
 import org.voice9.cc.tcp.event.SubStopCallEvent;
 import org.voice9.cc.websocket.event.*;
+import org.voice9.cc.websocket.event.base.WsBaseEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,6 +151,26 @@ public enum EventType {
      * 转接
      */
     WS_TRANSFER(2072, WsTransferEvent.class),
+
+    /**
+     * 咨询
+     */
+    WS_CONSULT(2073, WsConsultEvent.class),
+
+    /**
+     * 取消咨询
+     */
+    WS_CONSULT_CANCEL(2074, WsBaseEvent.class),
+
+    /**
+     * 咨询转接
+     */
+    WS_CONSULT_TRANSFER(2075, WsConsultEvent.class),
+
+    /**
+     * 转三方会议
+     */
+    WS_CONSULT_PARTY(2076, WsBaseEvent.class),
 
     /**
      * 坐席退出系统

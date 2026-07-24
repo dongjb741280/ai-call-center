@@ -63,7 +63,7 @@ public class FsListen {
     @Autowired
     protected HashedWheelTimer hashedWheelTimer;
 
-    @Value("${audio.codecs:^^:G729:PCMU:PCMA}")
+    @Value("${audio.codecs:^^:PCMU:PCMA}")
     private String codecs;
 
     @Value("${server.port}")
@@ -411,7 +411,7 @@ public class FsListen {
     /**
      * 发起呼叫
      * <p>
-     * bgapi originate {return_ring_ready=true,sip_contact_user=01017818388,ring_asr=true,absolute_codec_string=^^:G729:PCMU:PCMA,origination_caller_id_number=01017718388,origination_caller_id_name=01017718388,origination_uuid=192.168.1.1-25-5f8fe34b-1bb-76,sip_auto_answer=true}sofia/external/8731279@192.168.1.1:7470 &park()
+     * bgapi originate {return_ring_ready=true,sip_contact_user=01017818388,ring_asr=true,absolute_codec_string=^^:PCMU:PCMA,origination_caller_id_number=01017718388,origination_caller_id_name=01017718388,origination_uuid=192.168.1.1-25-5f8fe34b-1bb-76,sip_auto_answer=true}sofia/external/8731279@192.168.1.1:7470 &park()
      *
      * @param media
      * @param routeGetway      网关
@@ -506,6 +506,9 @@ public class FsListen {
      * @param deviceId2
      */
     public void bridgeCall(String media, Long callId, String deviceId1, String deviceId2) {
+        // 桥接前锁定编解码，避免 G.729 passthrough 模式导致转码失败
+        this.sendArgs(media, deviceId1, FsConstant.SET, "absolute_codec_string=" + codecs);
+        this.sendArgs(media, deviceId2, FsConstant.SET, "absolute_codec_string=" + codecs);
         this.sendArgs(media, deviceId1, FsConstant.SET, FsConstant.PARK_AFTER_BRIDGE);
         this.sendArgs(media, deviceId1, FsConstant.SET, FsConstant.HANGUP_AFTER_BRIDGE);
         this.sendArgs(media, deviceId2, FsConstant.SET, FsConstant.HANGUP_AFTER_BRIDGE);
@@ -657,6 +660,17 @@ public class FsListen {
         this.sendMessage(media, playfile);
     }
 
+
+    /**
+     * 加入会议
+     *
+     * @param media
+     * @param deviceId
+     * @param conferenceName
+     */
+    public void conference(String media, String deviceId, String conferenceName) {
+        this.sendArgs(media, deviceId, FsConstant.CONFERENCE, conferenceName);
+    }
 
     /**
      * 停止放音
