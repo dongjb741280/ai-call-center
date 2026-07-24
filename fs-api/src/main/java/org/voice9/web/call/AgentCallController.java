@@ -97,12 +97,13 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("hold")
     public CommonResponse hold(@ModelAttribute("agentInfo") AgentInfo agentInfo) {
-        Long callId = agentInfo.getCallId();
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        Long callId = cached != null ? cached.getCallId() : agentInfo.getCallId();
         CallInfo callInfo = cacheService.getCallInfo(callId);
         if (callId == null || callInfo == null) {
             throw new BusinessException(ErrorCode.CALL_NOT_EXIST);
         }
-        callCdrService.hold(callInfo, agentInfo.getDeviceId());
+        callCdrService.hold(callInfo, cached != null ? cached.getDeviceId() : agentInfo.getDeviceId());
         return new CommonResponse();
     }
 
@@ -114,12 +115,13 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("cancelHold")
     public CommonResponse cancelHold(@ModelAttribute("agentInfo") AgentInfo agentInfo) {
-        Long callId = agentInfo.getCallId();
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        Long callId = cached != null ? cached.getCallId() : agentInfo.getCallId();
         CallInfo callInfo = cacheService.getCallInfo(callId);
         if (callId == null || callInfo == null) {
             throw new BusinessException(ErrorCode.CALL_NOT_EXIST);
         }
-        callCdrService.cancelHold(callInfo, agentInfo.getDeviceId());
+        callCdrService.cancelHold(callInfo, cached != null ? cached.getDeviceId() : agentInfo.getDeviceId());
         return new CommonResponse();
     }
 
@@ -133,12 +135,13 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("readyMute")
     public CommonResponse readyMute(@ModelAttribute("agentInfo") AgentInfo agentInfo) {
-        Long callId = agentInfo.getCallId();
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        Long callId = cached != null ? cached.getCallId() : agentInfo.getCallId();
         CallInfo callInfo = cacheService.getCallInfo(callId);
         if (callId == null || callInfo == null) {
             throw new BusinessException(ErrorCode.CALL_NOT_EXIST);
         }
-        callCdrService.readyMute(callInfo, agentInfo.getDeviceId());
+        callCdrService.readyMute(callInfo, cached != null ? cached.getDeviceId() : agentInfo.getDeviceId());
         return new CommonResponse();
     }
 
@@ -150,12 +153,13 @@ public class AgentCallController extends BaseController {
      */
     @PostMapping("cancelMute")
     public CommonResponse cancelMute(@ModelAttribute("agentInfo") AgentInfo agentInfo) {
-        Long callId = agentInfo.getCallId();
+        AgentInfo cached = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        Long callId = cached != null ? cached.getCallId() : agentInfo.getCallId();
         CallInfo callInfo = cacheService.getCallInfo(callId);
         if (callId == null || callInfo == null) {
             throw new BusinessException(ErrorCode.CALL_NOT_EXIST);
         }
-        callCdrService.cancelMute(callInfo, agentInfo.getDeviceId());
+        callCdrService.cancelMute(callInfo, cached != null ? cached.getDeviceId() : agentInfo.getDeviceId());
         return new CommonResponse();
     }
 }

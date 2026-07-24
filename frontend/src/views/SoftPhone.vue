@@ -100,12 +100,16 @@
             <div class="call-row">
               <el-input v-model="consultNum" placeholder="咨询目标" style="flex: 1" />
               <el-button @click="handleConsult" :disabled="!connected" type="warning">咨询</el-button>
-              <el-button @click="handleConsultCancel" :disabled="!connected">取消咨询</el-button>
+              <el-button @click="handleConsultCancel" :disabled="!connected" type="danger" plain>
+                <el-icon><Close /></el-icon> 取消
+              </el-button>
             </div>
             <div class="call-row">
               <el-input v-model="consultTransferNum" placeholder="咨询转接目标" style="flex: 1" />
               <el-button @click="handleConsultTransfer" :disabled="!connected" type="warning">咨询转接</el-button>
-              <el-button @click="handleConsultParty" :disabled="!connected">转三方</el-button>
+              <el-button @click="handleConsultParty" :disabled="!connected" type="success">
+                <el-icon><Connection /></el-icon> 三方
+              </el-button>
             </div>
           </div>
         </el-card>
@@ -119,12 +123,14 @@
             </div>
           </template>
           <div class="card-actions">
-            <el-button @click="handleMute" :disabled="!connected">
-              <el-icon><MuteNotification /></el-icon> 静音
+            <el-button @click="handleMute" :disabled="!connected" type="warning" plain>
+              <el-icon><Microphone /></el-icon> 静音
             </el-button>
-            <el-button @click="handleCancelMute" :disabled="!connected">
-              <el-icon><Notification /></el-icon> 取消静音
+            <el-button @click="handleCancelMute" :disabled="!connected" type="success" plain>
+              <el-icon><Microphone /></el-icon> 取消静音
             </el-button>
+          </div>
+          <div class="card-actions" style="margin-top: 6px">
             <el-button @click="handleHold" :disabled="!connected" type="warning">
               <el-icon><VideoPause /></el-icon> 保持
             </el-button>
@@ -624,7 +630,15 @@ const handleConsultParty = () => {
 const handleMute = () => {
   if (voice9Instance) {
     voice9Instance.mutePhone()
-    addMessage('CMD', 'mutePhone')
+      .then(res => {
+        addMessage('CMD', 'mutePhone: ' + JSON.stringify(res))
+        if (res.code === 0) ElMessage.success('已静音')
+        else ElMessage.error(res.message || '静音失败')
+      })
+      .catch(err => {
+        addMessage('ERR', 'mutePhone error: ' + err.message)
+        ElMessage.error('静音请求失败')
+      })
   }
 }
 
@@ -632,7 +646,15 @@ const handleMute = () => {
 const handleCancelMute = () => {
   if (voice9Instance) {
     voice9Instance.cancelMute()
-    addMessage('CMD', 'cancelMute')
+      .then(res => {
+        addMessage('CMD', 'cancelMute: ' + JSON.stringify(res))
+        if (res.code === 0) ElMessage.success('已取消静音')
+        else ElMessage.error(res.message || '取消静音失败')
+      })
+      .catch(err => {
+        addMessage('ERR', 'cancelMute error: ' + err.message)
+        ElMessage.error('取消静音请求失败')
+      })
   }
 }
 
