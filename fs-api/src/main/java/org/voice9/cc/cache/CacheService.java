@@ -150,8 +150,24 @@ public class CacheService {
      */
     public void addAgentInfo(AgentInfo agentInfo) {
         redisTemplate.opsForValue().set(Constant.AGENT_INFO + agentInfo.getAgentKey(), JSON.toJSONString(agentInfo), 24 * cacheDay, TimeUnit.HOURS);
+        // 同步 agentKey → callId 映射
+        if (agentInfo.getCallId() != null) {
+            redisTemplate.opsForValue().set(Constant.AGENT_CALL + agentInfo.getAgentKey(), String.valueOf(agentInfo.getCallId()), 24 * cacheDay, TimeUnit.HOURS);
+        } else {
+            redisTemplate.delete(Constant.AGENT_CALL + agentInfo.getAgentKey());
+        }
     }
 
+    /**
+     * 通过 agentKey 查找通话
+     */
+    public CallInfo getCallInfoByAgentKey(String agentKey) {
+        Object callId = redisTemplate.opsForValue().get(Constant.AGENT_CALL + agentKey);
+        if (callId == null) {
+            return null;
+        }
+        return getCallInfo(Long.valueOf(callId.toString()));
+    }
 
     /**
      * 缓存CALL_INFO

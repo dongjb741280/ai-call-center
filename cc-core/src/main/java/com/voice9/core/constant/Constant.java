@@ -105,6 +105,7 @@ public class Constant {
 
     public final static String AGENT_TOKEN = "AGENT_TOKEN:";
     public final static String AGENT_INFO = "AGENT_INFO:";
+    public final static String AGENT_CALL = "AGENT_CALL:";
 
     public final static String ADMIN_TOKEN = "ADMIN_TOKEN:";
     public final static String ADMIN_INFO = "ADMIN_INFO:";

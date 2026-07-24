@@ -129,6 +129,27 @@ public abstract class BaseEventHandler<T extends FsBaseEvent> extends BaseHandle
         fsListen.sendMessage(mediaHost, answer);
     }
 
+    /**
+     * 执行 eavesdrop（监听/强插/耳语）
+     *
+     * @param mediaHost   FreeSWITCH 媒体地址
+     * @param channelUuid 班长自己的 channel UUID
+     * @param targetUuid  目标坐席的 channel UUID
+     * @param flags       模式: null=-m 监听, "-b"=强插, "-w"=耳语
+     */
+    protected void eavesdrop(String mediaHost, String channelUuid, String targetUuid, String flags) {
+        String arg = targetUuid;
+        if (StringUtils.isNotBlank(flags)) {
+            arg += " " + flags;
+        }
+        SendMsg msg = new SendMsg(channelUuid);
+        msg.addCallCommand(FsConstant.EXECUTE);
+        msg.addExecuteAppName(FsConstant.EAVESDROP);
+        msg.addExecuteAppArg(arg);
+        fsListen.sendMessage(mediaHost, msg);
+        logger.info("eavesdrop channel:{} target:{} flags:{}", channelUuid, targetUuid, flags);
+    }
+
 
     protected String getDeviceId(CallInfo callInfo, String... deviceIds) {
         for (String deviceId : callInfo.getDeviceList()) {

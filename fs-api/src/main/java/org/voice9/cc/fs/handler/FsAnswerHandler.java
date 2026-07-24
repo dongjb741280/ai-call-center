@@ -2,6 +2,8 @@ package org.voice9.cc.fs.handler;
 
 import com.voice9.core.po.*;
 import org.apache.commons.lang3.StringUtils;
+import org.voice9.cc.websocket.response.WsCallEntity;
+import org.voice9.cc.websocket.response.WsResponseEntity;
 import com.voice9.core.constant.Constant;
 import com.voice9.core.entity.CallDetail;
 import com.voice9.core.entity.RouteGetway;
@@ -79,6 +81,21 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
             case NEXT_CONSULT_CALLOUT:
                 //咨询外线
                 consultCallout(callInfo, deviceInfo, nextCommand, event);
+                break;
+
+            case NEXT_LISTEN_CALL:
+                //班长监听（静默）
+                eavesdrop(callInfo, deviceInfo, nextCommand, event, null);
+                break;
+
+            case NEXT_INSERT_CALL:
+                //班长强插（三方通话）
+                eavesdrop(callInfo, deviceInfo, nextCommand, event, "-b");
+                break;
+
+            case NEXT_WHISPER_CALL:
+                //班长耳语（单向对坐席说话）
+                eavesdrop(callInfo, deviceInfo, nextCommand, event, "-w");
                 break;
 
             default:
@@ -284,6 +301,43 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
             holdPlay(callInfo.getMediaHost(), nextCommand.getNextValue(), "hold.wav");
             DeviceInfo consultDevice = callInfo.getDeviceInfoMap().get(nextCommand.getNextValue());
             consultDevice.setState(AgentState.HOLD.name());
+        }
+    }
+
+    /**
+     * 班长监控（监听/强插/耳语）
+     * channel 应答后执行 eavesdrop，将班长 channel 接入目标坐席的通话
+     */
+    private void eavesdrop(CallInfo callInfo, DeviceInfo deviceInfo, NextCommand nextCommand, FsAnswerEvent event, String flags) {
+        String supervisorChannelUuid = event.getDeviceId();
+        String targetChannelUuid = nextCommand.getNextValue();
+        logger.info("eavesdrop callId:{} supervisor:{} target:{} flags:{}",
+                callInfo.getCallId(), supervisorChannelUuid, targetChannelUuid, flags);
+        super.eavesdrop(event.getRemoteAddress(), supervisorChannelUuid, targetChannelUuid, flags);
+
+        // 推送班长状态通知（eavesdrop 无 CHANNEL_BRIDGE 事件，需手动推送）
+        AgentInfo supervisor = cacheService.getAgentInfo(deviceInfo.getAgentKey());
+        if (supervisor != null) {
+            supervisor.setCallId(callInfo.getCallId());
+            supervisor.setDeviceId(deviceInfo.getDeviceId());
+            String stateName;
+            switch (deviceInfo.getCdrType()) {
+                case 6: stateName = AgentState.LISTEN.name(); break;
+                case 7: stateName = AgentState.INSERT.name(); break;
+                case 8: stateName = AgentState.WHISPER.name(); break;
+                default: stateName = AgentState.MONITOR.name(); break;
+            }
+            supervisor.setAgentState(AgentState.valueOf(stateName));
+            cacheService.addAgentInfo(supervisor);
+            WsCallEntity callEntity = new WsCallEntity();
+            callEntity.setCallId(callInfo.getCallId());
+            callEntity.setAgentState(AgentState.valueOf(stateName));
+            callEntity.setCaller(callInfo.getCaller());
+            callEntity.setCalled(callInfo.getCalled());
+            callEntity.setDirection(callInfo.getDirection());
+            callEntity.setCallType(callInfo.getCallType());
+            sendWsMessage(supervisor, new WsResponseEntity<WsCallEntity>(
+                    stateName, supervisor.getAgentKey(), callEntity));
         }
     }
 

@@ -43,6 +43,8 @@ public enum ErrorCode {
     AGENT_ALREADY_READY(2006, "坐席已经空闲"),
     CALL_NOT_EXIST(2007, "电话不存在"),
     AGENT_NOT_ONLINE(2008, "坐席不在线"),
+    TARGET_NOT_FOUND(2011, "目标坐席不存在"),
+    TARGET_NOT_IN_CALL(2012, "目标坐席不在通话中"),
     //不处于READY NOT_READY
     AGENT_BUSY(2009, "坐席忙碌"),
     CALL_ANSWERED(2010, "电话已经应答"),

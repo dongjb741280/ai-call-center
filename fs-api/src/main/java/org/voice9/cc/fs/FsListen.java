@@ -401,11 +401,18 @@ public class FsListen {
      * @param sipHeaders
      */
     public void makeCall(RouteGetway routeGetway, String display, String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, String... sipHeaders) {
+        makeCall(routeGetway, display, called, callId, deviceId, timeout, originateTimeout, false, sipHeaders);
+    }
+
+    /**
+     * 发起呼叫（支持自动应答，用于班长监控场景）
+     */
+    public void makeCall(RouteGetway routeGetway, String display, String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, boolean autoAnswer, String... sipHeaders) {
         String media = RandomUtil.getRandomKey(fsClient.keySet());
         if (StringUtils.isBlank(media)) {
             throw new BusinessException(ErrorCode.MEDIA_NOT_AVALIABLE);
         }
-        makeCall(media, routeGetway, display, called, callId, deviceId, timeout, originateTimeout, sipHeaders);
+        makeCall(media, routeGetway, display, called, callId, deviceId, timeout, originateTimeout, autoAnswer, sipHeaders);
     }
 
     /**
@@ -422,6 +429,10 @@ public class FsListen {
      * @param sipHeaders
      */
     public void makeCall(String media, RouteGetway routeGetway, String display, String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, String... sipHeaders) {
+        makeCall(media, routeGetway, display, called, callId, deviceId, timeout, originateTimeout, false, sipHeaders);
+    }
+
+    public void makeCall(String media, RouteGetway routeGetway, String display, String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, boolean autoAnswer, String... sipHeaders) {
         Client client = null;
         if (StringUtils.isBlank(media)) {
             media = RandomUtil.getRandomKey(fsClient.keySet());
@@ -482,6 +493,9 @@ public class FsListen {
         }
         StringBuilder builder = new StringBuilder();
         builder.append("{return_ring_ready=true").append(FsConstant.SPLIT).append("sip_contact_user=").append(display).append(FsConstant.SPLIT).append("ring_asr=true").append(FsConstant.SPLIT).append("absolute_codec_string=").append(codecs).append(FsConstant.SPLIT).append("origination_caller_id_number=").append(display).append(FsConstant.SPLIT).append("origination_caller_id_name=").append(display).append(FsConstant.SPLIT).append("origination_uuid=").append(deviceId);
+        if (autoAnswer) {
+            builder.append(FsConstant.SPLIT).append("sip_auto_answer=true");
+        }
         if (originateTimeout != null) {
             builder.append(FsConstant.SPLIT).append("originate_timeout=" + originateTimeout);
         }
@@ -560,7 +574,6 @@ public class FsListen {
     public EslMessage answer(String media, String deviceId) {
         return fsClient.get(media).sendApiCommand("uuid_phone_event", deviceId + " talk");
     }
-
 
     /**
      * 挂机

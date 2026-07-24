@@ -210,6 +210,7 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
         agentInfo.setAgentState(AgentState.INNER_CALL);
         agentInfo.setCallId(callInfo.getCallId());
         agentInfo.setDeviceId(deviceId);
+        cacheService.addAgentInfo(agentInfo);
         /**
          * 广播坐席状态
          */
@@ -306,6 +307,7 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
         agentInfo.setAgentState(AgentState.OUT_CALL);
         agentInfo.setCallId(callInfo.getCallId());
         agentInfo.setDeviceId(deviceId);
+        cacheService.addAgentInfo(agentInfo);
         /**
          * 广播坐席状态
          */

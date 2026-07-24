@@ -252,6 +252,19 @@
     phoneConsultParty() {
       this._send({ cmd: 'consult_party' });
     }
+
+    // 班长监控
+    phoneListen(target) {
+      this._send({ cmd: 'listen', target });
+    }
+
+    phoneInsert(target) {
+      this._send({ cmd: 'insert', target });
+    }
+
+    phoneWhisper(target) {
+      this._send({ cmd: 'whisper', target });
+    }
   }
 
   return Voice9;

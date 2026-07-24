@@ -173,6 +173,21 @@ public enum EventType {
     WS_CONSULT_PARTY(2076, WsBaseEvent.class),
 
     /**
+     * 监听
+     */
+    WS_LISTEN(2077, WsMonitorEvent.class),
+
+    /**
+     * 强插
+     */
+    WS_INSERT(2078, WsMonitorEvent.class),
+
+    /**
+     * 耳语
+     */
+    WS_WHISPER(2079, WsMonitorEvent.class),
+
+    /**
      * 坐席退出系统
      */
     WS_LOGOUT(2071, WsLogoutEvent.class),
