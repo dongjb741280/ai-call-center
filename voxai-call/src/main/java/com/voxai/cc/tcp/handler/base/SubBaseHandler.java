@@ -9,7 +9,8 @@ import com.voxai.cc.configration.Handler;
 import com.voxai.cc.websocket.WebSocketHandler;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public abstract class SubBaseHandler<T extends SubBaseEvent> implements Handler<T> {
     protected Logger logger = LoggerFactory.getLogger(getClass());

@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 import org.zhongweixian.server.websocket.WebSocketServer;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 public class WebSocketManager {

@@ -4,7 +4,8 @@ import com.voxai.core.entity.Agent;
 import com.voxai.core.entity.AgentSip;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class AgentSipPo extends AgentSip {
 

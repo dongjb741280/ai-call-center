@@ -3,7 +3,8 @@ package com.voxai.api.vo.server;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by dongjb on 2022/4/5
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class MenuVo {
 

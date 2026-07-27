@@ -8,7 +8,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class CallLogPo implements Serializable {
     /**

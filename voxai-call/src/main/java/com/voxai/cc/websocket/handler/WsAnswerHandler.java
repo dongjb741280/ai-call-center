@@ -13,7 +13,8 @@ import com.voxai.cc.websocket.response.WsResponseEntity;
 import com.voxai.cc.websocket.event.WsAnswerEvent;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_ANSWER")

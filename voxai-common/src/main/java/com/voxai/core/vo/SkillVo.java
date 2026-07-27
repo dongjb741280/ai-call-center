@@ -5,7 +5,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class SkillVo {
 

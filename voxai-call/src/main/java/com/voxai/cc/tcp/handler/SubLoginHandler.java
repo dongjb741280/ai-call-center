@@ -6,7 +6,8 @@ import com.voxai.cc.configration.HandlerType;
 import com.voxai.cc.tcp.event.SubLoginEvent;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 @HandlerType("SUB_LOGIN")
 @Component

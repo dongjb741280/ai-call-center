@@ -23,7 +23,8 @@ import com.voxai.cc.websocket.WebSocketHandler;
 import com.voxai.cc.fs.esl.transport.SendMsg;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class BaseHandler {
     protected Logger logger = LoggerFactory.getLogger(BaseHandler.class);

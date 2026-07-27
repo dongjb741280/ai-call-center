@@ -18,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class HttpRequestInteceptor implements HandlerInterceptor {
     private Logger logger = LoggerFactory.getLogger(HttpRequestInteceptor.class);

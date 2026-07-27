@@ -3,7 +3,8 @@ package com.voxai.api.vo.excel;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class AgentImportExcel {
 

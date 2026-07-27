@@ -3,7 +3,8 @@ package com.voxai.cc.configration;
 import java.lang.annotation.*;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)

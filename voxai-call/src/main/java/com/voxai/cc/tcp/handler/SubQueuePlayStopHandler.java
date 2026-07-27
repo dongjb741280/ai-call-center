@@ -4,7 +4,8 @@ import com.voxai.cc.tcp.event.SubQueuePlayStopEvent;
 import com.voxai.cc.tcp.handler.base.SubBaseHandler;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class SubQueuePlayStopHandler extends SubBaseHandler<SubQueuePlayStopEvent> {
     @Override

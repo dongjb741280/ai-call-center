@@ -1,7 +1,8 @@
 package com.voxai.cc.fs.stream;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class G711 {
 

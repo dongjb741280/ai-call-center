@@ -27,7 +27,8 @@ import com.voxai.cc.websocket.event.base.WsBaseEvent;
 import com.voxai.cc.websocket.response.WsResponseEntity;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public abstract class WsBaseHandler<T extends WsBaseEvent> implements Handler<T> {
     protected Logger logger = LoggerFactory.getLogger(getClass());

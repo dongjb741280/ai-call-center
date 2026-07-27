@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.voxai.cc.service.GroupMemoryService;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
-
 @Service
 public class GroupMemoryServiceImpl extends BaseServiceImpl<GroupMemory> implements GroupMemoryService {
 

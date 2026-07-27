@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.voxai.cc.service.BaseService;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public abstract class BaseServiceImpl<T> implements BaseService<T> {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

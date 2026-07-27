@@ -1,3 +1,7 @@
+/**
+ * @author dongjb
+ * @date 2026/07/27
+ */
 package com.voxai.api;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;

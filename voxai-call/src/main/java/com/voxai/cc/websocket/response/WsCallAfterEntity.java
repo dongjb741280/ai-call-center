@@ -5,7 +5,8 @@ import com.voxai.core.enums.CallType;
 import com.voxai.core.enums.Direction;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class WsCallAfterEntity {
 

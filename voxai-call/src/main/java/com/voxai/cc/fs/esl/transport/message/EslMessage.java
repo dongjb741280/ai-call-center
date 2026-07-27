@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @author dongjb
+ * @date 2026/07/27
+ */
 package com.voxai.cc.fs.esl.transport.message;
 
 import org.slf4j.Logger;

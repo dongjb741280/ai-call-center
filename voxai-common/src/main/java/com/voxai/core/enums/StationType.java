@@ -1,7 +1,8 @@
 package com.voxai.core.enums;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public enum StationType {
 

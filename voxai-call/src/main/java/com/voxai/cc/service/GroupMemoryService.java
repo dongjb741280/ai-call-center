@@ -3,7 +3,8 @@ package com.voxai.cc.service;
 import com.voxai.core.entity.GroupMemory;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface GroupMemoryService extends BaseService<GroupMemory>{
 

@@ -13,7 +13,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
- * Created by dongjb on2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class AgentCustomAssign implements AgentStrategy {
 

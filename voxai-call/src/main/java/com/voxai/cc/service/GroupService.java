@@ -6,7 +6,8 @@ import com.voxai.core.po.GroupInfo;
 import java.util.List;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface GroupService extends BaseService<Group> {
 

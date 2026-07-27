@@ -3,7 +3,8 @@ package com.voxai.cc.tcp.event;
 import com.voxai.cc.tcp.event.base.SubBaseEvent;
 
 /**
- * Create by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class SubStopCallEvent extends SubBaseEvent {
 }

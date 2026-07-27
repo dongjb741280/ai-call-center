@@ -5,7 +5,8 @@ import com.voxai.cc.websocket.event.base.WsBaseEvent;
 import java.util.Map;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class WsUpdateFollowDataEvent extends WsBaseEvent {
 

@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface CompanyService extends BaseService<Company> {
 

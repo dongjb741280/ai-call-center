@@ -7,7 +7,8 @@ import com.voxai.core.vo.SkillAgentsVo;
 import com.voxai.core.vo.SkillVo;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface SkillService extends BaseService<Skill> {
 

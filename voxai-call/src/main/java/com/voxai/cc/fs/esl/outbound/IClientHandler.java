@@ -1,3 +1,7 @@
+/**
+ * @author dongjb
+ * @date 2026/07/27
+ */
 package com.voxai.cc.fs.esl.outbound;
 
 import io.netty.channel.Channel;

@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 /**
  * @author dongjb
- * @date 2025/09/03
+ * @date 2026/07/27
  */
 public class CallSpeechText implements Serializable {
     /**

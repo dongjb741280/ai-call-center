@@ -6,7 +6,8 @@ import com.voxai.core.entity.Agent;
 import java.util.Date;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class ExcelAgentEntity extends Agent {
 

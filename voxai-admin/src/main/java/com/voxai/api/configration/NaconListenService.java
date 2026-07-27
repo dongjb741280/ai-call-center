@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by dongjb on 2025/09/03
+ * @author dongjb
+ * @date 2026/07/27
  */
-
 @Component
 public class NaconListenService implements EventListener {
     private Logger logger = LoggerFactory.getLogger(NaconListenService.class);
