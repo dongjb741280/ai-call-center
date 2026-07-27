@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.PhoneAreaMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.PhoneArea">
+<mapper namespace="com.voxai.core.mapper.PhoneAreaMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.PhoneArea">
         <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -34,14 +34,14 @@
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from cc_phone_area where id = #{id,jdbcType=INTEGER}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.PhoneArea">
+    <insert id="insert" parameterType="com.voxai.core.entity.PhoneArea">
         insert into cc_phone_area (id, cts, uts, num_prefix, operator, num_type, num_code, num_province, num_city, status)
         values (#{id,jdbcType=INTEGER}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT},
                 #{numPrefix,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{numType,jdbcType=INTEGER},
                 #{numCode,jdbcType=VARCHAR}, #{numProvince,jdbcType=VARCHAR}, #{numCity,jdbcType=VARCHAR},
                 #{status,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.PhoneArea">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.PhoneArea">
         insert into cc_phone_area
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -68,7 +68,7 @@
             <if test="status != null">#{status,jdbcType=INTEGER},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.PhoneArea">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.PhoneArea">
         update cc_phone_area
         <set>
             <if test="cts != null">cts = #{cts,jdbcType=BIGINT},</if>
@@ -83,7 +83,7 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.PhoneArea">
+    <update id="updateByPrimaryKey" parameterType="com.voxai.core.entity.PhoneArea">
         update cc_phone_area
         set cts = #{cts,jdbcType=BIGINT},
             uts = #{uts,jdbcType=BIGINT},

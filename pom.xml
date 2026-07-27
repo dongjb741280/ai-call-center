@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.voice9</groupId>
+    <groupId>com.voxai</groupId>
     <artifactId>ai-call-center</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
@@ -70,7 +70,7 @@
         <maven.docker.plugin.version>0.43.4</maven.docker.plugin.version>
 
         <docker.repostory>192.168.180.37:5000</docker.repostory>
-        <docker.registry.name>voice9</docker.registry.name>
+        <docker.registry.name>voxai</docker.registry.name>
     </properties>
 
     <dependencyManagement>
@@ -95,7 +95,7 @@
                 <version>${prometheus.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.voice9</groupId>
+                <groupId>com.voxai</groupId>
                 <artifactId>cc-core</artifactId>
                 <version>${project.version}</version>
             </dependency>

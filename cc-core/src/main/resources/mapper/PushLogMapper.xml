@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.PushLogMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.PushLog">
+<mapper namespace="com.voxai.core.mapper.PushLogMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.PushLog">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -21,7 +21,7 @@
     <delete id="deleteByPrimaryKey" parameterType="Long">
         delete from cc_push_log where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.PushLog">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.PushLog">
         insert into cc_push_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -38,7 +38,7 @@
             <if test="status != null">#{status},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.PushLog">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.PushLog">
         update cc_push_log
         <set>
             <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>
@@ -71,11 +71,11 @@
             <if test="status!=null">and status = #{status}</if>
         </where>
     </select>
-    <insert id="insert" parameterType="com.voice9.core.entity.PushLog">
+    <insert id="insert" parameterType="com.voxai.core.entity.PushLog">
         insert into cc_push_log (id, cts, uts, company_id, call_id, cdr_notify_url, content, push_times, push_response, status)
         values (#{id}, #{cts}, #{uts}, #{companyId}, #{callId}, #{cdrNotifyUrl}, #{content}, #{pushTimes}, #{pushResponse}, #{status})
     </insert>
-    <insert id="insertMonthSelective" parameterType="com.voice9.core.entity.PushLog">
+    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.PushLog">
         insert into cc_push_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -92,7 +92,7 @@
             <if test="status != null">#{status},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.PushLog">
+    <update id="updateByPrimaryKey" parameterType="com.voxai.core.entity.PushLog">
         update cc_push_log set cts=#{cts}, uts=#{uts}, company_id=#{companyId}, call_id=#{callId},
         cdr_notify_url=#{cdrNotifyUrl}, content=#{content}, push_times=#{pushTimes},
         push_response=#{pushResponse}, status=#{status} where id=#{id}
@@ -104,7 +104,7 @@
     <delete id="deletePushLog" parameterType="Long">
         delete from cc_push_log where cts &lt; #{cts}
     </delete>
-    <update id="pushSuccess" parameterType="com.voice9.core.entity.PushLog">
+    <update id="pushSuccess" parameterType="com.voxai.core.entity.PushLog">
         update cc_push_log set push_times = push_times + 1, push_response = #{pushResponse}, uts = #{uts}, status = #{status} where id = #{id}
     </update>
 </mapper>

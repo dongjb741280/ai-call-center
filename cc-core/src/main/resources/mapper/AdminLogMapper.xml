@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.AdminLogMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.AdminLog">
+<mapper namespace="com.voxai.core.mapper.AdminLogMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.AdminLog">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -25,7 +25,7 @@
     <delete id="deleteByPrimaryKey" parameterType="Long">
         delete from cc_admin_log where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminLog">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.AdminLog">
         insert into cc_admin_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -46,7 +46,7 @@
             <if test="requestParams != null">#{requestParams},</if><if test="status != null">#{status},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.AdminLog">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.AdminLog">
         update cc_admin_log
         <set>
             <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>

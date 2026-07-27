@@ -1,0 +1,37 @@
+package com.voxai.core.po;
+
+/**
+ * Create by dongjb on 2025/09/03
+ */
+public class CallQueue implements Comparable<Long> {
+
+    private Long id;
+
+    private Long callId;
+
+    public CallQueue(Long id, Long callId) {
+        this.id = id;
+        this.callId = callId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getCallId() {
+        return callId;
+    }
+
+    public void setCallId(Long callId) {
+        this.callId = callId;
+    }
+
+    @Override
+    public int compareTo(Long o) {
+        return this.id.compareTo(o);
+    }
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.TaskPauseMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskPause">
+<mapper namespace="com.voxai.core.mapper.TaskPauseMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.TaskPause">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="task_id" jdbcType="BIGINT" property="taskId"/>
         <result column="pause_start_time" jdbcType="BIGINT" property="pauseStartTime"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.TaskFieldMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskField">
+<mapper namespace="com.voxai.core.mapper.TaskFieldMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.TaskField">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -19,7 +19,7 @@
     <delete id="deleteByPrimaryKey" parameterType="Long">
         delete from cc_task_field where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.TaskField">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.TaskField">
         insert into cc_task_field
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -34,7 +34,7 @@
             <if test="fieldType != null">#{fieldType},</if><if test="status != null">#{status},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.TaskField">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.TaskField">
         update cc_task_field
         <set>
             <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>

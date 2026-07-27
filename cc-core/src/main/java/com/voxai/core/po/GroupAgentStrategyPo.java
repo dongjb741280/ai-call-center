@@ -1,0 +1,39 @@
+package com.voxai.core.po;
+
+import com.voxai.core.entity.GroupAgentStrategy;
+import com.voxai.core.entity.GroupStrategyExp;
+import com.voxai.core.strategy.AgentStrategy;
+
+import java.util.List;
+
+/**
+ * Created by dongjb on 2025/09/03
+ */
+public class GroupAgentStrategyPo extends GroupAgentStrategy {
+
+    /**
+     * 坐席策略接口
+     */
+    private AgentStrategy agentStrategy;
+
+    /**
+     * 坐席自定义策略
+     */
+    private List<GroupStrategyExp> strategyExpList;
+
+    public AgentStrategy getAgentStrategy() {
+        return agentStrategy;
+    }
+
+    public void setAgentStrategy(AgentStrategy agentStrategy) {
+        this.agentStrategy = agentStrategy;
+    }
+
+    public List<GroupStrategyExp> getStrategyExpList() {
+        return strategyExpList;
+    }
+
+    public void setStrategyExpList(List<GroupStrategyExp> strategyExpList) {
+        this.strategyExpList = strategyExpList;
+    }
+}

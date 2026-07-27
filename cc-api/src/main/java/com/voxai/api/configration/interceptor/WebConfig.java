@@ -1,0 +1,37 @@
+package com.voxai.api.configration.interceptor;
+
+import com.voxai.core.mapper.AdminUserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+/**
+ * Create by dongjb on 2025/09/03
+ */
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private AdminUserMapper adminUserMapper;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/admin/")
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH")
+                .maxAge(3600);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HttpRequestInteceptor(adminUserMapper))
+                .addPathPatterns("/call/**")
+                .addPathPatterns("/config/**")
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("/index/*", "/**/*.js", "/**/*.css", "/**/*.png");
+    }
+
+
+}

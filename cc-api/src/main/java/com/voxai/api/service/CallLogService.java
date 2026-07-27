@@ -1,0 +1,50 @@
+package com.voxai.api.service;
+
+import com.github.pagehelper.PageInfo;
+import com.voxai.core.entity.CallDevice;
+import com.voxai.core.entity.CallLog;
+import com.voxai.core.po.CallLogPo;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by dongjb on 2025/09/03
+ */
+public interface CallLogService extends BaseService<CallLog> {
+
+
+    /**
+     * 分页
+     *
+     * @param params
+     * @return
+     */
+    PageInfo<CallLogPo> calllogList(Map<String, Object> params);
+
+    /**
+     * 话单导出
+     *
+     * @param response
+     * @param params
+     */
+    void calllogExport(HttpServletResponse response, Map<String, Object> params) throws IOException;
+
+    /**
+     * 每天清理当天数据
+     *
+     * @param time
+     * @return
+     */
+    int cleaDayOfData(Long time);
+
+    /**
+     * 查询call_device列表
+     *
+     * @param params
+     * @return
+     */
+    List<CallDevice> callDeviceList(Map<String, Object> params);
+}

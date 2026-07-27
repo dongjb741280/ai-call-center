@@ -6,7 +6,7 @@ services:
     tty: true
     environment:
       - TZ=Asia/Shanghai
-      - hostname=voice9
+      - hostname=voxai
     #volumes:
     #  - ./freeswitch/conf:/usr/local/freeswitch/conf
     #  - ./freeswitch/log:/usr/local/freeswitch/log

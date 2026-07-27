@@ -1,11 +1,11 @@
 FROM debian:bookworm
-MAINTAINER caoliang1918 <caoliang@voice9.com>
+MAINTAINER caoliang1918 <caoliang@voxai.com>
 
 WORKDIR /usr/local/freeswitch
 ADD docker-entrypoint.sh /usr/local/
 RUN chmod +x /usr/local/docker-entrypoint.sh
 
-RUN echo voice9 >  /etc/hostname
+RUN echo voxai >  /etc/hostname
 RUN sed -i 's/http:\/\/deb.debian.org/http:\/\/mirrors.huaweicloud.com/g' /etc/apt/sources.list.d/debian.sources
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq install vim git sngrep
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.AdminUserMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.AdminUser">
+<mapper namespace="com.voxai.core.mapper.AdminUserMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.AdminUser">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -30,7 +30,7 @@
         from cc_admin_user
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.voxai.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
         insert into cc_admin_user (id, cts, uts, company_id,
                                       username, passwd, avatar, nickname, phone, email, user_type,
                                       status)
@@ -38,7 +38,7 @@
                 #{username,jdbcType=VARCHAR}, #{avatar,jdbcType=VARCHAR}, #{passwd,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER},
                 #{status,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.AdminUser" useGeneratedKeys="true" keyProperty="id">
         insert into cc_admin_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -117,7 +117,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.AdminUser">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.AdminUser">
         update cc_admin_user
         <set>
             <if test="cts != null">
@@ -156,7 +156,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.AdminUser">
+    <update id="updateByPrimaryKey" parameterType="com.voxai.core.entity.AdminUser">
         update cc_admin_user
         set cts        = #{cts,jdbcType=BIGINT},
             uts        = #{uts,jdbcType=BIGINT},

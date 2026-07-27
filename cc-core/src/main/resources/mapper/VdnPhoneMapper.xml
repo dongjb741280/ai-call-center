@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.VdnPhoneMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.VdnPhone">
+<mapper namespace="com.voxai.core.mapper.VdnPhoneMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.VdnPhone">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -24,13 +24,13 @@
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from cc_vdn_phone where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.VdnPhone">
+    <insert id="insert" parameterType="com.voxai.core.entity.VdnPhone">
         insert into cc_vdn_phone (id, cts, uts, company_id, vdn_id, phone, status, caller_prefix, called_prefix, called_suffix, ringing)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
                 #{vdnId,jdbcType=BIGINT}, #{phone,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
                 #{callerPrefix,jdbcType=VARCHAR}, #{calledPrefix,jdbcType=VARCHAR}, #{calledSuffix,jdbcType=VARCHAR}, #{ringing,jdbcType=VARCHAR})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.VdnPhone">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.VdnPhone">
         insert into cc_vdn_phone
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -59,7 +59,7 @@
             <if test="ringing != null">#{ringing,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.VdnPhone">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.VdnPhone">
         update cc_vdn_phone
         <set>
             <if test="cts != null">cts = #{cts,jdbcType=BIGINT},</if>
@@ -75,7 +75,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.VdnPhone">
+    <update id="updateByPrimaryKey" parameterType="com.voxai.core.entity.VdnPhone">
         update cc_vdn_phone
         set cts = #{cts,jdbcType=BIGINT}, uts = #{uts,jdbcType=BIGINT}, company_id = #{companyId,jdbcType=BIGINT},
             vdn_id = #{vdnId,jdbcType=BIGINT}, phone = #{phone,jdbcType=VARCHAR}, status = #{status,jdbcType=INTEGER},

@@ -169,7 +169,7 @@ const sipRegistered = ref(false)
 const sipSession = ref(null)   // 当前 JsSIP 通话 session
 const isOutgoingCall = ref(false) // 标记是否是主动外呼（A-leg），需自动接听
 
-let voice9Instance = null
+let voxaiInstance = null
 let sipUa = null
 let ringbackCtx = null      // 持久AudioContext，避免重复创建导致浏览器限制
 let ringbackTimer = null
@@ -239,10 +239,10 @@ const stopLocalRingback = () => {
 }
 
 // 初始化 CallSdk 事件监听
-const initVoice9 = (loginData) => {
-  voice9Instance = new CallSdk()
+const initVoxai = (loginData) => {
+  voxaiInstance = new CallSdk()
 
-  voice9Instance.addEventListener('message', (data) => {
+  voxaiInstance.addEventListener('message', (data) => {
     const msg = JSON.stringify(data)
     if (data.type === 'pong') return
 
@@ -270,15 +270,15 @@ const initVoice9 = (loginData) => {
     }
   })
 
-  voice9Instance.addEventListener('logout', () => {
+  voxaiInstance.addEventListener('logout', () => {
     addMessage('EVENT', 'logout', 'warning')
     connected.value = false
     agentState.value = ''
     callState.value = ''
-    voice9Instance = null
+    voxaiInstance = null
   })
 
-  voice9Instance.init(loginData)
+  voxaiInstance.init(loginData)
 }
 
 
@@ -309,7 +309,7 @@ const handleConnect = async () => {
 
     // 3. 保存 token 并初始化 SDK
     agentToken.value = res.data.token
-    initVoice9(res.data)
+    initVoxai(res.data)
     connected.value = true
     agentState.value = 'LOGIN'
 
@@ -328,8 +328,8 @@ const handleConnect = async () => {
 const handleLogout = () => {
   stopLocalRingback()
   if (ringbackCtx) { ringbackCtx.close(); ringbackCtx = null }
-  if (voice9Instance) {
-    voice9Instance.logout()
+  if (voxaiInstance) {
+    voxaiInstance.logout()
   }
   if (sipUa) {
     sipUa.stop()
@@ -340,7 +340,7 @@ const handleLogout = () => {
   connected.value = false
   agentState.value = ''
   callState.value = ''
-  voice9Instance = null
+  voxaiInstance = null
   agentToken.value = ''
   addMessage('EVENT', '手动登出', 'warning')
 }
@@ -464,8 +464,8 @@ const registerSip = (loginData, passwd) => {
 
 // 忙碌
 const handleBusy = () => {
-  if (voice9Instance) {
-    voice9Instance.setBusy()
+  if (voxaiInstance) {
+    voxaiInstance.setBusy()
     agentState.value = 'BUSY'
     addMessage('CMD', 'setBusy')
   }
@@ -473,8 +473,8 @@ const handleBusy = () => {
 
 // 空闲
 const handleReady = () => {
-  if (voice9Instance) {
-    voice9Instance.setReady()
+  if (voxaiInstance) {
+    voxaiInstance.setReady()
     agentState.value = 'READY'
     addMessage('CMD', 'setReady')
   }
@@ -495,9 +495,9 @@ const handleMakeCall = () => {
   callState.value = ''
   const audio = document.getElementById('sipRemoteAudio')
   if (audio) { audio.srcObject = null }
-  if (voice9Instance) {
+  if (voxaiInstance) {
     isOutgoingCall.value = true
-    voice9Instance.makeCall(phoneNum.value)
+    voxaiInstance.makeCall(phoneNum.value)
     callState.value = 'CALLING'
     addMessage('CMD', `makeCall: ${phoneNum.value}`)
   }
@@ -512,8 +512,8 @@ const handleAcceptCall = () => {
     addMessage('CMD', 'sipAnswer')
     return
   }
-  if (voice9Instance) {
-    voice9Instance.acceptCall()
+  if (voxaiInstance) {
+    voxaiInstance.acceptCall()
     callState.value = 'TALKING'
     addMessage('CMD', 'acceptCall')
   }
@@ -529,8 +529,8 @@ const handleHangup = () => {
     addMessage('CMD', 'sipTerminate')
     return
   }
-  if (voice9Instance) {
-    voice9Instance.closeCall()
+  if (voxaiInstance) {
+    voxaiInstance.closeCall()
     callState.value = ''
     addMessage('CMD', 'closeCall')
   }
@@ -542,8 +542,8 @@ const handleTransfer = () => {
     ElMessage.warning('请输入转接目标')
     return
   }
-  if (voice9Instance) {
-    voice9Instance.phoneTransfer(transferNum.value)
+  if (voxaiInstance) {
+    voxaiInstance.phoneTransfer(transferNum.value)
     addMessage('CMD', `phoneTransfer: ${transferNum.value}`)
   }
 }
@@ -554,16 +554,16 @@ const handleConsult = () => {
     ElMessage.warning('请输入咨询目标')
     return
   }
-  if (voice9Instance) {
-    voice9Instance.phoneConsult(consultNum.value)
+  if (voxaiInstance) {
+    voxaiInstance.phoneConsult(consultNum.value)
     addMessage('CMD', `phoneConsult: ${consultNum.value}`)
   }
 }
 
 // 取消咨询
 const handleConsultCancel = () => {
-  if (voice9Instance) {
-    voice9Instance.phoneConsultCancel()
+  if (voxaiInstance) {
+    voxaiInstance.phoneConsultCancel()
     addMessage('CMD', 'phoneConsultCancel')
   }
 }
@@ -574,24 +574,24 @@ const handleConsultTransfer = () => {
     ElMessage.warning('请输入咨询转接目标')
     return
   }
-  if (voice9Instance) {
-    voice9Instance.phoneConsultTransfer(consultTransferNum.value)
+  if (voxaiInstance) {
+    voxaiInstance.phoneConsultTransfer(consultTransferNum.value)
     addMessage('CMD', `phoneConsultTransfer: ${consultTransferNum.value}`)
   }
 }
 
 // 转三方
 const handleConsultParty = () => {
-  if (voice9Instance) {
-    voice9Instance.phoneConsultParty()
+  if (voxaiInstance) {
+    voxaiInstance.phoneConsultParty()
     addMessage('CMD', 'phoneConsultParty')
   }
 }
 
 // 静音
 const handleMute = () => {
-  if (voice9Instance) {
-    voice9Instance.mutePhone()
+  if (voxaiInstance) {
+    voxaiInstance.mutePhone()
       .then(res => {
         addMessage('CMD', 'mutePhone: ' + JSON.stringify(res))
         if (res.code === 0) ElMessage.success('已静音')
@@ -606,8 +606,8 @@ const handleMute = () => {
 
 // 取消静音
 const handleCancelMute = () => {
-  if (voice9Instance) {
-    voice9Instance.cancelMute()
+  if (voxaiInstance) {
+    voxaiInstance.cancelMute()
       .then(res => {
         addMessage('CMD', 'cancelMute: ' + JSON.stringify(res))
         if (res.code === 0) ElMessage.success('已取消静音')
@@ -622,16 +622,16 @@ const handleCancelMute = () => {
 
 // 保持
 const handleHold = () => {
-  if (voice9Instance) {
-    voice9Instance.holdTalking()
+  if (voxaiInstance) {
+    voxaiInstance.holdTalking()
     addMessage('CMD', 'holdTalking')
   }
 }
 
 // 取消保持
 const handleCancelHold = () => {
-  if (voice9Instance) {
-    voice9Instance.cancelHold()
+  if (voxaiInstance) {
+    voxaiInstance.cancelHold()
     addMessage('CMD', 'cancelHold')
   }
 }
@@ -642,12 +642,12 @@ const handleListen = () => {
     ElMessage.warning('请输入目标坐席')
     return
   }
-  if (!voice9Instance) return
-  if (!voice9Instance.phoneListen) {
+  if (!voxaiInstance) return
+  if (!voxaiInstance.phoneListen) {
     ElMessage.error('SDK 未更新，请重新部署 fs-api')
     return
   }
-  voice9Instance.phoneListen(monitorTarget.value)
+  voxaiInstance.phoneListen(monitorTarget.value)
   addMessage('CMD', `phoneListen: ${monitorTarget.value}`)
 }
 
@@ -656,12 +656,12 @@ const handleInsert = () => {
     ElMessage.warning('请输入目标坐席')
     return
   }
-  if (!voice9Instance) return
-  if (!voice9Instance.phoneInsert) {
+  if (!voxaiInstance) return
+  if (!voxaiInstance.phoneInsert) {
     ElMessage.error('SDK 未更新，请重新部署 fs-api')
     return
   }
-  voice9Instance.phoneInsert(monitorTarget.value)
+  voxaiInstance.phoneInsert(monitorTarget.value)
   addMessage('CMD', `phoneInsert: ${monitorTarget.value}`)
 }
 
@@ -670,12 +670,12 @@ const handleWhisper = () => {
     ElMessage.warning('请输入目标坐席')
     return
   }
-  if (!voice9Instance) return
-  if (!voice9Instance.phoneWhisper) {
+  if (!voxaiInstance) return
+  if (!voxaiInstance.phoneWhisper) {
     ElMessage.error('SDK 未更新，请重新部署 fs-api')
     return
   }
-  voice9Instance.phoneWhisper(monitorTarget.value)
+  voxaiInstance.phoneWhisper(monitorTarget.value)
   addMessage('CMD', `phoneWhisper: ${monitorTarget.value}`)
 }
 
@@ -686,8 +686,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   stopLocalRingback()
   if (ringbackCtx) { ringbackCtx.close(); ringbackCtx = null }
-  if (voice9Instance) {
-    voice9Instance.logout()
+  if (voxaiInstance) {
+    voxaiInstance.logout()
   }
   if (sipUa) {
     sipUa.stop()

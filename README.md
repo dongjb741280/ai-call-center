@@ -103,7 +103,7 @@ ai-call-center/
 修改 `application-dev.properties` 中的配置：
 ```properties
 # 数据库配置
-spring.datasource.url=jdbc:mysql://localhost:3306/voice9
+spring.datasource.url=jdbc:mysql://localhost:3306/voxai
 spring.datasource.username=root
 spring.datasource.password=your_password
 
@@ -113,9 +113,9 @@ spring.redis.port=6379
 spring.redis.password=your_redis_password
 
 # MinIO配置
-voice9.minio.endpoint=http://localhost:9000
-voice9.minio.access.key=admin
-voice9.minio.secret.key=your_secret_key
+voxai.minio.endpoint=http://localhost:9000
+voxai.minio.access.key=admin
+voxai.minio.secret.key=your_secret_key
 ```
 
 ### 构建和运行
@@ -233,15 +233,15 @@ docker-compose up -d
 ### 代码结构
 ```
 src/main/java/
-├── com.voice9.api/          # API服务
+├── com.voxai.api/          # API服务
 │   ├── web/                 # 控制器层
 │   ├── service/             # 服务层
 │   └── configration/        # 配置类
-├── com.voice9.core/         # 核心模块
+├── com.voxai.core/         # 核心模块
 │   ├── entity/              # 实体类
 │   ├── mapper/              # 数据访问层
 │   └── enums/               # 枚举类
-└── org.voice9/              # FreeSwitch集成
+└── com.voxai/              # FreeSwitch集成
     ├── cc/                  # 呼叫控制
     ├── fs/                  # FreeSwitch事件处理
     └── websocket/           # WebSocket通信
@@ -259,7 +259,7 @@ src/main/java/
 A: 参考 `freeswitch/` 目录下的配置文件，支持CentOS和Debian两种系统。
 
 ### Q: 如何添加新的分配策略？
-A: 在 `fs-api/src/main/java/org/voice9/cc/acd/assign/` 目录下实现新的分配算法。
+A: 在 `fs-api/src/main/java/com/voxai/cc/acd/assign/` 目录下实现新的分配算法。
 
 ### Q: 如何集成第三方系统？
 A: 通过WebHook回调或消息队列进行集成，支持HTTP和RabbitMQ。

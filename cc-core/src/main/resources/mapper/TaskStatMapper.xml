@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.TaskStatMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskStat">
+<mapper namespace="com.voxai.core.mapper.TaskStatMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.TaskStat">
         <result column="task_id" jdbcType="BIGINT" property="taskId"/>
         <result column="task_name" jdbcType="VARCHAR" property="taskName"/>
         <result column="transfer_name" jdbcType="VARCHAR" property="transferName"/>

@@ -4,7 +4,7 @@ MAINTAINER caoliang1918 <caoliang1918@gmail.com>
 WORKDIR /usr/local/freeswitch
 ADD docker-entrypoint.sh /usr/local/
 RUN chmod +x /usr/local/docker-entrypoint.sh
-RUN echo voice9 >  /etc/hostname
+RUN echo voxai >  /etc/hostname
 RUN yum install -y  wget
 
 

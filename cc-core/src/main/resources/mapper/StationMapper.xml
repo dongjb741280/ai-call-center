@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.StationMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.Station">
+<mapper namespace="com.voxai.core.mapper.StationMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.Station">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -31,7 +31,7 @@
         from cc_station
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.Station">
+    <insert id="insert" parameterType="com.voxai.core.entity.Station">
         insert into cc_station (id, cts, uts, application_id,
                                 application_type, application_group, application_host,
                                 application_port, username, pwd,
@@ -43,7 +43,7 @@
                 #{applicationPort,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{pwd,jdbcType=VARCHAR},
                 #{status,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.Station">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.Station">
         insert into cc_station
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -116,7 +116,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.Station">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.Station">
         update cc_station
         <set>
             <if test="cts != null">
@@ -152,7 +152,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.voice9.core.entity.Station">
+    <update id="updateByPrimaryKey" parameterType="com.voxai.core.entity.Station">
         update cc_station
         set cts               = #{cts,jdbcType=BIGINT},
             uts               = #{uts,jdbcType=BIGINT},

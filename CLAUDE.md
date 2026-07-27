@@ -30,9 +30,9 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 | Module | Port | Package | Purpose |
 |--------|------|---------|---------|
-| **cc-core** | — | `com.voice9.core` | Shared library: entities, MyBatis mappers, enums, constants, PO/VO classes, strategy interfaces |
-| **cc-api** | 8080 | `com.voice9.api` | Admin REST API: company/user/agent/skill/group CRUD, statistics, Quartz scheduling |
-| **fs-api** | 8081 | `org.voice9` | Call control service: connects to FreeSwitch via ESL, WebSocket for real-time agent comms, ACD routing |
+| **cc-core** | — | `com.voxai.core` | Shared library: entities, MyBatis mappers, enums, constants, PO/VO classes, strategy interfaces |
+| **cc-api** | 8080 | `com.voxai.api` | Admin REST API: company/user/agent/skill/group CRUD, statistics, Quartz scheduling |
+| **fs-api** | 8081 | `com.voxai` | Call control service: connects to FreeSwitch via ESL, WebSocket for real-time agent comms, ACD routing |
 | **frontend** | 3000 | — | Vue 3 + Vite + Element Plus + Pinia + JsSIP (softphone). Proxy `/cc-api` → `:7100`, `/fs-api` → `:7200` |
 
 ### Key Architectural Patterns
@@ -59,7 +59,7 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 ### Database
 
-MyBatis mappers in `cc-core/src/main/java/com/voice9/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `cc-api/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
+MyBatis mappers in `cc-core/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `cc-api/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
 
 ### Frontend State
 

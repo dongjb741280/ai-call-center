@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.CompanyStatMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.CompanyStat">
+<mapper namespace="com.voxai.core.mapper.CompanyStatMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.CompanyStat">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -67,7 +67,7 @@
     <delete id="deleteByPrimaryKey" parameterType="Long">
         delete from cc_company_stat where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.CompanyStat">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.CompanyStat">
         insert into cc_company_stat
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -110,7 +110,7 @@
             <if test="customBusyDuration != null">#{customBusyDuration},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.CompanyStat">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.CompanyStat">
         update cc_company_stat
         <set>
             <if test="cts != null">cts = #{cts},</if><if test="uts != null">uts = #{uts},</if>

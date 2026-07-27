@@ -149,7 +149,7 @@ const handleUpload = async ({ file }) => {
 }
 
 const handlePlay = (row) => {
-  const url = row.ossId ? `https://dev.voice9.com${row.ossId}` : row.playback
+  const url = row.ossId ? `https://dev.voxai.com${row.ossId}` : row.playback
   if (url) window.open(url, '_blank')
 }
 

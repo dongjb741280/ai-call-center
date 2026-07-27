@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.CompanyMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.Company">
+<mapper namespace="com.voxai.core.mapper.CompanyMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.Company">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -56,7 +56,7 @@
         from cc_company
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" parameterType="com.voice9.core.entity.Company">
+    <insert id="insert" parameterType="com.voxai.core.entity.Company">
         insert into cc_company (id, cts, uts, name, id_path, pid, company_code, gmt, contact, phone, balance,
                                 bill_type, pay_type, hidden_customer, secret_type, secret_key, ivr_limit, agent_limit, agent_size,
                                 group_limit, outbound_limit, expire_time,
@@ -72,7 +72,7 @@
                 #{ext3,jdbcType=VARCHAR}, #{ext4,jdbcType=VARCHAR}, #{ext5,jdbcType=VARCHAR},
                 #{status,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.Company">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.Company">
         insert into cc_company
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -275,7 +275,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.Company">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.Company">
         update cc_company
         <set>
             <if test="uts != null">
@@ -374,10 +374,10 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <resultMap id="CompanyInfoResultMap" type="com.voice9.core.po.CompanyInfo" extends="BaseResultMap">
-        <collection property="groupIds" column="id" select="com.voice9.core.mapper.GroupMapper.selectGroupIds"></collection>
+    <resultMap id="CompanyInfoResultMap" type="com.voxai.core.po.CompanyInfo" extends="BaseResultMap">
+        <collection property="groupIds" column="id" select="com.voxai.core.mapper.GroupMapper.selectGroupIds"></collection>
         <collection property="companyStats" column="id"
-                    select="com.voice9.core.mapper.CompanyStatMapper.selectByCompanyId"></collection>
+                    select="com.voxai.core.mapper.CompanyStatMapper.selectByCompanyId"></collection>
     </resultMap>
 
 
@@ -394,7 +394,7 @@
         </where>
     </select>
 
-    <update id="deleteCompany" parameterType="com.voice9.core.entity.Company">
+    <update id="deleteCompany" parameterType="com.voxai.core.entity.Company">
         update cc_company
         set name         = #{name},
             company_code = #{companyCode},

@@ -1,0 +1,8 @@
+package com.voxai.core.mapper;
+
+import com.voxai.core.entity.VdnSchedule;
+import com.voxai.core.mapper.base.BaseMapper;
+
+public interface VdnScheduleMapper extends BaseMapper<VdnSchedule> {
+
+}

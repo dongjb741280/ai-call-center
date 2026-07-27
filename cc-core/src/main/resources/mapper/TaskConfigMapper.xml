@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.voice9.core.mapper.TaskConfigMapper">
-    <resultMap id="BaseResultMap" type="com.voice9.core.entity.TaskConfig">
+<mapper namespace="com.voxai.core.mapper.TaskConfigMapper">
+    <resultMap id="BaseResultMap" type="com.voxai.core.entity.TaskConfig">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
@@ -43,7 +43,7 @@
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from cc_task_config where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voice9.core.entity.TaskConfig">
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.TaskConfig">
         insert into cc_task_config
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -108,7 +108,7 @@
             <if test="pauseEndTime != null">#{pauseEndTime},</if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.voice9.core.entity.TaskConfig">
+    <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.TaskConfig">
         update cc_task_config
         <set>
             <if test="cts != null">cts = #{cts},</if>
