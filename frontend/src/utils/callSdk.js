@@ -48,7 +48,7 @@ export default class CallSdk {
     this._ws = null;
     this._wsUrl = null;
     this._token = null;
-    this._httpBase = this._options.httpBase || '/fs-api';
+    this._httpBase = this._options.httpBase || '/voxai-call';
     this._heartbeatMs = this._options.heartbeatMs || 15000;
     this._hb = null;
     this._loginType = null;

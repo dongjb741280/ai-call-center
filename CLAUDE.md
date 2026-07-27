@@ -12,13 +12,13 @@ mvn clean install -DskipTests=true
 mvn clean install
 
 # Build single module
-mvn clean install -pl cc-core -DskipTests=true
+mvn clean install -pl voxai-common -DskipTests=true
 
 # Docker build (after mvn install)
 ./build.sh
 
 # Frontend
-cd frontend && npm install && npm run dev    # dev server on :3000, proxies to cc-api:7100 and fs-api:7200
+cd frontend && npm install && npm run dev    # dev server on :3000, proxies to voxai-admin:7100 and voxai-call:7200
 cd frontend && npm run build                 # production build to dist/
 ```
 
@@ -30,26 +30,26 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 | Module | Port | Package | Purpose |
 |--------|------|---------|---------|
-| **cc-core** | — | `com.voxai.core` | Shared library: entities, MyBatis mappers, enums, constants, PO/VO classes, strategy interfaces |
-| **cc-api** | 8080 | `com.voxai.api` | Admin REST API: company/user/agent/skill/group CRUD, statistics, Quartz scheduling |
-| **fs-api** | 8081 | `com.voxai` | Call control service: connects to FreeSwitch via ESL, WebSocket for real-time agent comms, ACD routing |
-| **frontend** | 3000 | — | Vue 3 + Vite + Element Plus + Pinia + JsSIP (softphone). Proxy `/cc-api` → `:7100`, `/fs-api` → `:7200` |
+| **voxai-common** | — | `com.voxai.core` | Shared library: entities, MyBatis mappers, enums, constants, PO/VO classes, strategy interfaces |
+| **voxai-admin** | 8080 | `com.voxai.api` | Admin REST API: company/user/agent/skill/group CRUD, statistics, Quartz scheduling |
+| **voxai-call** | 8081 | `com.voxai` | Call control service: connects to FreeSwitch via ESL, WebSocket for real-time agent comms, ACD routing |
+| **frontend** | 3000 | — | Vue 3 + Vite + Element Plus + Pinia + JsSIP (softphone). Proxy `/voxai-admin` → `:7100`, `/voxai-call` → `:7200` |
 
 ### Key Architectural Patterns
 
-**Handler dispatch pattern** (fs-api): `@HandlerType("EVENT_NAME")` annotation on handler classes → `HandlerProcessor` (a `BeanFactoryPostProcessor`) scans and registers them into `HandlerContext` at startup. At runtime, `HandlerContext.getInstance(type)` returns the Spring bean. This pattern is used for:
+**Handler dispatch pattern** (voxai-call): `@HandlerType("EVENT_NAME")` annotation on handler classes → `HandlerProcessor` (a `BeanFactoryPostProcessor`) scans and registers them into `HandlerContext` at startup. At runtime, `HandlerContext.getInstance(type)` returns the Spring bean. This pattern is used for:
 - **FreeSwitch events** (`cc.fs.handler`): `FsAnswerHandler`, `FsBridgeHandler`, `FsHangupCompleteHandler`, etc. — each annotated with the ESL event name.
 - **WebSocket commands** (`cc.websocket.handler`): `WsLoginHandler`, `WsMakeCallHandler`, `WsAnswerHandler`, `WsTransferHandler`, etc.
 - **Command handlers** (`cc.command`): `GroupHandler`, `TransferCallHandler`, `OverFlowHandler`, etc.
 - **TCP events** (`cc.tcp.handler`): agent state subscription.
 
-**FreeSwitch integration** (`FsListen` at `fs-api/.../cc/fs/FsListen.java`):
+**FreeSwitch integration** (`FsListen` at `voxai-call/.../cc/fs/FsListen.java`):
 - Maintains a pool of ESL inbound clients (one per FreeSwitch server, discovered from DB `station` table).
 - Subscribes to ALL ESL events; `EventType` enum maps event names to Java event classes.
 - Routes events to handlers via `HandlerContext`, using a fixed thread pool (configurable via `fs.thread.num`) where hangup events for the same `callId` go to the same thread.
 - Makes outbound calls via `bgapi originate`, bridges/transfers via `uuid_bridge`/`uuid_transfer`.
 
-**ACD routing** (fs-api `cc.acd`):
+**ACD routing** (voxai-call `cc.acd`):
 - `acd/assign/` — Agent selection strategies: `LeastAnswerAssign`, `LeastTalkAssign`, `LongReadyAssign`, `PollAssign`, `RandomAssign`, `TotalAfterTimeAssign`, etc. — all implementing `AgentStrategy`.
 - `acd/lineup/` — Caller queuing strategies: `DefaultLineupStrategy`, `VipLineupStrategy`, `CustomLineupStrategy` — all implementing `LineupStrategy`.
 
@@ -59,7 +59,7 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 ### Database
 
-MyBatis mappers in `cc-core/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `cc-api/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
+MyBatis mappers in `voxai-common/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `voxai-admin/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
 
 ### Frontend State
 

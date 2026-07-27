@@ -38,18 +38,18 @@ fi
 # 检查后端服务是否运行
 echo "🔍 检查后端服务..."
 
-# 检查cc-api服务 (端口8080)
+# 检查voxai-admin服务 (端口8080)
 if curl -s http://localhost:8080/index/health > /dev/null 2>&1; then
-    echo "✅ cc-api服务运行正常 (端口8080)"
+    echo "✅ voxai-admin服务运行正常 (端口8080)"
 else
-    echo "⚠️  警告: cc-api服务未运行，请先启动后端服务"
+    echo "⚠️  警告: voxai-admin服务未运行，请先启动后端服务"
 fi
 
-# 检查fs-api服务 (端口8081)
+# 检查voxai-call服务 (端口8081)
 if curl -s http://localhost:8081/index/health > /dev/null 2>&1; then
-    echo "✅ fs-api服务运行正常 (端口8081)"
+    echo "✅ voxai-call服务运行正常 (端口8081)"
 else
-    echo "⚠️  警告: fs-api服务未运行，请先启动后端服务"
+    echo "⚠️  警告: voxai-call服务未运行，请先启动后端服务"
 fi
 
 echo ""

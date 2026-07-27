@@ -3,7 +3,7 @@ import request from './request'
 // 用户登录
 export const login = (data) => {
   return request({
-    url: '/cc-api/index/login',
+    url: '/voxai-admin/index/login',
     method: 'post',
     data
   })
@@ -12,7 +12,7 @@ export const login = (data) => {
 // 用户登出
 export const logout = (token) => {
   return request({
-    url: '/cc-api/index/logout',
+    url: '/voxai-admin/index/logout',
     method: 'get',
     params: { token }
   })
@@ -21,7 +21,7 @@ export const logout = (token) => {
 // 获取用户菜单
 export const getUserMenus = () => {
   return request({
-    url: '/cc-api/admin/menu',
+    url: '/voxai-admin/admin/menu',
     method: 'get'
   })
 }

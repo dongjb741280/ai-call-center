@@ -72,8 +72,8 @@
             <div class="step-content">
               <h3>启动后台服务</h3>
               <div class="code-block">
-                <code>cd cc-api && mvn spring-boot:run</code>
-                <code>cd fs-api && mvn spring-boot:run</code>
+                <code>cd voxai-admin && mvn spring-boot:run</code>
+                <code>cd voxai-call && mvn spring-boot:run</code>
               </div>
             </div>
           </div>

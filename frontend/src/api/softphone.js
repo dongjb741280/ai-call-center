@@ -1,7 +1,7 @@
 import request from './request'
 import CryptoJS from 'crypto-js'
 
-// 坐席登录（fs-api）
+// 坐席登录（voxai-call）
 export const agentLogin = (data) => {
   const payload = {
     agentKey: data.agentKey,
@@ -11,7 +11,7 @@ export const agentLogin = (data) => {
     forceLogin: data.forceLogin || false
   }
   return request({
-    url: '/fs-api/index/login',
+    url: '/voxai-call/index/login',
     method: 'post',
     data: payload
   })
@@ -20,7 +20,7 @@ export const agentLogin = (data) => {
 // 坐席空闲
 export const agentReady = (token) => {
   return request({
-    url: '/fs-api/cti/agent/ready',
+    url: '/voxai-call/cti/agent/ready',
     method: 'post',
     headers: { token }
   })
@@ -29,7 +29,7 @@ export const agentReady = (token) => {
 // 坐席忙碌
 export const agentNotReady = (token) => {
   return request({
-    url: '/fs-api/cti/agent/notReady',
+    url: '/voxai-call/cti/agent/notReady',
     method: 'post',
     headers: { token }
   })
@@ -38,7 +38,7 @@ export const agentNotReady = (token) => {
 // 坐席登出
 export const agentLogout = (token) => {
   return request({
-    url: '/fs-api/cti/agent/logout',
+    url: '/voxai-call/cti/agent/logout',
     method: 'post',
     headers: { token }
   })
@@ -47,7 +47,7 @@ export const agentLogout = (token) => {
 // 发起呼叫
 export const makeCall = (token, data) => {
   return request({
-    url: '/fs-api/cti/call/makeCall',
+    url: '/voxai-call/cti/call/makeCall',
     method: 'post',
     headers: { token },
     data
@@ -57,7 +57,7 @@ export const makeCall = (token, data) => {
 // 挂断电话
 export const hangupCall = (token) => {
   return request({
-    url: '/fs-api/cti/call/hangup',
+    url: '/voxai-call/cti/call/hangup',
     method: 'post',
     headers: { token }
   })
@@ -66,7 +66,7 @@ export const hangupCall = (token) => {
 // 保持
 export const holdCall = (token) => {
   return request({
-    url: '/fs-api/cti/call/hold',
+    url: '/voxai-call/cti/call/hold',
     method: 'post',
     headers: { token }
   })
@@ -75,7 +75,7 @@ export const holdCall = (token) => {
 // 取消保持
 export const cancelHold = (token) => {
   return request({
-    url: '/fs-api/cti/call/cancelHold',
+    url: '/voxai-call/cti/call/cancelHold',
     method: 'post',
     headers: { token }
   })
@@ -84,7 +84,7 @@ export const cancelHold = (token) => {
 // 静音
 export const readyMute = (token) => {
   return request({
-    url: '/fs-api/cti/call/readyMute',
+    url: '/voxai-call/cti/call/readyMute',
     method: 'post',
     headers: { token }
   })
@@ -93,7 +93,7 @@ export const readyMute = (token) => {
 // 取消静音
 export const cancelMute = (token) => {
   return request({
-    url: '/fs-api/cti/call/cancelMute',
+    url: '/voxai-call/cti/call/cancelMute',
     method: 'post',
     headers: { token }
   })

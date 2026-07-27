@@ -11,9 +11,9 @@
 ### 项目结构
 ```
 ai-call-center/
-├── cc-core/          # 核心业务模块（数据层）
-├── cc-api/           # 管理API服务
-├── fs-api/           # FreeSwitch集成服务
+├── voxai-common/          # 核心业务模块（数据层）
+├── voxai-admin/           # 管理API服务
+├── voxai-call/           # FreeSwitch集成服务
 ├── freeswitch/       # FreeSwitch配置和Docker镜像
 └── Dockerfile        # 多阶段Docker构建
 ```
@@ -31,19 +31,19 @@ ai-call-center/
 
 ## 核心模块
 
-### cc-core（核心业务模块）
+### voxai-common（核心业务模块）
 - **实体类**: 企业、坐席、技能组、通话记录等业务实体
 - **数据访问**: MyBatis映射器
 - **工具类**: 加密、ID生成等通用工具
 
-### cc-api（管理API服务）
+### voxai-admin（管理API服务）
 - **管理功能**: 坐席管理、技能组管理、企业配置
 - **认证授权**: Spring Security + JWT
 - **定时任务**: Quartz调度器
 - **数据统计**: 通话统计、坐席状态统计
 - **文件管理**: MinIO集成
 
-### fs-api（FreeSwitch集成服务）
+### voxai-call（FreeSwitch集成服务）
 - **呼叫控制**: 呼入/呼出、转接、保持、静音等
 - **智能路由**: ACD（自动呼叫分配）算法
 - **坐席状态**: 实时状态管理和监控
@@ -96,7 +96,7 @@ ai-call-center/
 
 ### 数据库配置
 1. 创建数据库
-2. 执行SQL脚本：`cc-core/src/main/resources/sql/tables_mysql_innodb.sql`
+2. 执行SQL脚本：`voxai-common/src/main/resources/sql/tables_mysql_innodb.sql`
 3. 修改配置文件中的数据库连接信息
 
 ### 配置文件
@@ -127,19 +127,19 @@ mvn clean install -DskipTests=true
 
 #### 2. 启动服务
 ```bash
-# 启动cc-api服务
-java -jar cc-api/target/cc-api-1.0.0.jar
+# 启动voxai-admin服务
+java -jar voxai-admin/target/voxai-admin-1.0.0.jar
 
-# 启动fs-api服务
-java -jar fs-api/target/fs-api-1.0.0.jar
+# 启动voxai-call服务
+java -jar voxai-call/target/voxai-call-1.0.0.jar
 ```
 
 ### 接口文档（Swagger/OpenAPI）
 
-- cc-api 文档：
+- voxai-admin 文档：
   - Swagger UI: `http://localhost:8080/swagger-ui.html` 或 `http://localhost:8080/swagger-ui/index.html`
   - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-- fs-api 文档：
+- voxai-call 文档：
   - Swagger UI: `http://localhost:8081/swagger-ui.html` 或 `http://localhost:8081/swagger-ui/index.html`
   - OpenAPI JSON: `http://localhost:8081/v3/api-docs`
 
@@ -159,8 +159,8 @@ docker-compose up -d
 ## 部署架构
 
 ### 微服务部署
-- **cc-api**: 管理后台服务（端口：8080）
-- **fs-api**: 呼叫控制服务（端口：8081）
+- **voxai-admin**: 管理后台服务（端口：8080）
+- **voxai-call**: 呼叫控制服务（端口：8081）
 - **freeswitch**: 呼叫引擎（端口：5060）
 
 ### 数据存储
@@ -259,13 +259,13 @@ src/main/java/
 A: 参考 `freeswitch/` 目录下的配置文件，支持CentOS和Debian两种系统。
 
 ### Q: 如何添加新的分配策略？
-A: 在 `fs-api/src/main/java/com/voxai/cc/acd/assign/` 目录下实现新的分配算法。
+A: 在 `voxai-call/src/main/java/com/voxai/cc/acd/assign/` 目录下实现新的分配算法。
 
 ### Q: 如何集成第三方系统？
 A: 通过WebHook回调或消息队列进行集成，支持HTTP和RabbitMQ。
 
 ### Q: 如何扩展坐席功能？
-A: 在 `cc-core` 模块中添加新的实体和接口，在 `cc-api` 中实现具体业务逻辑。
+A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` 中实现具体业务逻辑。
 
 ## 许可证
 

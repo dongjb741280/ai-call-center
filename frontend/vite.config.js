@@ -23,15 +23,15 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/cc-api': {
+      '/voxai-admin': {
         target: 'http://localhost:7100',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/cc-api/, '')
+        // rewrite: (path) => path.replace(/^\/voxai-admin/, '')
       },
-      '/fs-api': {
+      '/voxai-call': {
         target: 'http://localhost:7200',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/fs-api/, '')
+        // rewrite: (path) => path.replace(/^\/voxai-call/, '')
       }
     }
   }

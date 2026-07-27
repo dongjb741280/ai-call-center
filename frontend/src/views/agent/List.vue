@@ -436,7 +436,7 @@ const handleExport = () => {
   params.set('pageNum', '1')
   params.set('pageSize', '999999')
   params.set('query', '{}')
-  window.open(`/cc-api/config/agent/export?${params.toString()}`, '_blank')
+  window.open(`/voxai-admin/config/agent/export?${params.toString()}`, '_blank')
 }
 
 const handleSearch = () => { pagination.currentPage = 1; loadData() }

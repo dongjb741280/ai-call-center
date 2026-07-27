@@ -3,7 +3,7 @@ import request from './request'
 // 呼叫管理
 export const makeCall = (data) => {
   return request({
-    url: '/fs-api/cti/call/makeCall',
+    url: '/voxai-call/cti/call/makeCall',
     method: 'post',
     data
   })
@@ -11,7 +11,7 @@ export const makeCall = (data) => {
 
 export const hangupCall = (data) => {
   return request({
-    url: '/fs-api/cti/call/hangup',
+    url: '/voxai-call/cti/call/hangup',
     method: 'post',
     data
   })
@@ -19,7 +19,7 @@ export const hangupCall = (data) => {
 
 export const answerCall = (data) => {
   return request({
-    url: '/fs-api/cti/call/answer',
+    url: '/voxai-call/cti/call/answer',
     method: 'post',
     data
   })
@@ -27,7 +27,7 @@ export const answerCall = (data) => {
 
 export const transferCall = (data) => {
   return request({
-    url: '/fs-api/cti/call/transfer',
+    url: '/voxai-call/cti/call/transfer',
     method: 'post',
     data
   })
@@ -36,7 +36,7 @@ export const transferCall = (data) => {
 // 通话记录
 export const getCallLogs = (params) => {
   return request({
-    url: '/fs-api/cti/admin/call',
+    url: '/voxai-call/cti/admin/call',
     method: 'get',
     params
   })
@@ -44,7 +44,7 @@ export const getCallLogs = (params) => {
 
 export const getCallDetail = (callId) => {
   return request({
-    url: `/fs-api/cti/admin/call`,
+    url: `/voxai-call/cti/admin/call`,
     method: 'get',
     params: { callId }
   })
@@ -53,14 +53,14 @@ export const getCallDetail = (callId) => {
 // 保持/取消保持
 export const holdCall = () => {
   return request({
-    url: '/fs-api/cti/call/hold',
+    url: '/voxai-call/cti/call/hold',
     method: 'post'
   })
 }
 
 export const cancelHold = () => {
   return request({
-    url: '/fs-api/cti/call/cancelHold',
+    url: '/voxai-call/cti/call/cancelHold',
     method: 'post'
   })
 }
@@ -68,14 +68,14 @@ export const cancelHold = () => {
 // 静音/取消静音
 export const readyMute = () => {
   return request({
-    url: '/fs-api/cti/call/readyMute',
+    url: '/voxai-call/cti/call/readyMute',
     method: 'post'
   })
 }
 
 export const cancelMute = () => {
   return request({
-    url: '/fs-api/cti/call/cancelMute',
+    url: '/voxai-call/cti/call/cancelMute',
     method: 'post'
   })
 }
@@ -83,7 +83,7 @@ export const cancelMute = () => {
 // 呼叫统计
 export const getCallStatistics = (params) => {
   return request({
-    url: '/fs-api/statistics/call',
+    url: '/voxai-call/statistics/call',
     method: 'get',
     params
   })

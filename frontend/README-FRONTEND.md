@@ -5,7 +5,7 @@
 ## 🎯 项目概述
 
 这是一个完整的AI呼叫中心解决方案，包含：
-- **后台服务**: Spring Boot微服务架构 (cc-api + fs-api)
+- **后台服务**: Spring Boot微服务架构 (voxai-admin + voxai-call)
 - **前台系统**: Vue 3 + Element Plus现代化界面
 - **呼叫引擎**: FreeSwitch语音通信
 
@@ -14,12 +14,12 @@
 ### 1. 启动后台服务
 
 ```bash
-# 启动cc-api管理服务 (端口8080)
-cd cc-api
+# 启动voxai-admin管理服务 (端口8080)
+cd voxai-admin
 mvn spring-boot:run
 
-# 启动fs-api呼叫服务 (端口8081) 
-cd fs-api
+# 启动voxai-call呼叫服务 (端口8081) 
+cd voxai-call
 mvn spring-boot:run
 ```
 
@@ -92,13 +92,13 @@ npm run dev
 
 ```
 ai-call-center/
-├── cc-api/                 # 管理后台服务
+├── voxai-admin/                 # 管理后台服务
 │   ├── src/main/java/     # Java源码
 │   └── src/main/resources/ # 配置文件
-├── fs-api/                # 呼叫控制服务  
+├── voxai-call/                # 呼叫控制服务  
 │   ├── src/main/java/     # Java源码
 │   └── src/main/resources/ # 配置文件
-├── cc-core/               # 核心业务模块
+├── voxai-common/               # 核心业务模块
 ├── freeswitch/            # FreeSwitch配置
 ├── frontend/              # 前台管理系统
 │   ├── src/
@@ -179,13 +179,13 @@ ai-call-center/
 - `DELETE /api/admin/user/{id}` - 删除用户
 
 ### 坐席接口
-- `GET /fs-api/agent/list` - 坐席列表
-- `POST /fs-api/cti/agent/ready` - 坐席空闲
-- `POST /fs-api/cti/agent/notReady` - 坐席忙碌
+- `GET /voxai-call/agent/list` - 坐席列表
+- `POST /voxai-call/cti/agent/ready` - 坐席空闲
+- `POST /voxai-call/cti/agent/notReady` - 坐席忙碌
 
 ### 呼叫接口
-- `GET /fs-api/cti/admin/call` - 通话记录
-- `POST /fs-api/cti/call/makeCall` - 发起呼叫
+- `GET /voxai-call/cti/admin/call` - 通话记录
+- `POST /voxai-call/cti/call/makeCall` - 发起呼叫
 
 ## 🚀 部署说明
 
@@ -214,8 +214,8 @@ docker-compose up -d
    mvn clean package
    
    # 运行
-   java -jar cc-api/target/cc-api-1.0.0.jar
-   java -jar fs-api/target/fs-api-1.0.0.jar
+   java -jar voxai-admin/target/voxai-admin-1.0.0.jar
+   java -jar voxai-call/target/voxai-call-1.0.0.jar
    ```
 
 3. **Nginx配置**
@@ -233,7 +233,7 @@ docker-compose up -d
            proxy_pass http://localhost:8080;
        }
        
-       location /fs-api {
+       location /voxai-call {
            proxy_pass http://localhost:8081;
        }
    }
@@ -262,8 +262,8 @@ docker-compose up -d
 
 ```bash
 # 后台日志
-tail -f logs/cc-api.log
-tail -f logs/fs-api.log
+tail -f logs/voxai-admin.log
+tail -f logs/voxai-call.log
 
 # 前台日志
 # 查看浏览器开发者工具控制台

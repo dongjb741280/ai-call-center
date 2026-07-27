@@ -116,13 +116,13 @@ frontend/
 - `DELETE /api/admin/user/{id}` - 删除用户
 
 ### 坐席接口
-- `GET /fs-api/agent/list` - 坐席列表
-- `POST /fs-api/cti/agent/ready` - 坐席空闲
-- `POST /fs-api/cti/agent/notReady` - 坐席忙碌
+- `GET /voxai-call/agent/list` - 坐席列表
+- `POST /voxai-call/cti/agent/ready` - 坐席空闲
+- `POST /voxai-call/cti/agent/notReady` - 坐席忙碌
 
 ### 呼叫接口
-- `GET /fs-api/cti/admin/call` - 通话记录
-- `POST /fs-api/cti/call/makeCall` - 发起呼叫
+- `GET /voxai-call/cti/admin/call` - 通话记录
+- `POST /voxai-call/cti/call/makeCall` - 发起呼叫
 
 ## 配置说明
 
@@ -135,14 +135,14 @@ frontend/
 server: {
   proxy: {
     '/api': {
-      target: 'http://localhost:8080',  // cc-api服务
+      target: 'http://localhost:8080',  // voxai-admin服务
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/api/, '')
     },
-    '/fs-api': {
-      target: 'http://localhost:8081',  // fs-api服务
+    '/voxai-call': {
+      target: 'http://localhost:8081',  // voxai-call服务
       changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/fs-api/, '')
+      rewrite: (path) => path.replace(/^\/voxai-call/, '')
     }
   }
 }
@@ -214,7 +214,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
     
-    location /fs-api {
+    location /voxai-call {
         proxy_pass http://localhost:8081;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

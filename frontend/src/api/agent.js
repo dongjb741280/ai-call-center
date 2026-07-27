@@ -3,7 +3,7 @@ import request from './request'
 // 坐席管理
 export const getAgentList = (params) => {
   return request({
-    url: '/fs-api/agent/list',
+    url: '/voxai-call/agent/list',
     method: 'get',
     params
   })
@@ -11,7 +11,7 @@ export const getAgentList = (params) => {
 
 export const addAgent = (data) => {
   return request({
-    url: '/fs-api/agent',
+    url: '/voxai-call/agent',
     method: 'post',
     data
   })
@@ -19,7 +19,7 @@ export const addAgent = (data) => {
 
 export const updateAgent = (data) => {
   return request({
-    url: '/fs-api/agent',
+    url: '/voxai-call/agent',
     method: 'put',
     data
   })
@@ -27,7 +27,7 @@ export const updateAgent = (data) => {
 
 export const deleteAgent = (id) => {
   return request({
-    url: `/fs-api/agent/${id}`,
+    url: `/voxai-call/agent/${id}`,
     method: 'delete'
   })
 }
@@ -35,21 +35,21 @@ export const deleteAgent = (id) => {
 // 坐席状态管理
 export const agentReady = () => {
   return request({
-    url: '/fs-api/cti/agent/ready',
+    url: '/voxai-call/cti/agent/ready',
     method: 'post'
   })
 }
 
 export const agentNotReady = () => {
   return request({
-    url: '/fs-api/cti/agent/notReady',
+    url: '/voxai-call/cti/agent/notReady',
     method: 'post'
   })
 }
 
 export const agentLogout = () => {
   return request({
-    url: '/fs-api/cti/agent/logout',
+    url: '/voxai-call/cti/agent/logout',
     method: 'post'
   })
 }
@@ -57,7 +57,7 @@ export const agentLogout = () => {
 // 技能组管理
 export const getGroupList = (params) => {
   return request({
-    url: '/fs-api/group/list',
+    url: '/voxai-call/group/list',
     method: 'get',
     params
   })
@@ -65,7 +65,7 @@ export const getGroupList = (params) => {
 
 export const addGroup = (data) => {
   return request({
-    url: '/fs-api/group',
+    url: '/voxai-call/group',
     method: 'post',
     data
   })
@@ -73,7 +73,7 @@ export const addGroup = (data) => {
 
 export const updateGroup = (data) => {
   return request({
-    url: '/fs-api/group',
+    url: '/voxai-call/group',
     method: 'put',
     data
   })
@@ -81,7 +81,7 @@ export const updateGroup = (data) => {
 
 export const deleteGroup = (id) => {
   return request({
-    url: `/fs-api/group/${id}`,
+    url: `/voxai-call/group/${id}`,
     method: 'delete'
   })
 }

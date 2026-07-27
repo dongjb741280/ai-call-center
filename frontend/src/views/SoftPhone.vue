@@ -644,7 +644,7 @@ const handleListen = () => {
   }
   if (!voxaiInstance) return
   if (!voxaiInstance.phoneListen) {
-    ElMessage.error('SDK 未更新，请重新部署 fs-api')
+    ElMessage.error('SDK 未更新，请重新部署 voxai-call')
     return
   }
   voxaiInstance.phoneListen(monitorTarget.value)
@@ -658,7 +658,7 @@ const handleInsert = () => {
   }
   if (!voxaiInstance) return
   if (!voxaiInstance.phoneInsert) {
-    ElMessage.error('SDK 未更新，请重新部署 fs-api')
+    ElMessage.error('SDK 未更新，请重新部署 voxai-call')
     return
   }
   voxaiInstance.phoneInsert(monitorTarget.value)
@@ -672,7 +672,7 @@ const handleWhisper = () => {
   }
   if (!voxaiInstance) return
   if (!voxaiInstance.phoneWhisper) {
-    ElMessage.error('SDK 未更新，请重新部署 fs-api')
+    ElMessage.error('SDK 未更新，请重新部署 voxai-call')
     return
   }
   voxaiInstance.phoneWhisper(monitorTarget.value)

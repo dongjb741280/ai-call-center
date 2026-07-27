@@ -124,12 +124,12 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getStationList, saveStation, deleteStation } from '@/api/config'
 
 const typeOptions = [
-  { label: 'cc-api', value: 1 },
-  { label: 'fs-api', value: 2 },
+  { label: 'voxai-admin', value: 1 },
+  { label: 'voxai-call', value: 2 },
   { label: 'cc-ivr', value: 3 },
   { label: 'fs-media', value: 4 }
 ]
-const typeMap = { 1: 'cc-api', 2: 'fs-api', 3: 'cc-ivr', 4: 'fs-media' }
+const typeMap = { 1: 'voxai-admin', 2: 'voxai-call', 3: 'cc-ivr', 4: 'fs-media' }
 
 const loading = ref(false)
 const submitLoading = ref(false)
