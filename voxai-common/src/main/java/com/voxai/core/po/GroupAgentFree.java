@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 技能组空闲坐席
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class GroupAgentFree {
     /**

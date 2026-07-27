@@ -24,16 +24,8 @@ import java.net.InetSocketAddress;
 import java.time.Instant;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 坐席登录
- * <p>
- * 1001 账号或密码错误
- * 1002 坐席被禁用
- * 1003 技能组为空
- * 1004 坐席通话中，不允许再次登录
- * 1005 坐席在别处登录
- * 1006 坐席重复登录
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_LOGIN")

@@ -4,9 +4,8 @@ import com.voxai.core.po.AgentInfo;
 import com.voxai.core.strategy.AgentStrategy;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 累计话后时间长优先
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class TotalAfterTimeAssign implements AgentStrategy {
 

@@ -15,10 +15,8 @@ import com.voxai.cc.exception.BusinessException;
 import java.util.List;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 呼叫话单查询等
- * 需要企业账号访问
+ * @author dongjb
+ * @date 2026/07/27
  */
 @RestController
 @RequestMapping("/cti/admin")

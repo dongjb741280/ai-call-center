@@ -9,9 +9,8 @@ import com.voxai.cc.configration.HandlerType;
 import com.voxai.cc.fs.event.FsPlaybackStopEvent;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 放音结束
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("PLAYBACK_STOP")

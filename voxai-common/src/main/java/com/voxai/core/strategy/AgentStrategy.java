@@ -3,9 +3,8 @@ package com.voxai.core.strategy;
 import com.voxai.core.po.AgentInfo;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 坐席在技能组空闲策略
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface AgentStrategy {
 

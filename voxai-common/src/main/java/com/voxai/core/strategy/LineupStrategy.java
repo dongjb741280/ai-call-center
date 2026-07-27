@@ -3,9 +3,8 @@ package com.voxai.core.strategy;
 import com.voxai.core.po.CallInfo;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 多媒体在技能组中排队策略
+ * @author dongjb
+ * @date 2026/07/27
  */
 public interface LineupStrategy {
 

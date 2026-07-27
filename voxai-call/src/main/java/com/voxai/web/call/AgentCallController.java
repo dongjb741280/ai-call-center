@@ -16,9 +16,8 @@ import com.voxai.cc.exception.BusinessException;
 import com.voxai.web.base.BaseController;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * rest cti for agent
+ * @author dongjb
+ * @date 2026/07/27
  */
 @RestController
 @RequestMapping("/cti/call")

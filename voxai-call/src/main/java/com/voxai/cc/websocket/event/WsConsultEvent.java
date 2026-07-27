@@ -3,9 +3,8 @@ package com.voxai.cc.websocket.event;
 import com.voxai.cc.websocket.event.base.WsBaseEvent;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 咨询事件（咨询 / 咨询转接）
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class WsConsultEvent extends WsBaseEvent {
 

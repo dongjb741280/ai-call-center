@@ -4,8 +4,8 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.voxai.cc.fs.event.base.FsBaseEvent;
 
 /**
- * Created by dongjb on 2025/09/03
- * 振铃事件
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class FsParkEvent extends FsBaseEvent {
 

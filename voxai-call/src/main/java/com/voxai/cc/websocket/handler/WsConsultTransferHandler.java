@@ -12,9 +12,8 @@ import com.voxai.cc.websocket.response.WsResponseEntity;
 import java.time.Instant;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 咨询转接（咨询完成后将客户交给被咨询方，坐席退出通话）
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_CONSULT_TRANSFER")

@@ -4,9 +4,8 @@ import com.voxai.core.po.AgentInfo;
 import com.voxai.core.strategy.AgentStrategy;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 当前最长空闲时间
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class LongReadyAssign implements AgentStrategy {
 

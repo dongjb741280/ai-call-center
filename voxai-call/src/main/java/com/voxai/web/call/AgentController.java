@@ -19,9 +19,8 @@ import com.voxai.cc.websocket.event.WsNotReadyEvent;
 import com.voxai.cc.websocket.event.WsReadyEvent;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * rest api for agent
+ * @author dongjb
+ * @date 2026/07/27
  */
 @RestController
 @RequestMapping("/cti/agent")

@@ -12,10 +12,8 @@ import com.voxai.cc.websocket.event.WsReadyEvent;
 import java.time.Instant;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 坐席空闲
- * 2002 示闲失败
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_READY")

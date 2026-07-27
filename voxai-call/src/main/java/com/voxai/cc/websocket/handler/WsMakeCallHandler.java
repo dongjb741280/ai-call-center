@@ -20,9 +20,8 @@ import com.voxai.cc.websocket.event.WsMakeCallEvent;
 import java.time.Instant;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 坐席发起外呼
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_MAKE_CALL")

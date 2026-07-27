@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 更新随路数据
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_UPDATE_FOLLOWDATA")

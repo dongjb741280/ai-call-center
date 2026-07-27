@@ -10,9 +10,8 @@ import com.voxai.cc.command.base.BaseHandler;
 import java.time.Instant;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 电话进vdn流程
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 public class VdnHandler extends BaseHandler {

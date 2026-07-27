@@ -12,9 +12,8 @@ import com.voxai.cc.command.base.BaseHandler;
 import java.time.Instant;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 转外呼
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 public class TransferCallHandler extends BaseHandler {

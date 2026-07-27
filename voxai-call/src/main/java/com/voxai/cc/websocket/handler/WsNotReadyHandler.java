@@ -12,10 +12,8 @@ import com.voxai.cc.websocket.event.WsNotReadyEvent;
 import java.time.Instant;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 坐席忙碌
- * 2001 示忙失败
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_NOT_READY")

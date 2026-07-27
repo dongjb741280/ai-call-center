@@ -5,9 +5,8 @@ import com.voxai.core.enums.Direction;
 import com.voxai.core.po.AgentState;
 
 /**
- * Created by dongjb on 2025/09/03
- *
- * 呼入来电、外呼主被叫振铃
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class WsCallEntity {
     /**

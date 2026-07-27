@@ -6,9 +6,8 @@ import com.voxai.cc.websocket.handler.base.WsBaseHandler;
 import com.voxai.cc.websocket.event.WsWorkReadyEvent;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 上班之后的状态
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_WORK_READY")

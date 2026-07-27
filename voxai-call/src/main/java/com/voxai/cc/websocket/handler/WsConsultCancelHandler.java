@@ -10,9 +10,8 @@ import com.voxai.cc.websocket.handler.base.WsBaseHandler;
 import com.voxai.cc.websocket.response.WsResponseEntity;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 坐席取消咨询（挂断被咨询方，恢复与客户的通话）
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_CONSULT_CANCEL")

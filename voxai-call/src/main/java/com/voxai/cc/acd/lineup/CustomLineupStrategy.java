@@ -13,9 +13,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 自定义排队策略
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class CustomLineupStrategy implements LineupStrategy {
     private Logger logger = LoggerFactory.getLogger(CustomLineupStrategy.class);

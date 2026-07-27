@@ -20,9 +20,8 @@ import com.voxai.cc.fs.handler.base.BaseEventHandler;
 import java.time.Instant;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 设备应答处理类
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("CHANNEL_ANSWER")

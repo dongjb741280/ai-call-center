@@ -5,9 +5,8 @@ import com.voxai.cc.websocket.event.base.WsBaseEvent;
 import java.util.List;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 坐席登录
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class WsLoginEvnet extends WsBaseEvent {
 

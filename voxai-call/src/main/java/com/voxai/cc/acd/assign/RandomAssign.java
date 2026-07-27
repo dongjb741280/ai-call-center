@@ -5,9 +5,8 @@ import com.voxai.core.po.AgentInfo;
 import com.voxai.core.strategy.AgentStrategy;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 随机分配
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class RandomAssign implements AgentStrategy {
 

@@ -7,11 +7,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 工作模式[CBC，CFB，ECB，OFB，PCBC]
- * <p>
- * 填充方式[NoPadding/zero，PKCS5Padding , PKCS7Padding ，ISO10126Padding]
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class AesUtils {
 

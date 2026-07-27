@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 咨询转三方会议（将客户、坐席、被咨询方合并为三方通话）
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("WS_CONSULT_PARTY")

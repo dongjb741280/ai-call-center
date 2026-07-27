@@ -8,9 +8,8 @@ import com.voxai.cc.fs.event.FsRecordStartEvent;
 import com.voxai.cc.fs.handler.base.BaseEventHandler;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 录音开始
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 @HandlerType("RECORD_START")

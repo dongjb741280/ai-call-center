@@ -4,9 +4,8 @@ import com.voxai.core.po.AgentInfo;
 import com.voxai.core.strategy.AgentStrategy;
 
 /**
- * Created by dongjb on 2025/09/03
- *
- * 累计空闲最长时间，不包含当前的空闲时间
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class TotalReadyAssign implements AgentStrategy {
 

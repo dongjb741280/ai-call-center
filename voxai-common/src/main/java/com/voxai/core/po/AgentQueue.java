@@ -1,9 +1,8 @@
 package com.voxai.core.po;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 坐席属性队列
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class AgentQueue implements Comparable<Long> {
 

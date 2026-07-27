@@ -4,9 +4,8 @@ import com.voxai.core.po.CallInfo;
 import com.voxai.core.strategy.LineupStrategy;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 默认按照进技能组时间，时间越小转坐席越早
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class DefaultLineupStrategy implements LineupStrategy {
 

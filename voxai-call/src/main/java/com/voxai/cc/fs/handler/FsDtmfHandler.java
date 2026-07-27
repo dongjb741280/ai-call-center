@@ -6,11 +6,9 @@ import com.voxai.cc.configration.HandlerType;
 import com.voxai.cc.fs.event.FsDtmfEvent;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * 按键收号
+ * @author dongjb
+ * @date 2026/07/27
  */
-
 @Component
 @HandlerType("DTMF")
 public class FsDtmfHandler extends BaseEventHandler<FsDtmfEvent> {

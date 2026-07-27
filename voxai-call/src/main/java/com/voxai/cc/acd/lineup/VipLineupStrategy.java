@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by dongjb on 2025/09/03
- * <p>
- * vip排队优先
+ * @author dongjb
+ * @date 2026/07/27
  */
 public class VipLineupStrategy implements LineupStrategy {
     private Logger logger = LoggerFactory.getLogger(VipLineupStrategy.class);

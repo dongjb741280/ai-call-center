@@ -20,9 +20,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * Create by dongjb on 2025/09/03
- * <p>
- * 进技能组
+ * @author dongjb
+ * @date 2026/07/27
  */
 @Component
 public class GroupHandler extends BaseHandler {
