@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.voice9</groupId>
-    <artifactId>contact-center</artifactId>
+    <artifactId>ai-call-center</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>
 
-    <name>contact-center</name>
+    <name>ai-call-center</name>
     <description>Demo project for Spring Boot</description>
 
     <parent>

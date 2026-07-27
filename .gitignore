@@ -67,3 +67,6 @@ hs_err_pid*
 /frontend/yarn-debug.log*
 /frontend/yarn-error.log*
 /frontend/pnpm-debug.log*
+
+# CodeGraph runtime files
+/.codegraph/
