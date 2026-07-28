@@ -3,12 +3,6 @@ import { useUserStore } from '@/stores/user'
 
 const routes = [
   {
-    path: '/demo',
-    name: 'Demo',
-    component: () => import('@/views/Demo.vue'),
-    meta: { requiresAuth: false }
-  },
-  {
     path: '/softphone',
     name: 'SoftPhone',
     component: () => import('@/views/SoftPhone.vue'),
