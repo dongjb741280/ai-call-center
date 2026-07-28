@@ -88,6 +88,17 @@ public class VoxaiCallApplication implements CommandLineRunner, ApplicationListe
     }
 
     /**
+     * 录音下载服务（FreeSwitch mod_http_cache）
+     */
+    @Bean
+    public RestTemplate recordRestTemplate(@Value("${fs.record.http.connectTimeout:5000}") Integer connectTimeout, @Value("${fs.record.http.readTimeout:30000}") Integer readTimeout) {
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        simpleClientHttpRequestFactory.setConnectTimeout(connectTimeout);
+        simpleClientHttpRequestFactory.setReadTimeout(readTimeout);
+        return new RestTemplate(simpleClientHttpRequestFactory);
+    }
+
+    /**
      * 内部调用服务
      *
      * @param connectTimeout

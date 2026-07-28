@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,7 +47,13 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
     private RestTemplate restTemplate;
 
     @Autowired
+    private RestTemplate recordRestTemplate;
+
+    @Autowired
     private MinioClient minioClient;
+
+    @Value("${fs.record.http.port:7430}")
+    private Integer fsRecordHttpPort;
 
     @Override
     public void handleEvent(FsHangupCompleteEvent event) {
@@ -83,9 +90,9 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             String day = DateFormatUtils.format(new Date(), "yyyyMMddHH");
             String[] record = deviceInfo.getRecord().split("/");
             String fileName = "/" + day.substring(0, 6) + "/" + day.substring(0, 8) + "/" + day.substring(8, 10) + "/" + record[record.length - 1];
-            String url = "http://" + event.getLocalMediaIp() + ":7430" + deviceInfo.getRecord();
+            String url = "http://" + event.getLocalMediaIp() + ":" + fsRecordHttpPort + deviceInfo.getRecord();
             try {
-                ResponseEntity<byte[]> responseEntity = restTemplate.getForEntity(url, byte[].class);
+                ResponseEntity<byte[]> responseEntity = recordRestTemplate.getForEntity(url, byte[].class);
                 logger.info("get record file:{}", deviceInfo.getRecord());
                 ObjectWriteResponse writeResponse = minioClient.putObject(PutObjectArgs.builder().stream(new ByteArrayInputStream(responseEntity.getBody()), responseEntity.getBody().length, -1).object(fileName).bucket("cc-record").build());
                 logger.info("callId:{}, record fileName:{}, minioTag:{}", deviceInfo.getCallId(), fileName, writeResponse.etag());
@@ -196,7 +203,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(notifyUrl, requestEntity, String.class);
             logger.info("push call:{} to {} success, statusCode:{} response:{}", callInfo.getCallId(), notifyUrl, responseEntity.getStatusCode(), responseEntity.getBody());
         } catch (Exception e) {
-            logger.error("push call:{} to {} error, payload:{}", callInfo.getCallId(), notifyUrl, payload);
+            logger.error("push call:{} to {} error, payload:{}", callInfo.getCallId(), notifyUrl, payload, e);
         }
     }
 
