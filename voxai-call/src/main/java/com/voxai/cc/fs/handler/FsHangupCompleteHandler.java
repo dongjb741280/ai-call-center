@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,6 +30,8 @@ import com.voxai.cc.fs.event.FsHangupCompleteEvent;
 import com.voxai.cc.fs.handler.base.BaseEventHandler;
 
 import java.io.ByteArrayInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,13 +48,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
     private RestTemplate restTemplate;
 
     @Autowired
-    private RestTemplate recordRestTemplate;
-
-    @Autowired
     private MinioClient minioClient;
-
-    @Value("${fs.record.http.port:7430}")
-    private Integer fsRecordHttpPort;
 
     @Override
     public void handleEvent(FsHangupCompleteEvent event) {
@@ -90,15 +85,14 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             String day = DateFormatUtils.format(new Date(), "yyyyMMddHH");
             String[] record = deviceInfo.getRecord().split("/");
             String fileName = "/" + day.substring(0, 6) + "/" + day.substring(0, 8) + "/" + day.substring(8, 10) + "/" + record[record.length - 1];
-            String url = "http://" + event.getLocalMediaIp() + ":" + fsRecordHttpPort + deviceInfo.getRecord();
             try {
-                ResponseEntity<byte[]> responseEntity = recordRestTemplate.getForEntity(url, byte[].class);
-                logger.info("get record file:{}", deviceInfo.getRecord());
-                ObjectWriteResponse writeResponse = minioClient.putObject(PutObjectArgs.builder().stream(new ByteArrayInputStream(responseEntity.getBody()), responseEntity.getBody().length, -1).object(fileName).bucket("cc-record").build());
+                byte[] fileBytes = Files.readAllBytes(Paths.get(deviceInfo.getRecord()));
+                logger.info("read record file:{} size:{}", deviceInfo.getRecord(), fileBytes.length);
+                ObjectWriteResponse writeResponse = minioClient.putObject(PutObjectArgs.builder().stream(new ByteArrayInputStream(fileBytes), fileBytes.length, -1).object(fileName).bucket("cc-record").build());
                 logger.info("callId:{}, record fileName:{}, minioTag:{}", deviceInfo.getCallId(), fileName, writeResponse.etag());
                 deviceInfo.setRecord("/cc-record" + fileName);
             } catch (Exception e) {
-                logger.error("url:" + url + e.getMessage(), e);
+                logger.error("read record file:{} error:{}", deviceInfo.getRecord(), e.getMessage(), e);
             }
         }
 
