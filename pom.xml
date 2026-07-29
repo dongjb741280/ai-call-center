@@ -69,7 +69,7 @@
         <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
         <maven.docker.plugin.version>0.43.4</maven.docker.plugin.version>
 
-        <docker.repostory>192.168.180.37:5000</docker.repostory>
+        <docker.repostory>harbor.example.com</docker.repostory>
         <docker.registry.name>voxai</docker.registry.name>
     </properties>
 

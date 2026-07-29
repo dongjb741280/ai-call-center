@@ -18,7 +18,7 @@ stages:
 variables:
   MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  DOCKER_REGISTRY: "192.168.180.37:5000"
+  DOCKER_REGISTRY: "harbor.example.com"
   DOCKER_NAMESPACE: "voxai"
 
 # ---------------------------------------------------------------------------
