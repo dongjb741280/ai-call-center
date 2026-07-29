@@ -17,9 +17,9 @@ mvn clean install -pl voxai-common -DskipTests=true
 # Docker build (after mvn install)
 ./build.sh
 
-# Frontend
-cd frontend && npm install && npm run dev    # dev server on :3000, proxies to voxai-admin:7100 and voxai-call:7200
-cd frontend && npm run build                 # production build to dist/
+# Frontend (separate project: ai-call-center-web)
+cd ../ai-call-center-web && npm install && npm run dev    # dev server on :3000
+cd ../ai-call-center-web && npm run build                 # production build to dist/
 ```
 
 ## Architecture Overview
@@ -33,7 +33,7 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 | **voxai-common** | — | `com.voxai.core` | Shared library: entities, MyBatis mappers, enums, constants, PO/VO classes, strategy interfaces |
 | **voxai-admin** | 8080 | `com.voxai.api` | Admin REST API: company/user/agent/skill/group CRUD, statistics, Quartz scheduling |
 | **voxai-call** | 8081 | `com.voxai` | Call control service: connects to FreeSwitch via ESL, WebSocket for real-time agent comms, ACD routing |
-| **frontend** | 3000 | — | Vue 3 + Vite + Element Plus + Pinia + JsSIP (softphone). Proxy `/voxai-admin` → `:7100`, `/voxai-call` → `:7200` |
+| **frontend** (独立项目 — `ai-call-center-web`) | 3000 | — | Vue 3 + Vite + Element Plus + Pinia + JsSIP (softphone). Proxy `/voxai-admin` → `:7100`, `/voxai-call` → `:7200` |
 
 ### Key Architectural Patterns
 
@@ -61,10 +61,9 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 MyBatis mappers in `voxai-common/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `voxai-admin/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
 
-### Frontend State
+### Frontend State (独立项目 `ai-call-center-web`)
 
 - `stores/user.js` — authentication (login/logout, JWT token)
-- `stores/softphone.js` — JsSIP SIP client instance, call state, audio management
 
 ### Default Credentials
 
