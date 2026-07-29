@@ -1,0 +1,241 @@
+# =============================================================================
+# AI呼叫中心 CI/CD Pipeline
+# GitLab Runner + SonarQube + Maven + JMeter + Artifactory + Docker
+# =============================================================================
+
+stages:
+  - compile
+  - test
+  - static-analysis
+  - integration-test
+  - package
+  - docker-build
+  - publish
+
+# ---------------------------------------------------------------------------
+# 全局变量 — 敏感值请在 GitLab CI/CD Settings → Variables 中配置
+# ---------------------------------------------------------------------------
+variables:
+  MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  DOCKER_REGISTRY: "192.168.180.37:5000"
+  DOCKER_NAMESPACE: "voxai"
+
+# ---------------------------------------------------------------------------
+# Maven 本地仓库缓存
+# ---------------------------------------------------------------------------
+cache:
+  key: m2-cache
+  paths:
+    - .m2/repository/
+
+# ---------------------------------------------------------------------------
+# 通用模板：Maven 作业
+# ---------------------------------------------------------------------------
+.maven-job:
+  image: maven:3.8.6-openjdk-8
+  before_script:
+    - echo "Maven $(mvn --version | head -1)"
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+
+# ---------------------------------------------------------------------------
+# Stage 1: 编译
+# ---------------------------------------------------------------------------
+maven-compile:
+  extends: .maven-job
+  stage: compile
+  script:
+    - mvn $MAVEN_CLI_OPTS clean compile -DskipTests
+  artifacts:
+    paths:
+      - "*/target/classes/"
+      - "*/target/generated-sources/"
+    expire_in: 30min
+
+# ---------------------------------------------------------------------------
+# Stage 2: 单元测试
+# ---------------------------------------------------------------------------
+unit-test:
+  extends: .maven-job
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - "*/target/surefire-reports/TEST-*.xml"
+    paths:
+      - "*/target/surefire-reports/"
+    expire_in: 7d
+  coverage: '/Total.*?([0-9]{1,3})%/'  # 可选覆盖率正则
+
+# ---------------------------------------------------------------------------
+# Stage 3: SonarQube 代码扫描
+# 仅 main / develop 分支及 Merge Request 自动触发
+# 需在 Settings → Variables 配置 SONAR_HOST_URL、SONAR_TOKEN
+# ---------------------------------------------------------------------------
+sonarqube:
+  extends: .maven-job
+  stage: static-analysis
+  needs: ["unit-test"]
+  script:
+    - mvn $MAVEN_CLI_OPTS sonar:sonar
+      -Dsonar.host.url=$SONAR_HOST_URL
+      -Dsonar.login=$SONAR_TOKEN
+      -Dsonar.java.binaries="*/target/classes"
+  only:
+    - main
+    - develop
+    - merge_requests
+  except:
+    variables:
+      - $SONAR_HOST_URL == null
+      - $SONAR_TOKEN == null
+
+# ---------------------------------------------------------------------------
+# Stage 4: JMeter 集成测试 (手动触发 / 可选)
+# 仅在 tests/jmeter/ 目录存在 .jmx 文件时有效
+# ---------------------------------------------------------------------------
+jmeter-test:
+  image: justb4/jmeter:5.5
+  stage: integration-test
+  needs:
+    - job: maven-package
+      artifacts: false
+  when: manual
+  script:
+    - echo "=== JMeter 集成测试 ==="
+    - mkdir -p reports/jmeter
+    - |
+      if ls tests/jmeter/*.jmx 2>/dev/null; then
+        for f in tests/jmeter/*.jmx; do
+          name=$(basename "$f" .jmx)
+          jmeter -n -t "$f" -l "reports/jmeter/${name}.jtl" -e -o "reports/jmeter/${name}-dashboard"
+        done
+      else
+        echo "警告: 未找到 .jmx 测试计划，跳过集成测试"
+      fi
+  artifacts:
+    when: always
+    paths:
+      - reports/jmeter/
+    expire_in: 7d
+  only:
+    - main
+    - develop
+    - merge_requests
+
+# ---------------------------------------------------------------------------
+# Stage 5: Maven 打包
+# ---------------------------------------------------------------------------
+maven-package:
+  extends: .maven-job
+  stage: package
+  needs: ["unit-test"]
+  script:
+    - mvn $MAVEN_CLI_OPTS package -DskipTests
+  artifacts:
+    paths:
+      - "voxai-admin/target/*.jar"
+      - "voxai-call/target/*.jar"
+      - "voxai-admin/target/classes/logback-spring.xml"
+      - "voxai-admin/target/classes/bootstrap.properties"
+      - "voxai-admin/target/classes/application-prod.properties"
+      - "voxai-call/target/classes/logback-spring.xml"
+      - "voxai-call/target/classes/bootstrap.properties"
+      - "voxai-call/target/classes/application-prod.properties"
+    exclude:
+      - "*/target/*-sources.jar"
+    expire_in: 1h
+
+# ---------------------------------------------------------------------------
+# Stage 6: Docker 镜像构建
+# 使用 fabric8 docker-maven-plugin + Docker-in-Docker
+# ---------------------------------------------------------------------------
+docker-build:
+  image: maven:3.8.6-openjdk-8
+  stage: docker-build
+  needs: ["maven-package"]
+  services:
+    - docker:20.10.24-dind
+  variables:
+    DOCKER_HOST: "tcp://docker:2376"
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+  before_script:
+    - echo "Docker $(docker --version)"
+    - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASS" "$DOCKER_REGISTRY" || true
+  script:
+    - mvn $MAVEN_CLI_OPTS docker:build -pl voxai-admin,voxai-call
+      -Ddocker.registry=$DOCKER_REGISTRY
+      -Ddocker.username=$DOCKER_REGISTRY_USER
+      -Ddocker.password=$DOCKER_REGISTRY_PASS
+  except:
+    variables:
+      - $DOCKER_REGISTRY_USER == null
+      - $DOCKER_REGISTRY_PASS == null
+
+# ---------------------------------------------------------------------------
+# Stage 7a: Docker Push — 推送到私有镜像仓库
+# ---------------------------------------------------------------------------
+docker-push:
+  image: docker:20.10.24
+  stage: publish
+  needs: ["docker-build"]
+  services:
+    - docker:20.10.24-dind
+  variables:
+    DOCKER_HOST: "tcp://docker:2376"
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_CERT_PATH: "/certs/client"
+  before_script:
+    - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASS" "$DOCKER_REGISTRY" || true
+  script:
+    - |
+      for module in voxai-admin voxai-call; do
+        IMAGE_TAG="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${module}:${CI_COMMIT_TAG:-${CI_COMMIT_SHORT_SHA}}"
+        echo "推送镜像: $IMAGE_TAG"
+        docker push "$IMAGE_TAG"
+        # 对 main 分支额外打 latest 标签
+        if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+          LATEST_TAG="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${module}:latest"
+          docker tag "$IMAGE_TAG" "$LATEST_TAG"
+          docker push "$LATEST_TAG"
+        fi
+      done
+  only:
+    - main
+    - develop
+    - tags
+  except:
+    variables:
+      - $DOCKER_REGISTRY_USER == null
+      - $DOCKER_REGISTRY_PASS == null
+
+# ---------------------------------------------------------------------------
+# Stage 7b: Artifactory 制品发布
+# 使用 ci/settings.xml 中的仓库认证
+# ---------------------------------------------------------------------------
+artifactory-deploy:
+  extends: .maven-job
+  stage: publish
+  needs: ["unit-test"]
+  script:
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests
+      -DaltDeploymentRepository=voxai-release::default::$ARTIFACTORY_URL/voxai-release-local
+      --settings ci/settings.xml
+  only:
+    - main
+    - tags
+  except:
+    variables:
+      - $ARTIFACTORY_URL == null
+      - $ARTIFACTORY_USER == null
+      - $ARTIFACTORY_TOKEN == null
