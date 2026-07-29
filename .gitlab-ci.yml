@@ -1,6 +1,6 @@
 # =============================================================================
 # AI呼叫中心 CI/CD Pipeline
-# GitLab Runner + SonarQube + Maven + Jib + Artifactory + Harbor
+# GitLab Runner + SonarQube + Maven + Jib + Nexus + Harbor
 # =============================================================================
 
 stages:
@@ -138,22 +138,22 @@ jib-build:
       - $DOCKER_REGISTRY_PASS == null
 
 # ---------------------------------------------------------------------------
-# Stage 6: Artifactory 制品发布
+# Stage 6: Nexus 制品发布
 # 使用 ci/settings.xml 中的仓库认证
 # ---------------------------------------------------------------------------
-artifactory-deploy:
+nexus-deploy:
   extends: .maven-job
   stage: publish
   needs: ["unit-test"]
   script:
     - mvn $MAVEN_CLI_OPTS deploy -DskipTests
-      -DaltDeploymentRepository=voxai-release::default::$ARTIFACTORY_URL/voxai-release-local
+      -DaltDeploymentRepository=nexus-releases::default::${NEXUS_URL}/repository/maven-releases/
       --settings ci/settings.xml
   only:
     - main
     - tags
   except:
     variables:
-      - $ARTIFACTORY_URL == null
-      - $ARTIFACTORY_USER == null
-      - $ARTIFACTORY_TOKEN == null
+      - $NEXUS_URL == null
+      - $NEXUS_USER == null
+      - $NEXUS_PASSWORD == null
