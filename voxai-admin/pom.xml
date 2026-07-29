@@ -170,28 +170,36 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${maven.docker.plugin.version}</version>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib-maven-plugin.version}</version>
                 <configuration>
-                    <verbose>true</verbose>
-                    <images>
-                        <image>
-                            <name>${docker.repostory}/${docker.registry.name}/${project.artifactId}:${project.version}</name>
-                        </image>
-                    </images>
+                    <from>
+                        <image>eclipse-temurin:8-jre</image>
+                    </from>
+                    <to>
+                        <image>${docker.repostory}/${docker.registry.name}/${project.artifactId}:${project.version}</image>
+                        <auth>
+                            <username>${env.DOCKER_REGISTRY_USER}</username>
+                            <password>${env.DOCKER_REGISTRY_PASS}</password>
+                        </auth>
+                        <tags>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <jvmFlags>
+                            <jvmFlag>-Dfile.encoding=UTF-8</jvmFlag>
+                            <jvmFlag>-XX:+UseG1GC</jvmFlag>
+                            <jvmFlag>-Xmn1g</jvmFlag>
+                            <jvmFlag>-Xmx2g</jvmFlag>
+                            <jvmFlag>-Xms2g</jvmFlag>
+                        </jvmFlags>
+                        <environment>
+                            <TZ>Asia/Shanghai</TZ>
+                        </environment>
+                    </container>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>default</id>
-                        <!--mvn构建时build、push -->
-                        <!--<phase>install</phase>-->
-                        <goals>
-                            <goal>build</goal>
-                            <goal>push</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

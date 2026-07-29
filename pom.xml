@@ -67,7 +67,7 @@
         <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
-        <maven.docker.plugin.version>0.43.4</maven.docker.plugin.version>
+        <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
 
         <docker.repostory>harbor.example.com</docker.repostory>
         <docker.registry.name>voxai</docker.registry.name>
