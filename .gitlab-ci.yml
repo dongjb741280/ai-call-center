@@ -1,13 +1,12 @@
 # =============================================================================
 # AI呼叫中心 CI/CD Pipeline
-# GitLab Runner + SonarQube + Maven + JMeter + Artifactory + Docker
+# GitLab Runner + SonarQube + Maven + Artifactory + Docker (Harbor)
 # =============================================================================
 
 stages:
   - compile
   - test
   - static-analysis
-  - integration-test
   - package
   - docker-build
   - publish
@@ -98,40 +97,7 @@ sonarqube:
       - $SONAR_TOKEN == null
 
 # ---------------------------------------------------------------------------
-# Stage 4: JMeter 集成测试 (手动触发 / 可选)
-# 仅在 tests/jmeter/ 目录存在 .jmx 文件时有效
-# ---------------------------------------------------------------------------
-jmeter-test:
-  image: justb4/jmeter:5.5
-  stage: integration-test
-  needs:
-    - job: maven-package
-      artifacts: false
-  when: manual
-  script:
-    - echo "=== JMeter 集成测试 ==="
-    - mkdir -p reports/jmeter
-    - |
-      if ls tests/jmeter/*.jmx 2>/dev/null; then
-        for f in tests/jmeter/*.jmx; do
-          name=$(basename "$f" .jmx)
-          jmeter -n -t "$f" -l "reports/jmeter/${name}.jtl" -e -o "reports/jmeter/${name}-dashboard"
-        done
-      else
-        echo "警告: 未找到 .jmx 测试计划，跳过集成测试"
-      fi
-  artifacts:
-    when: always
-    paths:
-      - reports/jmeter/
-    expire_in: 7d
-  only:
-    - main
-    - develop
-    - merge_requests
-
-# ---------------------------------------------------------------------------
-# Stage 5: Maven 打包
+# Stage 4: Maven 打包
 # ---------------------------------------------------------------------------
 maven-package:
   extends: .maven-job
@@ -154,7 +120,7 @@ maven-package:
     expire_in: 1h
 
 # ---------------------------------------------------------------------------
-# Stage 6: Docker 镜像构建
+# Stage 5: Docker 镜像构建
 # 使用 fabric8 docker-maven-plugin + Docker-in-Docker
 # ---------------------------------------------------------------------------
 docker-build:
@@ -182,7 +148,7 @@ docker-build:
       - $DOCKER_REGISTRY_PASS == null
 
 # ---------------------------------------------------------------------------
-# Stage 7a: Docker Push — 推送到私有镜像仓库
+# Stage 6a: Docker Push — 推送到私有镜像仓库
 # ---------------------------------------------------------------------------
 docker-push:
   image: docker:20.10.24
@@ -220,7 +186,7 @@ docker-push:
       - $DOCKER_REGISTRY_PASS == null
 
 # ---------------------------------------------------------------------------
-# Stage 7b: Artifactory 制品发布
+# Stage 6b: Artifactory 制品发布
 # 使用 ci/settings.xml 中的仓库认证
 # ---------------------------------------------------------------------------
 artifactory-deploy:
