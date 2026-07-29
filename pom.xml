@@ -69,7 +69,7 @@
         <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
 
-        <docker.repostory>harbor.example.com</docker.repostory>
+        <docker.repostory>localhost:8443</docker.repostory>
         <docker.registry.name>voxai</docker.registry.name>
     </properties>
 
