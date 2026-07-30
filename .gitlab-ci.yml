@@ -85,7 +85,6 @@ sonarqube:
     - mvn $MAVEN_CLI_OPTS compile sonar:sonar
       -Dsonar.host.url=$SONAR_HOST_URL
       -Dsonar.login=$SONAR_TOKEN
-      -Dsonar.java.binaries="*/target/classes"
   only:
     - main
     - develop
