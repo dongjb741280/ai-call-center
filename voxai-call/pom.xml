@@ -159,6 +159,7 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
+                    <allowInsecureRegistries>true</allowInsecureRegistries>
                     <from>
                         <image>eclipse-temurin:8-jre</image>
                     </from>
