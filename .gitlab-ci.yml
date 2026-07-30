@@ -82,7 +82,7 @@ sonarqube:
   stage: static-analysis
   needs: ["unit-test"]
   script:
-    - mvn $MAVEN_CLI_OPTS sonar:sonar
+    - mvn $MAVEN_CLI_OPTS compile sonar:sonar
       -Dsonar.host.url=$SONAR_HOST_URL
       -Dsonar.login=$SONAR_TOKEN
       -Dsonar.java.binaries="*/target/classes"
