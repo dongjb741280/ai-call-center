@@ -103,19 +103,6 @@ maven-package:
   needs: ["unit-test"]
   script:
     - mvn $MAVEN_CLI_OPTS package -DskipTests
-  artifacts:
-    paths:
-      - "voxai-admin/target/*.jar"
-      - "voxai-call/target/*.jar"
-      - "voxai-admin/target/classes/logback-spring.xml"
-      - "voxai-admin/target/classes/bootstrap.properties"
-      - "voxai-admin/target/classes/application-prod.properties"
-      - "voxai-call/target/classes/logback-spring.xml"
-      - "voxai-call/target/classes/bootstrap.properties"
-      - "voxai-call/target/classes/application-prod.properties"
-    exclude:
-      - "*/target/*-sources.jar"
-    expire_in: 1h
 
 # ---------------------------------------------------------------------------
 # Stage 5: Jib 镜像构建 & 推送到 Harbor
