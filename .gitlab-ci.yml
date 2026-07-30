@@ -112,8 +112,19 @@ jib-build:
   extends: .maven-job
   stage: jib-build
   needs: ["unit-test"]
+  variables:
+    MAVEN_OPTS: "-Djava.awt.headless=true -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Djib.sendCredentialsOverHttp=true"
+  before_script:
+    - echo "Maven $(mvn --version | head -1)"
+    - docker pull eclipse-temurin:8-jre 2>/dev/null || true
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
   script:
     - mvn $MAVEN_CLI_OPTS compile jib:build -pl voxai-admin,voxai-call
+      -Djib.sendCredentialsOverHttp=true
   only:
     - main
     - develop
