@@ -156,7 +156,6 @@
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
-                    <sendCredentialsOverHttp>true</sendCredentialsOverHttp>
                     <from>
                         <image>eclipse-temurin:8-jre</image>
                     </from>

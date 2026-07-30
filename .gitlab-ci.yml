@@ -121,7 +121,7 @@ jib-build:
       - runner_system_failure
       - unknown_failure
   script:
-    - mvn $MAVEN_CLI_OPTS compile jib:build -pl voxai-admin,voxai-call
+    - mvn $MAVEN_CLI_OPTS compile jib:build -pl voxai-admin,voxai-call -DsendCredentialsOverHttp=true
   only:
     - main
     - develop
