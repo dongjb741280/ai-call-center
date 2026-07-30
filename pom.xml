@@ -66,7 +66,6 @@
         <logstash-encoder.version>7.4</logstash-encoder.version>
         <maven.release.plugin.version>3.0.1</maven.release.plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-        <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
 
         <docker.repostory>localhost:8444</docker.repostory>
