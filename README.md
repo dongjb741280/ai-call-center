@@ -30,7 +30,7 @@ ai-call-center/
 - **构建工具**: Maven + Jib（无需 Docker Daemon 构建镜像）
 - **镜像仓库**: Harbor
 - **容器化**: Docker
-- **CI/CD**: GitLab CI + 1Panel 自动部署
+- **CI/CD**: GitLab CI + Watchtower 自动部署
 
 ## 核心模块
 
@@ -181,12 +181,32 @@ docker run -d --name voxai-admin --network host \
 ### CI/CD 流水线
 
 ```
-编译 → 单元测试 → SonarQube → 打包 → Jib 构建 → Nexus 发布 → 1Panel 部署
+编译 → 单元测试 → SonarQube → 打包 → Jib 构建(Harbor) → Nexus 发布
+                                                         ↓
+                                              Watchtower(k8s-work-4)
+                                              自动拉取镜像并重启容器
 ```
 
-- **Jib 构建**：无需 Docker Daemon，直接从 Maven 构建镜像并推送到 Harbor
+- **CI（GitLab）**：负责构建、测试、代码扫描，Jib 构建镜像并推送到 Harbor
 - **Harbor**：本地镜像仓库（`localhost:8444`）
-- **1Panel**：通过 API 拉取最新镜像并升级容器，自动完成 CD
+- **CD（Watchtower）**：部署在目标服务器上，定时检测 Harbor 中新镜像，自动拉取并重启容器
+
+#### Watchtower 部署（k8s-work-4）
+
+```bash
+docker run -d \
+  --name watchtower \
+  --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /root/.docker/config.json:/config.json \
+  -e DOCKER_CONFIG=/ \
+  containrrr/watchtower \
+  --interval 30 \
+  --cleanup \
+  voxai-admin voxai-call
+```
+
+> 依赖 `/root/.docker/config.json` 中的 Harbor 登录凭据（`docker login` 后自动生成）
 
 #### GitLab CI Variables 配置
 
@@ -195,8 +215,6 @@ docker run -d --name voxai-admin --network host \
 | `HARBOR_REGISTRY` | Harbor 镜像仓库地址 |
 | `HARBOR_REGISTRY_USER` | Harbor 用户名 |
 | `HARBOR_REGISTRY_PASS` | Harbor 密码 |
-| `ONEPANEL_URL` | 1Panel 面板地址 |
-| `ONEPANEL_API_KEY` | 1Panel API Key |
 | `SONAR_HOST_URL` | SonarQube 服务地址 |
 | `SONAR_TOKEN` | SonarQube Token |
 | `NEXUS_URL` / `NEXUS_USER` / `NEXUS_PASSWORD` | Nexus 仓库认证 |
@@ -317,7 +335,7 @@ A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` �
 
 ### v1.0.1 (2026-07-31)
 - 集成 Jib 构建镜像，免除 Docker Daemon 依赖
-- 接入 GitLab CI + Harbor + 1Panel 自动部署流水线
+- 接入 GitLab CI + Harbor + Watchtower 自动部署流水线
 - 统一 Harbor 环境变量命名（`HARBOR_REGISTRY` 前缀）
 
 ### v1.0.0 (2024-01-01)
