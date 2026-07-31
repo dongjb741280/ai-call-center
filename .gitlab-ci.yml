@@ -161,10 +161,7 @@ nexus-deploy:
 # ---------------------------------------------------------------------------
 deploy-1panel:
   stage: deploy
-  image: alpine:latest
   needs: ["jib-build"]
-  before_script:
-    - apk add --no-cache curl openssl
   script:
     - |
       deploy() {
