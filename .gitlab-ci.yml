@@ -168,22 +168,9 @@ deploy-1panel:
       deploy() {
         CONTAINER="$1"
         IMAGE="${HARBOR_REGISTRY}/voxai/${CONTAINER}:latest"
-
-        # Step 1: 强制拉取最新镜像
-        echo "→ 拉取镜像 ${IMAGE} ..."
         TS=$(date +%s)
         TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
-        PULL_RESP=$(curl -sS -X POST "${ONEPANEL_URL}/api/v2/images/pull" \
-          -H "1Panel-Token: ${TOKEN}" \
-          -H "1Panel-Timestamp: ${TS}" \
-          -H "Content-Type: application/json" \
-          -d "{\"repoID\":0,\"imageName\":\"${IMAGE}\"}")
-        echo "  ${PULL_RESP}"
-
-        # Step 2: 升级容器
-        echo "→ 升级容器 ${CONTAINER} ..."
-        TS=$(date +%s)
-        TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
+        echo "→ 部署 ${CONTAINER} (${IMAGE}) ..."
         RESP=$(curl -sS -w "\n%{http_code}" -X POST "${ONEPANEL_URL}/api/v2/containers/upgrade" \
           -H "1Panel-Token: ${TOKEN}" \
           -H "1Panel-Timestamp: ${TS}" \
