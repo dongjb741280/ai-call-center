@@ -156,9 +156,9 @@ nexus-deploy:
 
 # ---------------------------------------------------------------------------
 # Stage 7: 1Panel CD 部署
-# Jib 推送镜像到 Harbor 后，调用 1Panel v2 API 强制重建容器（拉取最新镜像）
+# Jib 推送镜像到 Harbor 后，调用 1Panel v2 API 拉取最新镜像并升级容器
 # 需在 Settings → Variables 配置 HARBOR_REGISTRY、ONEPANEL_URL、ONEPANEL_API_KEY
-# 注意：容器需先在 1Panel 中创建一次，后续 CI 会自动重建
+# 注意：1Panel 宿主机需先 docker login Harbor，否则拉取镜像会失败
 # ---------------------------------------------------------------------------
 deploy-1panel:
   stage: deploy
@@ -167,15 +167,23 @@ deploy-1panel:
     - |
       deploy() {
         CONTAINER="$1"
+        IMAGE="${HARBOR_REGISTRY}/voxai/${CONTAINER}:latest"
         TS=$(date +%s)
         TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
-        echo "→ 重建容器 ${CONTAINER} ..."
-        curl -sS -X POST "${ONEPANEL_URL}/api/v2/containers/recreate" \
+        echo "→ 部署 ${CONTAINER} (${IMAGE}) ..."
+        RESP=$(curl -sS -w "\n%{http_code}" -X POST "${ONEPANEL_URL}/api/v2/containers/upgrade" \
           -H "1Panel-Token: ${TOKEN}" \
           -H "1Panel-Timestamp: ${TS}" \
           -H "Content-Type: application/json" \
-          -d "{\"names\":[\"${CONTAINER}\"]}"
-        echo ""
+          -d "{\"names\":[\"${CONTAINER}\"],\"image\":\"${IMAGE}\"}")
+        HTTP_CODE=$(echo "$RESP" | tail -1)
+        BODY=$(echo "$RESP" | sed '$d')
+        echo "  HTTP ${HTTP_CODE}: ${BODY}"
+        if [ "${HTTP_CODE}" != "200" ]; then
+          echo "  ✗ ${CONTAINER} 部署失败" >&2
+          return 1
+        fi
+        echo "  ✓ ${CONTAINER} 部署完成"
       }
     - deploy voxai-admin
     - deploy voxai-call
@@ -185,5 +193,6 @@ deploy-1panel:
     variables:
       - $HARBOR_REGISTRY == null
       - $ONEPANEL_URL == null
+      - $ONEPANEL_API_KEY == null
       - $ONEPANEL_API_KEY == null
 
