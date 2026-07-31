@@ -12,10 +12,11 @@
 ```
 ai-call-center/
 ├── voxai-common/          # 核心业务模块（数据层）
-├── voxai-admin/           # 管理API服务
-├── voxai-call/           # FreeSwitch集成服务
-├── freeswitch/       # FreeSwitch配置和Docker镜像
-└── Dockerfile        # 多阶段Docker构建
+├── voxai-admin/           # 管理API服务（端口 7100）
+├── voxai-call/            # FreeSwitch集成服务（端口 7200）
+├── freeswitch/            # FreeSwitch配置和Docker镜像
+├── .gitlab-ci.yml         # GitLab CI/CD 流水线
+└── Dockerfile             # 多阶段Docker构建
 ```
 
 ### 技术栈
@@ -26,8 +27,10 @@ ai-call-center/
 - **消息队列**: RabbitMQ（可选Kafka）
 - **文件存储**: MinIO
 - **呼叫引擎**: FreeSwitch
-- **构建工具**: Maven
+- **构建工具**: Maven + Jib（无需 Docker Daemon 构建镜像）
+- **镜像仓库**: Harbor
 - **容器化**: Docker
+- **CI/CD**: GitLab CI + 1Panel 自动部署
 
 ## 核心模块
 
@@ -122,56 +125,81 @@ voxai.minio.secret.key=your_secret_key
 
 #### 1. 编译项目
 ```bash
-mvn clean install -DskipTests=true
+# 编译全部模块（跳过测试）
+mvn clean install -DskipTests
+
+# 编译单个模块
+mvn clean install -pl voxai-admin -DskipTests
 ```
 
-#### 2. 启动服务
+#### 2. 本地启动
 ```bash
-# 启动voxai-admin服务
+# voxai-admin（管理后台，端口 7100）
 java -jar voxai-admin/target/voxai-admin-1.0.0.jar
 
-# 启动voxai-call服务
+# voxai-call（呼叫服务，端口 7200）
 java -jar voxai-call/target/voxai-call-1.0.0.jar
+```
+
+#### 3. Jib 构建镜像（无需 Docker Daemon）
+```bash
+# 构建并推送到 Harbor
+mvn compile jib:build -pl voxai-admin,voxai-call \
+  -DsendCredentialsOverHttp=true \
+  -Ddocker.repostory=localhost:8444 \
+  -Djib.to.tags=latest
+
+# 或构建到本地 Docker Daemon
+mvn compile jib:dockerBuild -pl voxai-admin
+```
+
+#### 4. Docker 运行
+```bash
+# 从 Harbor 拉取并启动
+docker pull localhost:8444/voxai/voxai-admin:latest
+docker run -d --name voxai-admin --network host \
+  localhost:8444/voxai/voxai-admin:latest
 ```
 
 ### 接口文档（Swagger/OpenAPI）
 
-- voxai-admin 文档：
-  - Swagger UI: `http://localhost:8080/swagger-ui.html` 或 `http://localhost:8080/swagger-ui/index.html`
-  - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-- voxai-call 文档：
-  - Swagger UI: `http://localhost:8081/swagger-ui.html` 或 `http://localhost:8081/swagger-ui/index.html`
-  - OpenAPI JSON: `http://localhost:8081/v3/api-docs`
-
-注意：若配置了 `server.servlet.context-path`，请在上述 URL 前加上该前缀；两个服务启动后也会在启动日志中打印可访问地址。
-
-
-#### 3. Docker部署
-```bash
-# 构建镜像
-./build.sh
-
-# 使用Docker Compose启动
-cd freeswitch/centos
-docker-compose up -d
-```
+- voxai-admin：`http://localhost:7100/voxai-admin/swagger-ui/index.html`
+- voxai-call：`http://localhost:7200/voxai-call/swagger-ui/index.html`
 
 ## 部署架构
 
 ### 微服务部署
-- **voxai-admin**: 管理后台服务（端口：8080）
-- **voxai-call**: 呼叫控制服务（端口：8081）
+- **voxai-admin**: 管理后台服务（端口：7100）
+- **voxai-call**: 呼叫控制服务（端口：7200）
 - **freeswitch**: 呼叫引擎（端口：5060）
 
 ### 数据存储
-- **关系数据库**: 业务数据存储
+- **MySQL**: 业务数据存储
 - **Redis**: 缓存和会话存储
 - **MinIO**: 录音文件和媒体存储
 
-### 容器化
-- 支持Docker多阶段构建
-- 提供CentOS和Debian两种FreeSwitch镜像
-- 支持Docker Compose一键部署
+### CI/CD 流水线
+
+```
+编译 → 单元测试 → SonarQube → 打包 → Jib 构建 → Nexus 发布 → 1Panel 部署
+```
+
+- **Jib 构建**：无需 Docker Daemon，直接从 Maven 构建镜像并推送到 Harbor
+- **Harbor**：本地镜像仓库（`localhost:8444`）
+- **1Panel**：通过 API 拉取最新镜像并升级容器，自动完成 CD
+
+#### GitLab CI Variables 配置
+
+| 变量 | 说明 |
+|------|------|
+| `HARBOR_REGISTRY` | Harbor 镜像仓库地址 |
+| `HARBOR_REGISTRY_USER` | Harbor 用户名 |
+| `HARBOR_REGISTRY_PASS` | Harbor 密码 |
+| `ONEPANEL_URL` | 1Panel 面板地址 |
+| `ONEPANEL_API_KEY` | 1Panel API Key |
+| `SONAR_HOST_URL` | SonarQube 服务地址 |
+| `SONAR_TOKEN` | SonarQube Token |
+| `NEXUS_URL` / `NEXUS_USER` / `NEXUS_PASSWORD` | Nexus 仓库认证 |
 
 ## 配置说明
 
@@ -215,8 +243,8 @@ docker-compose up -d
 ## 监控和运维
 
 ### 健康检查
-- `GET /index/health` - 服务健康检查
-- `GET /actuator/health` - Spring Boot Actuator
+- `GET /voxai-admin/manager/health` - voxai-admin 健康检查（端口 7100）
+- `GET /voxai-call/manager/health` - voxai-call 健康检查（端口 7200）
 
 ### 日志管理
 - 支持Logback日志配置
@@ -286,6 +314,11 @@ A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` �
 - 项目地址: [GitHub Repository](https://github.com/your-username/ai-call-center)
 
 ## 更新日志
+
+### v1.0.1 (2026-07-31)
+- 集成 Jib 构建镜像，免除 Docker Daemon 依赖
+- 接入 GitLab CI + Harbor + 1Panel 自动部署流水线
+- 统一 Harbor 环境变量命名（`HARBOR_REGISTRY` 前缀）
 
 ### v1.0.0 (2024-01-01)
 - 初始版本发布
