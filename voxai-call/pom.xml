@@ -161,7 +161,7 @@
                 <configuration>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <from>
-                        <image>eclipse-temurin:8-jre</image>
+                        <image>${docker.repostory}/voxai/eclipse-temurin:8-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>arm64</architecture>
