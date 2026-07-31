@@ -186,3 +186,4 @@ deploy-1panel:
       - $HARBOR_REGISTRY == null
       - $ONEPANEL_URL == null
       - $ONEPANEL_API_KEY == null
+
