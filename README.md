@@ -181,32 +181,33 @@ docker run -d --name voxai-admin --network host \
 ### CI/CD 流水线
 
 ```
-编译 → 单元测试 → SonarQube → 打包 → Jib 构建(Harbor) → Nexus 发布
-                                                         ↓
-                                              Watchtower(k8s-work-4)
-                                              自动拉取镜像并重启容器
+编译 → 单元测试 → SonarQube → 打包 → Jib 构建(Harbor) → Nexus 发布 → 1Panel API 部署
+                                                                         ↓
+                                                              Watchtower(k8s-work-4)
+                                                              双重保障，自动拉取重启
 ```
 
-- **CI（GitLab）**：负责构建、测试、代码扫描，Jib 构建镜像并推送到 Harbor
+- **CI（GitLab）**：构建、测试、代码扫描，Jib 推送镜像到 Harbor
 - **Harbor**：本地镜像仓库（`localhost:8444`）
-- **CD（Watchtower）**：部署在目标服务器上，定时检测 Harbor 中新镜像，自动拉取并重启容器
+- **CD 双重保障**：
+  - **方案 A（1Panel API）**：CI 主动触发 `images/pull` + `containers/upgrade`
+  - **方案 B（Watchtower）**：k8s-work-4 后台运行，定时检测自动部署
+  - 两者并存互不冲突，任一成功即可
 
 #### Watchtower 部署（k8s-work-4）
 
 ```bash
 docker run -d \
-  --name watchtower \
-  --restart unless-stopped \
+  --name watchtower --restart unless-stopped \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /root/.docker/config.json:/config.json \
   -e DOCKER_CONFIG=/ \
   containrrr/watchtower \
-  --interval 30 \
-  --cleanup \
+  --interval 30 --cleanup \
   voxai-admin voxai-call
 ```
 
-> 依赖 `/root/.docker/config.json` 中的 Harbor 登录凭据（`docker login` 后自动生成）
+> 依赖 `/root/.docker/config.json` 中的 Harbor 登录凭据
 
 #### GitLab CI Variables 配置
 
@@ -215,6 +216,8 @@ docker run -d \
 | `HARBOR_REGISTRY` | Harbor 镜像仓库地址 |
 | `HARBOR_REGISTRY_USER` | Harbor 用户名 |
 | `HARBOR_REGISTRY_PASS` | Harbor 密码 |
+| `ONEPANEL_URL` | 1Panel 面板地址（方案 A） |
+| `ONEPANEL_API_KEY` | 1Panel API Key（方案 A） |
 | `SONAR_HOST_URL` | SonarQube 服务地址 |
 | `SONAR_TOKEN` | SonarQube Token |
 | `NEXUS_URL` / `NEXUS_USER` / `NEXUS_PASSWORD` | Nexus 仓库认证 |

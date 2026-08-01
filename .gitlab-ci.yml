@@ -10,6 +10,7 @@ stages:
   - package
   - jib-build
   - publish
+  - deploy
 
 # ---------------------------------------------------------------------------
 # 全局变量 — 敏感值请在 GitLab CI/CD Settings → Variables 中配置
@@ -154,7 +155,42 @@ nexus-deploy:
       - $NEXUS_PASSWORD == null
 
 # ---------------------------------------------------------------------------
-# CD 部署：Watchtower（k8s-work-4 上运行，监控 Harbor 镜像自动更新容器）
-# CI 只负责构建 & 推送镜像到 Harbor，后续由 Watchtower 接管
+# Stage 7: CD 部署（双重保障）
+#   方案 A - 1Panel API：CI 主动触发升级容器（本 Job）
+#   方案 B - Watchtower：k8s-work-4 后台运行，定时检测 Harbor 自动更新
+#   两者并存互不冲突，任一成功即可完成部署
+#   需在 Settings → Variables 配置 HARBOR_REGISTRY、ONEPANEL_URL、ONEPANEL_API_KEY
 # ---------------------------------------------------------------------------
+deploy-1panel:
+  stage: deploy
+  needs: ["jib-build"]
+  script:
+    - |
+      deploy() {
+        CONTAINER="$1"
+        IMAGE="${HARBOR_REGISTRY}/voxai/${CONTAINER}:latest"
+        TS=$(date +%s)
+        TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
+        echo "  [upgrade] ${CONTAINER} → ${IMAGE}"
+        RESP=$(curl -sS -w "\n%{http_code}" -X POST "${ONEPANEL_URL}/api/v2/containers/upgrade" \
+          -H "1Panel-Token: ${TOKEN}" \
+          -H "1Panel-Timestamp: ${TS}" \
+          -H "Content-Type: application/json" \
+          -d "{\"names\":[\"${CONTAINER}\"],\"image\":\"${IMAGE}\"}")
+        HTTP_CODE=$(echo "$RESP" | tail -1)
+        BODY=$(echo "$RESP" | sed '$d')
+        echo "  HTTP ${HTTP_CODE}: ${BODY}"
+      }
+    - echo "→ 1Panel 部署 voxai-admin"
+    - deploy voxai-admin
+    - echo "→ 1Panel 部署 voxai-call"
+    - deploy voxai-call
+    - echo "✓ 1Panel 部署完成（Watchtower 亦在后台监控）"
+  only:
+    - main
+  except:
+    variables:
+      - $HARBOR_REGISTRY == null
+      - $ONEPANEL_URL == null
+      - $ONEPANEL_API_KEY == null
 
