@@ -10,7 +10,7 @@ stages:
   - package
   - jib-build
   - publish
-  - deploy
+#  - deploy  # 暂时关闭，仅用 Watchtower CD
 
 # ---------------------------------------------------------------------------
 # 全局变量 — 敏感值请在 GitLab CI/CD Settings → Variables 中配置
@@ -161,36 +161,36 @@ nexus-deploy:
 #   两者并存互不冲突，任一成功即可完成部署
 #   需在 Settings → Variables 配置 HARBOR_REGISTRY、ONEPANEL_URL、ONEPANEL_API_KEY
 # ---------------------------------------------------------------------------
-deploy-1panel:
-  stage: deploy
-  needs: ["jib-build"]
-  script:
-    - |
-      deploy() {
-        CONTAINER="$1"
-        IMAGE="${HARBOR_REGISTRY}/voxai/${CONTAINER}:latest"
-        TS=$(date +%s)
-        TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
-        echo "  [upgrade] ${CONTAINER} → ${IMAGE}"
-        RESP=$(curl -sS -w "\n%{http_code}" -X POST "${ONEPANEL_URL}/api/v2/containers/upgrade" \
-          -H "1Panel-Token: ${TOKEN}" \
-          -H "1Panel-Timestamp: ${TS}" \
-          -H "Content-Type: application/json" \
-          -d "{\"names\":[\"${CONTAINER}\"],\"image\":\"${IMAGE}\"}")
-        HTTP_CODE=$(echo "$RESP" | tail -1)
-        BODY=$(echo "$RESP" | sed '$d')
-        echo "  HTTP ${HTTP_CODE}: ${BODY}"
-      }
-    - echo "→ 1Panel 部署 voxai-admin"
-    - deploy voxai-admin
-    - echo "→ 1Panel 部署 voxai-call"
-    - deploy voxai-call
-    - echo "✓ 1Panel 部署完成（Watchtower 亦在后台监控）"
-  only:
-    - main
-  except:
-    variables:
-      - $HARBOR_REGISTRY == null
-      - $ONEPANEL_URL == null
-      - $ONEPANEL_API_KEY == null
+# deploy-1panel:
+#   stage: deploy
+#   needs: ["jib-build"]
+#   script:
+#     - |
+#       deploy() {
+#         CONTAINER="$1"
+#         IMAGE="${HARBOR_REGISTRY}/voxai/${CONTAINER}:latest"
+#         TS=$(date +%s)
+#         TOKEN=$(echo -n "1panel:${TS}" | openssl dgst -sha256 -hmac "${ONEPANEL_API_KEY}" | awk '{print $NF}')
+#         echo "  [upgrade] ${CONTAINER} → ${IMAGE}"
+#         RESP=$(curl -sS -w "\n%{http_code}" -X POST "${ONEPANEL_URL}/api/v2/containers/upgrade" \
+#           -H "1Panel-Token: ${TOKEN}" \
+#           -H "1Panel-Timestamp: ${TS}" \
+#           -H "Content-Type: application/json" \
+#           -d "{\"names\":[\"${CONTAINER}\"],\"image\":\"${IMAGE}\"}")
+#         HTTP_CODE=$(echo "$RESP" | tail -1)
+#         BODY=$(echo "$RESP" | sed '$d')
+#         echo "  HTTP ${HTTP_CODE}: ${BODY}"
+#       }
+#     - echo "→ 1Panel 部署 voxai-admin"
+#     - deploy voxai-admin
+#     - echo "→ 1Panel 部署 voxai-call"
+#     - deploy voxai-call
+#     - echo "✓ 1Panel 部署完成（Watchtower 亦在后台监控）"
+#   only:
+#     - main
+#   except:
+#     variables:
+#       - $HARBOR_REGISTRY == null
+#       - $ONEPANEL_URL == null
+#       - $ONEPANEL_API_KEY == null
 
