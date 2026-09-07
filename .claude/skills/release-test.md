@@ -18,11 +18,24 @@ argument-hint: <prev-tag> <new-tag> [--explore]
 - `new-tag`: 当前发布 tag（如 `v1.1.0`）
 - `--explore`: 对无脚本覆盖的功能，使用 Playwright MCP 探索并自动生成脚本
 
+## 前置步骤
+
+读取测试工程的 `project.config.json`，加载以下配置段：
+
+- **fileClassification** — 变更分类规则（glob pattern → 类别 → 影响级别）
+- **frontendApiMapping** — 前端 API 文件 → 受影响模块
+- **controllerMapping** — 后端 Controller 关键字 → 前端模块/页面
+- **moduleSpecs** — 模块名 → spec 文件路径 + 菜单父节点
+- **globalImpactModules** / **smokeModules** — 全局影响时的回退列表
+
+> project.config.json 是规则的单点来源。skill 不再內联规则表，避免不同步。
+
 ## 流程
 
 ### Step 1: 获取变更列表
 
 ```bash
+cd ai-call-center
 git diff <prev-tag>..<new-tag> --name-only
 git diff <prev-tag>..<new-tag> --stat
 git log <prev-tag>..<new-tag> --oneline
@@ -30,81 +43,28 @@ git log <prev-tag>..<new-tag> --oneline
 
 ### Step 2: 变更分类
 
-将变更文件按以下规则分类：
+对每个变更文件，按 `project.config.json` → `fileClassification` 的顺序匹配 glob pattern，命中即停。
 
-| 分类 | 匹配规则 | 影响范围 |
-|------|----------|----------|
-| **frontend-view** | `ai-call-center-web/src/views/**/*.vue` | 直接对应路由页面 |
-| **frontend-api** | `ai-call-center-web/src/api/**/*.js` | 对应模块所有页面 |
-| **frontend-store** | `ai-call-center-web/src/stores/**/*.js` | 全局影响，所有需认证页面 |
-| **frontend-util** | `ai-call-center-web/src/utils/**/*.js` | 引用该 util 的页面 |
-| **backend-controller** | `voxai-admin/.../controller/**/*.java` | 对应前端 API 模块的前端页面 |
-| **backend-service** | `*/.../service/**/*.java` | 追溯 Controller → 前端页面 |
-| **backend-mapper** | `voxai-common/.../mapper/**/*.xml` | 追溯 → Service → Controller → 前端页面 |
-| **backend-common** | `voxai-common/**/*.java` | 全量后端，保守评估为所有页面 |
-| **config** | `*.yml, *.xml, *.properties, Dockerfile` | 基础设施，不影响前端功能 |
-| **docs** | `*.md` | 无需测试 |
+- `impact: direct` → 文件路径直接对应路由（如 views/<module>/Page.vue）
+- `impact: module` → 文件所属模块的所有页面受影响
+- `impact: mapped` → 按 controllerMapping 查表
+- `impact: trace` → 向上追溯调用链到 Controller，再查 controllerMapping
+- `impact: global` → 全量冒烟
+- `impact: none` → 跳过
 
 ### Step 3: 影响面映射
 
-根据变更分类和文件名，映射到前端功能模块（7 大模块）：
+根据分类结果映射到前端模块：
 
-```
-变更文件 → 前端路由 → 功能模块 → e2e/scripts/ 对应脚本
-```
+- **frontend-view**：文件路径 `views/<module>/<Page>.vue` → 模块 `module`、页面 `/<module>/<page>`
+- **frontend-api**：查 `frontendApiMapping` 获取受影响模块
+- **frontend-store / frontend-util**：搜索 import 引用该文件的页面，反推模块
+- **backend-controller**：文件名匹配 `controllerMapping` 中的 keyword（子串匹配），获取 `modules` 和 `pages`
+- **backend-service**：搜索调用该 Service 的 Controller，再查表
+- **backend-mapper**：搜索调用该 Mapper 的 Service → Controller，再查表
+- **backend-common**：所有模块 + `globalImpactModules`
 
-**映射规则详表：**
-
-##### 后端 Controller → 前端 API 模块 → 前端路由
-
-| Controller 文件关键字 | 前端 API | 前端路由模块 | 受影响页面 |
-|----------------------|----------|-------------|-----------|
-| `UserController` | `admin.js` (getUserList 等) | `admin` | /admin/users |
-| `RoleController` | `admin.js` (getRoleList 等) | `admin` | /admin/roles |
-| `GatewayController` | `admin.js` | `admin` | /admin/gateways |
-| `NumberRouteController` | `admin.js` | `admin` | /admin/number-route |
-| `BlacklistController` | `admin.js` | `admin` | /admin/blacklist |
-| `ModulesController` | `admin.js` | `admin` | /admin/modules |
-| `SipGatewayController` | `admin.js` | `admin` | /admin/sip-gateway |
-| `AiEngineController` | `admin.js` | `admin` | /admin/ai-engine |
-| `AgentController` | `agent.js` | `service` | /service/agent-list, /service/agent-groups |
-| `GroupController` | `agent.js` | `service` | /service/agent-groups |
-| `SkillController` | `config.js` | `service` | /service/skills |
-| `SipNumberController` | `config.js` | `service` | /service/sip-numbers |
-| `DisplayNumberController` | `config.js` | `service` | /service/display-numbers |
-| `VoiceFileController` | `config.js` | `service` | /service/voice-file |
-| `NumberPoolController` | `config.js` | `service` | /service/number-pool |
-| `Incoming*Controller` | `call.js` | `incoming` | /incoming/* 全部 |
-| `Outbound*Controller` | `call.js` | `outbound` | /outbound/* 全部 |
-| `TaskController` | `call.js` | `outbound` | /outbound/task, /outbound/monitor |
-| `Call*Controller` | `call.js` | `call` | /call/* 全部 |
-| `Report*Controller` | `call.js` | `report` | /report/* 全部 |
-| `Login/Auth/Token*` | `auth.js` | 全局 | Login |
-| `SoftPhone/CallSdk*` | `softphone.js` | 全局 | SoftPhone |
-| `Common/Base*` | 所有 | 全局 | 所有页面 |
-
-##### 前端文件 → 路由
-
-| 前端文件路径 | 对应路由 | 模块 |
-|-------------|---------|------|
-| `src/views/Dashboard.vue` | `/` | dashboard |
-| `src/views/Login.vue` | `/login` | login |
-| `src/views/SoftPhone.vue` | `/softphone` | softphone |
-| `src/views/admin/*.vue` | `/admin/*` | admin |
-| `src/views/agent/*.vue` | `/service/agent-*` | service |
-| `src/views/service/*.vue` | `/service/*` | service |
-| `src/views/incoming/*.vue` | `/incoming/*` | incoming |
-| `src/views/outbound/*.vue` | `/outbound/*` | outbound |
-| `src/views/call/*.vue` | `/call/*` | call |
-| `src/views/report/*.vue` | `/report/*` | report |
-| `src/api/admin.js` | `/admin/*` 全部 | admin |
-| `src/api/agent.js` | `/service/agent-*` | service |
-| `src/api/config.js` | `/service/*`, `/admin/*` | service, admin |
-| `src/api/call.js` | `/incoming/*`, `/outbound/*`, `/call/*`, `/report/*` | incoming, outbound, call, report |
-| `src/api/auth.js` | `/login` | login |
-| `src/api/softphone.js` | `/softphone` | softphone |
-| `src/stores/*` | 所有需登录页面 | 全部 |
-| `src/utils/*` | 按引用路径判断 | 按实际引用 |
+合并去重所有受影响的模块名。
 
 ### Step 4: 生成 diff-mapping.json
 
@@ -115,94 +75,91 @@ git log <prev-tag>..<new-tag> --oneline
   "prevTag": "v1.0.0",
   "newTag": "v1.1.0",
   "changedFiles": [
-    { "file": "...", "category": "frontend-view" }
+    { "file": "voxai-admin/.../controller/UserController.java", "category": "backend-controller" }
   ],
   "affectedModules": ["admin", "service"],
   "affectedPages": ["/admin/users", "/service/agent-list"],
-  "riskLevel": "medium",
-  "specsToRun": ["admin/baseline.spec.js", "service/baseline.spec.js"]
+  "riskLevel": "medium"
 }
 ```
 
-### Step 5: 检查已有脚本覆盖
+> 注意：`specsToRun` 由 `run-changed.js` 根据 moduleSpecs 自动推导，无需手工写入。
 
-对每个受影响的模块，检查 `ai-call-center-test/e2e/scripts/` 下是否存在对应脚本：
-
-```
-e2e/scripts/
-├── admin/baseline.spec.js      ← 已覆盖
-├── service/baseline.spec.js    ← 已覆盖
-├── incoming/baseline.spec.js   ← 不存在，需要新建
-```
-
-- **已有脚本**：检查是否需要追加新 test case（如新增按钮/新增流程）
-- **无脚本**：进入 Step 6 生成脚本
-
-### Step 6: 生成/更新测试脚本
-
-**方法 A（--explore 模式）：Playwright MCP 探索**
-1. 启动 Playwright MCP browser
-2. 导航到目标页面
-3. 执行页面基本流程（列表加载、搜索、新增/编辑弹窗）
-4. 记录关键选择器和操作流
-5. 生成 `.spec.js` 并写入 `e2e/scripts/<module>/baseline.spec.js`
-
-**方法 B（手动编写）：** 基于已知的页面结构直接编写脚本。
-
-**脚本模板：**
-```js
-const { test, expect } = require('../fixtures/auth');
-const { goToMenu, waitForTable } = require('../helpers/navigation');
-
-test.describe('<模块名>', () => {
-  test('<页面名> 页面加载正常', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForTimeout(800);
-    await goToMenu(page, '<一级菜单>', '<二级菜单>');
-    await page.waitForTimeout(500);
-    await expect(page.locator('.el-table, .el-empty').first()).toBeVisible({ timeout: 8000 });
-  });
-});
-```
-
-### Step 7: 执行测试
+### Step 5: 执行测试
 
 ```bash
 cd ai-call-center-test
 
-# 执行受影响的 spec
-npx playwright test e2e/scripts/admin/baseline.spec.js e2e/scripts/service/baseline.spec.js
+# 方式 1: run-changed.js（推荐）
+node scripts/run-changed.js e2e/releases/<prev>--<new>/diff-mapping.json
 
-# 或通过 run-changed.js
+# 方式 2: 手动指定模块
 node scripts/run-changed.js --modules admin,service
+
+# 方式 3: 全量
+npm test
 ```
 
-### Step 8: 归档结果
+`run-changed.js` 会从 diff-mapping.json 读取 `affectedModules`，再查 `project.config.json` 的 `moduleSpecs` 找到对应 spec 文件并执行。
 
-将测试结果写入 `ai-call-center-test/e2e/releases/<prev>--<new>/`：
+### Step 6: 检查覆盖率（仅 --explore）
+
+如果指定了 `--explore`，对 `affectedModules` 中不在 `moduleSpecs` 的模块：
+
+1. 启动 Playwright MCP browser
+2. 导航到目标页面
+3. 执行基本流程（列表加载、搜索、弹窗开闭）
+4. 记录关键选择器
+5. 按以下模板生成 `e2e/scripts/<module>/baseline.spec.js`：
+
+```js
+const { test, expect } = require('../../fixtures/auth');
+const { goToMenu, waitForLoadingComplete } = require('../../helpers/navigation');
+
+const MODULES = [
+  { label: '<页面名>' },
+];
+
+for (const mod of MODULES) {
+  test.describe(mod.label, () => {
+    test('page renders with table', async ({ page }) => {
+      await page.goto('/');
+      await goToMenu(page, '<父菜单>', mod.label);
+      await waitForLoadingComplete(page);
+      await expect(page.locator('.el-table, .el-empty, .el-table__empty-block').first()).toBeVisible({ timeout: 8000 });
+    });
+  });
+}
+```
+
+6. 追加新模块到 `project.config.json` → `moduleSpecs`
+
+### Step 7: 归档结果
+
+将测试报告复制到 `ai-call-center-test/e2e/releases/<prev>--<new>/`：
 
 ```
 e2e/releases/v1.0.0-v1.1.0/
 ├── impact-report.md      # Claude 影响面分析报告
 ├── diff-mapping.json     # 变更映射（机器可读）
-├── test-results.json     # Playwright JSON 报告
+├── test-results.json     # Playwright JSON 报告（从根目录复制）
 └── test-output.txt       # 控制台输出
 ```
 
-### Step 9: Git 提交
+### Step 8: Git 提交
 
 ```bash
 cd ai-call-center-test
-git add e2e/scripts/ e2e/releases/
+git add e2e/scripts/ e2e/releases/ project.config.json
 git commit -m "test(e2e): release <prev> → <new> 增量测试"
 ```
 
-## 优先级矩阵（40+ 页面的分层策略）
+## 优先级矩阵（38 页面的分层策略）
 
 | 优先级 | 模块 | 页面数 | 条件 |
 |--------|------|--------|------|
 | **P0** | Login, Dashboard, SoftPhone | 3 | 始终执行 |
-| **P1** | Admin (9), Service (7) | 16 | 有变更时执行 |
+| **P1** | Admin (7), Service (7) | 14 | 有变更时执行 |
 | **P2** | Incoming (5), Outbound (4), Call (5), Report (7) | 21 | 有变更时执行 |
 
 ## 注意事项
@@ -210,4 +167,5 @@ git commit -m "test(e2e): release <prev> → <new> 增量测试"
 - **首次使用**：先执行 `cd ai-call-center-test && npm run login` 生成登录态
 - **无 tag 时**：提示用户先打 tag（`git tag v1.0.0`）
 - **脚本去重**：同一页面多个 release 都有变更时，追加 test case 而非覆盖
+- **规则变更**：修改影响面映射逻辑时，改 `project.config.json` 而非 skill 文件或 DESIGN.md
 - **软电话模块**：涉及 WebSocket/JsSIP 实时通信，建议优先用 MCP 探索式测试
