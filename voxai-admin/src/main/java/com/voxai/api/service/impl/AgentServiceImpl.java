@@ -212,6 +212,8 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
     public int saveOrUpdateAgentSip(AgentSipVo agentSipVo) {
         AgentSip agentSip = new AgentSip();
         BeanUtils.copyProperties(agentSipVo, agentSip);
+        // BeanUtils does not convert the request's String to the entity's Integer.
+        agentSip.setSip(Integer.valueOf(agentSipVo.getSip()));
 
         Map<String, Object> params = new HashMap<>();
         params.put("sip", agentSipVo.getSip());
@@ -224,6 +226,7 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
         }
         if (agentSipVo.getId() == null) {
             agentSip.setCts(Instant.now().getEpochSecond());
+            agentSip.setStatus(1);
             return agentSipMapper.insertSelective(agentSip);
         }
         //修改sip账号时，判断是否存在

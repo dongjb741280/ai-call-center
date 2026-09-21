@@ -3,6 +3,8 @@ package com.voxai.core.vo;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.DecimalMax;
 
 /**
  * @author dongjb
@@ -31,7 +33,8 @@ public class AgentSipVo {
      *
      */
     @NotBlank(message = "sip号码不能为空")
-    @Size(min = 5, max = 16, message = "sip号码必须是5,16字符")
+    @Pattern(regexp = "[1-9][0-9]{4,9}", message = "sip号码须为5-10位数字，不能以0开头")
+    @DecimalMax(value = "2147483647", message = "sip号码不能超过2147483647")
     private String sip;
 
     /**
