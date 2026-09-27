@@ -12,15 +12,10 @@
 - 所有正常页面资源采用相对路径，适配 GitHub Pages 仓库子目录。
 
 ## 发布
-将此目录作为新仓库 `voxhub-portal` 的根目录。推送 main 前后，在 Settings → Pages 将 Source 设置为 GitHub Actions。工作流位于 `.github/workflows/deploy.yml`，检查、构建并部署 `dist/`。PR 只构建验证，不发布。
-
-仓库计划地址：https://github.com/dongjb741280/voxhub-portal
-
-
-Pages 计划地址：https://dongjb741280.github.io/voxhub-portal/
-
-也可直接选择 Deploy from a branch → main → /(root)，不需要构建。若采用这种方式，应停用 Actions 发布工作流，避免两种方式冲突。
-自定义域名请在 Pages 中配置，并开启 HTTPS。
+本目录通过主仓库根目录的 `.github/workflows/portal-ci.yml` 部署到 GitHub Pages：
+1. 在仓库 Settings → Pages → Build and deployment 中，将 Source 设为 `GitHub Actions`。
+2. 推送 `main` 或改动 `portal/**` 时，工作流执行检查、构建并部署 `portal/dist`。PR 只构建验证，不发布。
+3. 站点地址：https://dongjb741280.github.io/ai-call-center/
 
 ## 项目来源与真实性
 内容来自本地 ai-call-center、ai-call-center-web、ai-call-center-test 与 IntelliCall-Pro 的 README、架构文档。业务能力不由静态门户实际提供，独立项目的组合需要完成接口集成。
