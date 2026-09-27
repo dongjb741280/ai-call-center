@@ -10,7 +10,7 @@
 >
 > 纯粹的AI呼叫中心(无人优先)，请参照项目
 >
-> https://github.com/dongjb741280/IntelliCall-Pro
+> <https://github.com/dongjb741280/IntelliCall-Pro>
 
 ## 产品门户（声枢 VoxHub）
 
@@ -38,16 +38,19 @@ npm run build    # 生成 dist/
 
 1. 仓库 Settings → Pages → Source 选 `GitHub Actions`。
 2. 推送 `main` 或改动 `portal/**` 时，工作流执行检查、构建并部署 `portal/dist`；PR 只构建不发布。
-3. 站点地址：https://dongjb741280.github.io/ai-call-center/
+3. 站点地址：<https://dongjb741280.github.io/ai-call-center/>
 
 ### 维护
 
-编辑 `index.html`（首页）、`guide.html`（指南）、`assets/`（样式与脚本）、`scripts/`（构建与本地服务器）、`tests/`（链接校验）。站点内容源自 ai-call-center / ai-call-center-web / ai-call-center-test / IntelliCall-Pro 的 README 与架构文档，业务能力不由静态门户实际提供。
+编辑 `index.html`（首页）、`guide.html`（指南）、`assets/`（样式与脚本）、`scripts/`（构建与本地服务器）、`tests/`（链接校验）。
+站点内容源自 ai-call-center / ai-call-center-web / ai-call-center-test /
+IntelliCall-Pro 的 README 与架构文档，业务能力不由静态门户实际提供。
 
 ## 技术架构
 
 ### 项目结构
-```
+
+```text
 ai-call-center/
 ├── voxai-common/          # 核心业务模块（数据层）
 ├── voxai-admin/           # 管理API服务（端口 7100）
@@ -60,6 +63,7 @@ ai-call-center/
 ```
 
 ### 技术栈
+
 - **后端框架**: Spring Boot 2.3.12
 - **微服务**: Spring Cloud + Nacos
 - **数据库**: MySQL/PostgreSQL/Oracle/SQL Server（多数据库支持）
@@ -75,11 +79,13 @@ ai-call-center/
 ## 核心模块
 
 ### voxai-common（核心业务模块）
+
 - **实体类**: 企业、坐席、技能组、通话记录等业务实体
 - **数据访问**: MyBatis映射器
 - **工具类**: 加密、ID生成等通用工具
 
 ### voxai-admin（管理API服务）
+
 - **管理功能**: 坐席管理、技能组管理、企业配置
 - **认证授权**: Spring Security + JWT
 - **定时任务**: Quartz调度器
@@ -87,6 +93,7 @@ ai-call-center/
 - **文件管理**: MinIO集成
 
 ### voxai-call（FreeSwitch集成服务）
+
 - **呼叫控制**: 呼入/呼出、转接、保持、静音等
 - **智能路由**: ACD（自动呼叫分配）算法
 - **坐席状态**: 实时状态管理和监控
@@ -97,6 +104,7 @@ ai-call-center/
 ## 核心功能
 
 ### 1. 呼叫管理
+
 - **呼入处理**: 自动路由到技能组
 - **呼出功能**: 坐席主动外呼
 - **呼叫转接**: 坐席间转接、技能组转接
@@ -104,6 +112,7 @@ ai-call-center/
 - **静音控制**: 坐席静音/取消静音
 
 ### 2. 智能路由（ACD）
+
 - **多种分配策略**:
   - 最少接听次数
   - 最少通话时长
@@ -113,16 +122,19 @@ ai-call-center/
   - 自定义分配
 
 ### 3. 技能组管理
+
 - **排队策略**: 优先级排队、VIP排队
 - **溢出处理**: 排队超时、技能组溢出
 - **记忆坐席**: 客户历史坐席匹配
 
 ### 4. 坐席管理
+
 - **状态管理**: 就绪、忙碌、通话中、离线等
 - **多登录方式**: SIP、WebRTC、电话
 - **权限控制**: 基于角色的权限管理
 
 ### 5. 监控统计
+
 - **实时监控**: 坐席状态、通话状态
 - **数据统计**: 通话量、接通率、平均通话时长
 - **报表导出**: Excel报表导出
@@ -130,6 +142,7 @@ ai-call-center/
 ## 快速开始
 
 ### 环境要求
+
 - JDK 1.8+
 - Maven 3.6+
 - MySQL 5.7+ / PostgreSQL 10+ / Oracle 11g+ / SQL Server 2016+
@@ -138,12 +151,15 @@ ai-call-center/
 - Docker & Docker Compose
 
 ### 数据库配置
+
 1. 创建数据库
 2. 执行SQL脚本：`voxai-common/src/main/resources/sql/tables_mysql_innodb.sql`
 3. 修改配置文件中的数据库连接信息
 
 ### 配置文件
+
 修改 `application-dev.properties` 中的配置：
+
 ```properties
 # 数据库配置
 spring.datasource.url=jdbc:mysql://localhost:3306/voxai
@@ -164,6 +180,7 @@ voxai.minio.secret.key=your_secret_key
 ### 构建和运行
 
 #### 1. 编译项目
+
 ```bash
 # 编译全部模块（跳过测试）
 mvn clean install -DskipTests
@@ -173,6 +190,7 @@ mvn clean install -pl voxai-admin -DskipTests
 ```
 
 #### 2. 本地启动
+
 ```bash
 # voxai-admin（管理后台，端口 7100）
 java -jar voxai-admin/target/voxai-admin-1.0.0.jar
@@ -182,6 +200,7 @@ java -jar voxai-call/target/voxai-call-1.0.0.jar
 ```
 
 #### 3. Jib 构建镜像（无需 Docker Daemon）
+
 ```bash
 # 构建并推送到 Harbor
 mvn compile jib:build -pl voxai-admin,voxai-call \
@@ -194,6 +213,7 @@ mvn compile jib:dockerBuild -pl voxai-admin
 ```
 
 #### 4. Docker 运行
+
 ```bash
 # 从 Harbor 拉取并启动
 docker pull localhost:8444/voxai/voxai-admin:latest
@@ -209,18 +229,20 @@ docker run -d --name voxai-admin --network host \
 ## 部署架构
 
 ### 微服务部署
+
 - **voxai-admin**: 管理后台服务（端口：7100）
 - **voxai-call**: 呼叫控制服务（端口：7200）
 - **freeswitch**: 呼叫引擎（端口：5060）
 
 ### 数据存储
+
 - **MySQL**: 业务数据存储
 - **Redis**: 缓存和会话存储
 - **MinIO**: 录音文件和媒体存储
 
 ### CI/CD 流水线
 
-```
+```text
 编译 → 单元测试 → SonarQube → 打包 → Jib 构建(Harbor) → Nexus 发布 → 1Panel API 部署
                                                                          ↓
                                                               Watchtower(k8s-work-4)
@@ -252,7 +274,7 @@ docker run -d \
 #### GitLab CI Variables 配置
 
 | 变量 | 说明 |
-|------|------|
+| ------ | ------ |
 | `HARBOR_REGISTRY` | Harbor 镜像仓库地址 |
 | `HARBOR_REGISTRY_USER` | Harbor 用户名 |
 | `HARBOR_REGISTRY_PASS` | Harbor 密码 |
@@ -265,17 +287,20 @@ docker run -d \
 ## 配置说明
 
 ### 多环境支持
+
 - 开发环境（dev）
 - 生产环境（prod）
 - Nacos配置中心集成
 
 ### 多数据库支持
+
 - MySQL（主要）
 - PostgreSQL
 - Oracle
 - SQL Server
 
 ### 安全特性
+
 - JWT Token认证
 - 密码加密存储
 - 接口权限控制
@@ -285,18 +310,21 @@ docker run -d \
 ### 主要接口
 
 #### 坐席管理
+
 - `POST /index/login` - 坐席登录
 - `GET /index/logout` - 坐席退出
 - `GET /agent/list` - 坐席列表
 - `POST /agent/add` - 添加坐席
 
 #### 呼叫管理
+
 - `POST /call/make` - 发起呼叫
 - `POST /call/answer` - 接听呼叫
 - `POST /call/hangup` - 挂断呼叫
 - `POST /call/transfer` - 转接呼叫
 
 #### 技能组管理
+
 - `GET /group/list` - 技能组列表
 - `POST /group/add` - 添加技能组
 - `POST /group/agent/add` - 添加坐席到技能组
@@ -304,15 +332,18 @@ docker run -d \
 ## 监控和运维
 
 ### 健康检查
+
 - `GET /voxai-admin/manager/health` - voxai-admin 健康检查（端口 7100）
 - `GET /voxai-call/manager/health` - voxai-call 健康检查（端口 7200）
 
 ### 日志管理
+
 - 支持Logback日志配置
 - 支持ELK日志收集
 - 结构化日志输出
 
 ### 性能监控
+
 - Prometheus指标收集
 - JVM性能监控
 - 数据库连接池监控
@@ -320,7 +351,8 @@ docker run -d \
 ## 开发指南
 
 ### 代码结构
-```
+
+```text
 src/main/java/
 ├── com.voxai.api/          # API服务
 │   ├── web/                 # 控制器层
@@ -337,6 +369,7 @@ src/main/java/
 ```
 
 ### 开发规范
+
 - 遵循阿里巴巴Java开发手册
 - 使用统一的异常处理机制
 - 支持多租户数据隔离
@@ -345,15 +378,19 @@ src/main/java/
 ## 常见问题
 
 ### Q: 如何配置FreeSwitch？
+
 A: 参考 `freeswitch/` 目录下的配置文件，支持CentOS和Debian两种系统。
 
 ### Q: 如何添加新的分配策略？
+
 A: 在 `voxai-call/src/main/java/com/voxai/cc/acd/assign/` 目录下实现新的分配算法。
 
 ### Q: 如何集成第三方系统？
+
 A: 通过WebHook回调或消息队列进行集成，支持HTTP和RabbitMQ。
 
 ### Q: 如何扩展坐席功能？
+
 A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` 中实现具体业务逻辑。
 
 ## 许可证
@@ -371,17 +408,19 @@ A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` �
 ## 联系方式
 
 - 作者: dongjianbin
-- 邮箱: dongjb741280@gmail.com
+- 邮箱: <dongjb741280@gmail.com>
 - 项目地址: [GitHub Repository](https://github.com/your-username/ai-call-center)
 
 ## 更新日志
 
 ### v1.0.1 (2026-07-31)
+
 - 集成 Jib 构建镜像，免除 Docker Daemon 依赖
 - 接入 GitLab CI + Harbor + Watchtower 自动部署流水线
 - 统一 Harbor 环境变量命名（`HARBOR_REGISTRY` 前缀）
 
 ### v1.0.0 (2024-01-01)
+
 - 初始版本发布
 - 支持基本的呼叫中心功能
 - 集成FreeSwitch呼叫引擎
@@ -391,4 +430,3 @@ A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` �
 ---
 
 **注意**: 本项目仅供学习和研究使用，商业使用请确保遵守相关法律法规。
-
