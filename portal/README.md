@@ -2,14 +2,7 @@
 智能客户联络平台中文静态门户。Vox 代表声音，Hub 代表枢纽，以「连接每一种声音，成就每一次服务」为产品表达。
 
 ## 本地运行
-需要 Node.js 20+，无需安装依赖。
-```sh
-npm run dev
-# http://localhost:4173
-npm run check
-npm run build
-npm run preview
-```
+主项目的一个目录
 
 ## 内容
 - 首页：产品能力（含预留能力）、场景切换与流程演示、行业应用、架构、四个项目介绍、FAQ。
