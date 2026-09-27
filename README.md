@@ -22,6 +22,8 @@ npm run preview
 将此目录作为新仓库 `voxhub-portal` 的根目录。推送 main 前后，在 Settings → Pages 将 Source 设置为 GitHub Actions。工作流位于 `.github/workflows/deploy.yml`，检查、构建并部署 `dist/`。PR 只构建验证，不发布。
 
 仓库计划地址：https://github.com/dongjb741280/voxhub-portal
+
+
 Pages 计划地址：https://dongjb741280.github.io/voxhub-portal/
 
 也可直接选择 Deploy from a branch → main → /(root)，不需要构建。若采用这种方式，应停用 Actions 发布工作流，避免两种方式冲突。
