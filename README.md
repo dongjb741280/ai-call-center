@@ -12,6 +12,38 @@
 >
 > https://github.com/dongjb741280/IntelliCall-Pro
 
+## 产品门户（声枢 VoxHub）
+
+`portal/` 是项目的静态产品门户，用原生 HTML/CSS/JS 构建，无 CDN、无追踪、无后端依赖，场景演示均为预设内容。
+
+### 本地运行
+
+需要 Node.js 20+，无需安装依赖：
+
+```bash
+cd portal
+npm run dev      # http://localhost:4173
+npm run check    # 语法检查 + 链接/锚点/重复ID校验
+npm run build    # 生成 dist/
+```
+
+### 内容
+
+- 首页：产品能力（含预留能力）、场景切换与流程演示、行业应用、架构、四个项目介绍、FAQ。
+- 项目指南（guide.html）：项目分工、实施状态、业务接入、自动化测试与门户发布。
+
+### 部署（GitHub Pages）
+
+通过根目录 `.github/workflows/portal-ci.yml` 部署：
+
+1. 仓库 Settings → Pages → Source 选 `GitHub Actions`。
+2. 推送 `main` 或改动 `portal/**` 时，工作流执行检查、构建并部署 `portal/dist`；PR 只构建不发布。
+3. 站点地址：https://dongjb741280.github.io/ai-call-center/
+
+### 维护
+
+编辑 `index.html`（首页）、`guide.html`（指南）、`assets/`（样式与脚本）、`scripts/`（构建与本地服务器）、`tests/`（链接校验）。站点内容源自 ai-call-center / ai-call-center-web / ai-call-center-test / IntelliCall-Pro 的 README 与架构文档，业务能力不由静态门户实际提供。
+
 ## 技术架构
 
 ### 项目结构
@@ -21,6 +53,8 @@ ai-call-center/
 ├── voxai-admin/           # 管理API服务（端口 7100）
 ├── voxai-call/            # FreeSwitch集成服务（端口 7200）
 ├── freeswitch/            # FreeSwitch配置和Docker镜像
+├── portal/                # 产品门户（声枢 VoxHub）
+├── .github/workflows/     # GitHub Actions（portal CI/CD）
 ├── .gitlab-ci.yml         # GitLab CI/CD 流水线
 └── Dockerfile             # 多阶段Docker构建
 ```
