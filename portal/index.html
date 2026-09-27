@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b746e">
+  <meta name="description" content="声枢 VoxHub 智能客户联络平台，汇聚 FreeSWITCH 呼叫中心、AI 语音客服、坐席工作台与自动化测试，让每一次沟通更有价值。">
+  <meta property="og:title" content="声枢 VoxHub · 让每一次沟通，都更有价值">
+  <meta property="og:description" content="从呼叫接入到 AI 理解，从人工协同到服务洞察，构建属于你的智能客户联络平台。">
+  <meta property="og:type" content="website">
+  <title>声枢 VoxHub · 智能客户联络平台</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script src="./assets/main.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳转到主要内容</a>
+<header class="header">
+  <div class="container header-inner">
+    <a href="./index.html" class="brand" aria-label="声枢 VoxHub 首页"><img src="./assets/favicon.svg" width="36" height="36" alt=""><span>声枢<span class="brand-en">VoxHub</span></span></a>
+    <button class="menu-toggle" aria-label="打开导航菜单" aria-controls="navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+    <nav id="navigation" class="navigation" aria-label="主导航">
+      <a href="#capabilities">产品能力</a><a href="#scenarios">应用场景</a><a href="#architecture">技术架构</a><a href="#orchestration">流程编排</a><a href="#ecosystem">项目生态</a>
+    </nav>
+    <div class="header-actions"><a class="docs-link" href="./guide.html">开发者文档 <span aria-hidden="true">↗</span></a><a class="button button-small" href="#start">开始探索 <span aria-hidden="true">→</span></a></div>
+  </div>
+</header>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <div class="eyebrow pill"><span class="status-dot"></span> 为下一代客户沟通而构建</div>
+        <h1 id="hero-title">让每一次沟通，<br>都<span class="accent">更有价值。</span></h1>
+        <p class="hero-description">以稳定的呼叫能力为底座，让 AI 与人工自然协同。<br class="desktop-only">从第一声问候，到每一个问题的解决。</p>
+        <div class="hero-buttons"><a href="#capabilities" class="button">探索产品能力 <span aria-hidden="true">↗</span></a><button class="button button-white" data-demo-open><span class="play-icon" aria-hidden="true">▶</span> 体验场景演示</button></div>
+        <div class="hero-notes"><span><i>✓</i> 自主部署</span><span><i>✓</i> 模块化架构</span><span><i>✓</i> AI 与人工协同</span></div>
+        <div class="hero-caption"><span class="tiny-line"></span> CONNECT VOICES. CREATE VALUE.</div>
+      </div>
+      <div class="hero-art" aria-label="AI 语音服务与坐席协作的产品界面示意">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="floating-label"><span class="status-dot"></span> 每一段对话，都有回应</div>
+        <div class="console-preview">
+          <div class="console-top"><div class="console-title"><span class="mini-logo">ııı</span> 声枢工作台</div><span class="preview-tag">产品界面示意</span><span class="avatar">林</span></div>
+          <div class="console-body">
+            <div class="console-sidebar" aria-hidden="true"><span class="sidebar-active">▦</span><span>♧</span><span>◉</span><span>▥</span><span>⚙</span></div>
+            <div class="console-main">
+              <div class="console-heading"><div><span class="overline">AI VOICE ASSISTANT</span><h2>一通电话，一次高效服务</h2></div><span class="live-pill"><span class="status-dot"></span> AI 接待</span></div>
+              <div class="waveform" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="chat-message customer"><span class="chat-avatar">客</span><p>你好，我想了解一下产品的部署方式。</p></div>
+              <div class="chat-message assistant"><span class="chat-avatar">AI</span><div><p>您好，支持自主部署。我可以为您介绍部署架构，也可以转接技术顾问。</p><span class="source-label">✧ 基于知识库生成回复 · 示例</span></div></div>
+              <div class="process-strip"><span>语音识别</span><i>→</i><span>知识检索</span><i>→</i><span>自然应答</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="handoff-card"><span class="handoff-icon">↗</span><div><strong>AI 先响应，人工来协同</strong><span>复杂问题，交给合适的人</span></div><span class="check-circle">✓</span></div>
+        <span class="art-cross cross-one" aria-hidden="true">+</span><span class="art-cross cross-two" aria-hidden="true">+</span>
+      </div>
+    </div>
+    <div class="container hero-footer"><span>让成熟的通信技术，与 AI 能力相遇</span><div class="tech-names"><strong>FreeSWITCH<span>®</span></strong><strong>WebRTC</strong><strong>LangGraph</strong><strong>FunASR</strong><strong>CosyVoice</strong><strong>Playwright</strong></div></div>
+  </section>
+
+  <section class="section capabilities" id="capabilities" aria-labelledby="cap-title">
+    <div class="container">
+      <div class="section-heading"><div><p class="eyebrow">01 / 产品能力</p><h2 id="cap-title">连接服务全流程，<br>不止于接通。</h2></div><p class="section-intro">把呼叫控制、智能对话与业务运营连接起来，<br class="desktop-only">为客户和服务团队创造更顺畅的沟通体验。</p></div>
+      <div class="capability-grid">
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M6 3h4l2 5-3 2a14 14 0 0 0 5 5l2-3 5 2v4c0 2-2 3-4 2C9 18 5 14 3 7c-1-2 1-4 3-4Z"/></svg></span><span class="card-number">01</span></div><h3>全链路呼叫中心</h3><p>覆盖呼入、呼出、转接与保持，让每一通电话都有清晰的服务路径。</p><div class="tags"><span>IVR 导航</span><span>ACD 路由</span><span>技能组</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><rect x="5" y="6" width="14" height="13" rx="4"/><path d="M12 3v3M2 11v4m20-4v4M8 12h.01M16 12h.01M9 16h6"/></svg></span><span class="card-number">02</span></div><h3>AI 语音客服</h3><p>将语音识别、知识检索和大模型连接成对话链路，让常见问题得到及时回应。</p><div class="tags"><span>ASR / TTS</span><span>RAG 知识库</span><span>转人工</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4M7 8h4m-4 4h7m2-4h1"/></svg></span><span class="card-number">03</span></div><h3>一体化坐席工作台</h3><p>在浏览器内处理通话、管理坐席与技能组，集中查看服务记录和运营报表。</p><div class="tags"><span>WebRTC 软电话</span><span>实时状态</span><span>多租户</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 4-5 8-8 9-3-1-8-5-8-9V6Z"/><path d="m8 12 3 3 5-6"/></svg></span><span class="card-number">04</span></div><h3>质量与服务洞察</h3><p>结合通话记录、录音与质检模块，关注服务过程；以自动化回归支持持续迭代。</p><div class="tags"><span>数据报表</span><span>PII 脱敏</span><span>E2E 测试</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 10v4h4l6 3V7L7 10H3Z"/><path d="M16 8a4 4 0 0 1 0 8"/></svg></span><span class="card-number">05</span></div><h3>智能外呼中心<span class="reserved-tag">预留</span></h3><p>以任务组织外呼名单，支持坐席主动外呼与自动触达，预测式外呼与合规策略为预留能力。</p><div class="tags"><span>预测式外呼</span><span>预览式外呼</span><span>任务外呼</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="card-number">06</span></div><h3>实时监控大屏<span class="reserved-tag">预留</span></h3><p>实时呈现队列、坐席与通话状态，为运营提供一目了然的现场视图。</p><div class="tags"><span>队列监控</span><span>坐席看板</span><span>通话监听</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v4h6V3M9 11h6M9 15h4"/></svg></span><span class="card-number">07</span></div><h3>工单与客户管理<span class="reserved-tag">预留</span></h3><p>把通话与客户、工单连接起来，来电弹屏展示客户信息，让服务过程可跟踪。</p><div class="tags"><span>工单流转</span><span>来电弹屏</span><span>客户画像</span></div></article>
+        <article class="cap-card"><div class="card-top"><span class="feature-icon"><svg viewBox="0 0 24 24"><path d="M8 5H5v14h3M16 5h3v14h-3M12 8v8"/></svg></span><span class="card-number">08</span></div><h3>开放平台<span class="reserved-tag">预留</span></h3><p>以统一的 API、WebSocket 与 SDK 对接外部系统，支持 HTTP IVR 集成与二次开发。</p><div class="tags"><span>REST API</span><span>WebSocket</span><span>SDK</span></div></article>
+      </div>
+      <a class="text-link capability-more" href="./guide.html#capability-status">查看能力边界与实施状态 <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+  <section class="section scenarios" id="scenarios" aria-labelledby="scenario-heading">
+    <div class="container">
+      <div class="section-heading"><div><p class="eyebrow">02 / 应用场景</p><h2 id="scenario-heading">让 AI 处理常见问题，<br>让团队专注关键时刻。</h2></div><span class="outline-label">人机协同 · 服务闭环</span></div>
+      <div class="scenario-layout">
+        <div class="scenario-tabs" role="tablist" aria-label="应用场景" aria-orientation="vertical">
+          <button id="tab-service" class="scenario-tab active" role="tab" aria-selected="true" aria-controls="scenario-panel" data-scenario="service"><span class="scenario-tab-icon">01</span><span><strong>客户服务</strong><small>常见咨询，及时响应</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button id="tab-followup" class="scenario-tab" role="tab" aria-selected="false" aria-controls="scenario-panel" tabindex="-1" data-scenario="followup"><span class="scenario-tab-icon">02</span><span><strong>客户回访</strong><small>让反馈成为服务的下一步</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button id="tab-collaboration" class="scenario-tab" role="tab" aria-selected="false" aria-controls="scenario-panel" tabindex="-1" data-scenario="collaboration"><span class="scenario-tab-icon">03</span><span><strong>人工协同</strong><small>复杂问题，有专业的人接续</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <button id="tab-outbound" class="scenario-tab" role="tab" aria-selected="false" aria-controls="scenario-panel" tabindex="-1" data-scenario="outbound"><span class="scenario-tab-icon">04</span><span><strong>智能外呼</strong><small>主动触达，有节奏有边界</small></span><span class="tab-arrow" aria-hidden="true">↗</span></button>
+          <p class="scenario-note">场景内容为流程示意，实际业务需接入对应的数据、线路与业务系统。</p>
+        </div>
+        <div class="scenario-panel" id="scenario-panel" role="tabpanel" aria-labelledby="tab-service" tabindex="0">
+          <div class="scenario-detail"><span class="small-eyebrow" id="scenario-kicker">CUSTOMER SERVICE</span><h3 id="scenario-title">从“请稍候”到“我来帮您”</h3><p id="scenario-description">把产品说明和常见问答放进知识库，AI 理解客户问题并组织回复，需要进一步处理时转接人工。</p><ul class="check-list" id="scenario-features"><li>知识库检索，让回答有所依据</li><li>业务工具调用，连接查询与办理</li><li>保留人工服务出口</li></ul><button class="text-link" data-demo-open>播放流程演示 <span aria-hidden="true">↗</span></button></div>
+          <div class="conversation"><div class="conversation-header"><span class="bot-symbol">✧</span><div><strong>声枢 AI 助手</strong><small><span class="status-dot"></span> 场景交互示意</small></div><span class="conversation-dots" aria-hidden="true">•••</span></div><div class="conversation-messages" id="scenario-messages"><p class="bubble-user">产品可以部署在我们自己的服务器吗？</p><p class="bubble-ai">可以。呼叫中心与语音编排服务支持自主部署，语音识别和合成也可以本地运行。</p><span class="conversation-source">✧ 参考：部署说明</span><p class="bubble-user">我想和技术人员聊聊具体方案。</p><p class="bubble-ai">好的，可以为您转接人工坐席继续沟通。</p></div><div class="conversation-footer"><span class="tiny-bars" aria-hidden="true">▂▅▃▇▃▅▂</span><span>听见需求，连接服务</span><span aria-hidden="true">↗</span></div></div>
+        </div>
+      </div>
+      <div class="industry-block">
+        <div class="industry-head"><p class="eyebrow">行业应用</p><p class="industry-note">行业场景为流程示意，涉及外呼、工单、质检等预留能力，以<a href="./guide.html#capability-status">能力与进展</a>为准。</p></div>
+        <div class="industry-grid">
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1.2 13H7.2L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span class="industry-type">呼入 · 外呼</span></div><h3>电商与零售</h3><p>售前咨询、订单与物流查询、退换货处理，常见问题由 AI 应答，复杂售后转人工。</p><div class="tags"><span>智能应答</span><span>订单查询</span><span>售后转接</span></div></article>
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><path d="M3 9h18v11H3z"/><path d="M3 9 12 4l9 5M6 9v11M10 9v11M14 9v11M18 9v11M3 20h18"/></svg></span><span class="industry-type">呼入 · 合规</span></div><h3>金融与保险</h3><p>产品咨询、理赔报案与合规回访，敏感信息脱敏处理，服务过程可追溯。</p><div class="tags"><span>合规回访</span><span>PII 脱敏</span><span>智能质检</span></div></article>
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5V4Z"/></svg></span><span class="industry-type">外呼 · 回访</span></div><h3>医疗健康</h3><p>预约挂号、复诊提醒与健康随访，主动外呼触达并把结果回写业务系统。</p><div class="tags"><span>预约提醒</span><span>外呼回访</span><span>服务记录</span></div></article>
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><path d="M12 5 3 9l9 4 9-4-9-4Z"/><path d="M6 11.5V16c0 1.2 2.7 3 6 3s6-1.8 6-3v-4.5"/></svg></span><span class="industry-type">外呼 · 邀约</span></div><h3>教育服务</h3><p>课程咨询、试听邀约与学习回访，按任务组织外呼，沉淀意向与反馈。</p><div class="tags"><span>任务外呼</span><span>意向记录</span><span>坐席协同</span></div></article>
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 10h4l3 3v4h-7M7 17a2 2 0 1 0 0 .01M17 17a2 2 0 1 0 0 .01"/></svg></span><span class="industry-type">通知 · 评价</span></div><h3>物流与本地生活</h3><p>配送通知、签收确认与服务评价，语音通知触达，满意度回访沉淀口碑。</p><div class="tags"><span>语音通知</span><span>满意度回访</span><span>工单联动</span></div></article>
+          <article class="industry-card"><div class="industry-top"><span class="industry-icon"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h2m2 0h2M9 11h2m2 0h2M9 15h2m2 0h2M10 21v-3h4v3"/></svg></span><span class="industry-type">呼入 · 引导</span></div><h3>政务与民生</h3><p>政策咨询、办事引导与满意度回访，常见咨询 AI 应答，人工兜底复杂事项。</p><div class="tags"><span>智能应答</span><span>办事引导</span><span>人工兜底</span></div></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section architecture" id="architecture" aria-labelledby="architecture-title">
+    <div class="container architecture-layout">
+      <div class="architecture-copy"><p class="eyebrow">03 / 技术架构</p><h2 id="architecture-title">稳定的通信底座。<br>开放的智能能力。</h2><p>以 FreeSWITCH 连接语音，以模块化服务连接业务。根据团队需要，选择人工服务、AI 优先或协同模式。</p><ul class="architecture-points"><li><span>01</span><div><strong>服务自主部署</strong><p>呼叫、数据与语音服务可部署在自有环境。</p></div></li><li><span>02</span><div><strong>能力按需组合</strong><p>独立的呼叫、前端、语音编排与测试工程。</p></div></li><li><span>03</span><div><strong>面向集成设计</strong><p>通过 API、WebSocket 与业务工具对接系统。</p></div></li></ul><a class="text-link" href="./guide.html#architecture-guide">了解技术选型 <span aria-hidden="true">↗</span></a></div>
+      <div class="architecture-diagram" aria-label="架构示意：电话和浏览器接入 FreeSWITCH，通过呼叫业务与 AI 编排连接数据和运营服务">
+        <div class="diagram-top"><span>PLATFORM ARCHITECTURE</span><span>架构示意</span></div>
+        <div class="diagram-inputs"><div><span>◉</span> SIP 电话</div><div><span>▣</span> WebRTC</div><div><span>⌘</span> 业务系统</div></div>
+        <div class="connector" aria-hidden="true"></div>
+        <div class="diagram-core"><span class="core-symbol">ııı</span><div><strong>FreeSWITCH</strong><span>呼叫控制 · 媒体处理 · 事件驱动</span></div><span class="core-label">通信底座</span></div>
+        <div class="connector fork" aria-hidden="true"></div>
+        <div class="diagram-services"><div><span class="diagram-badge">业务引擎</span><strong>呼叫中心服务</strong><span>路由 / 坐席 / 技能组</span><small>Spring Boot · Vue 3</small></div><div><span class="diagram-badge">智能引擎</span><strong>AI 语音编排</strong><span>识别 / 理解 / 检索 / 合成</span><small>LangGraph · FunASR · CosyVoice</small></div></div>
+        <div class="connector" aria-hidden="true"></div>
+        <div class="diagram-foundation"><span>业务数据</span><span>知识库</span><span>录音与质检</span><span>自动化测试</span></div>
+        <p>逻辑能力组合示意；具体接入方式见各项目文档。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section orchestration" id="orchestration" aria-labelledby="orchestration-title">
+    <div class="container">
+      <div class="section-heading"><div><p class="eyebrow">04 / 业务流程编排</p><h2 id="orchestration-title">把每一步，编排成一次服务。</h2></div><p class="section-intro">从呼叫接入到服务完成，用状态机把识别、理解、知识与转人工连接起来，<br class="desktop-only">让每一次通话都有清晰、可扩展的路径。</p></div>
+      <div class="flow" aria-label="业务流程编排示意：呼叫接入、语音识别、意图理解、编排决策、语音合成、服务完成与记录质检">
+        <div class="flow-node"><span class="flow-step">01</span><strong>呼叫接入</strong><small>SIP / WebRTC 呼入</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node"><span class="flow-step">02</span><strong>语音识别</strong><small>ASR 整句转写</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node"><span class="flow-step">03</span><strong>意图理解</strong><small>大模型理解需求</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node flow-hub"><span class="flow-step">04</span><strong>编排决策</strong><small>LangGraph 状态机</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node"><span class="flow-step">05</span><strong>语音合成</strong><small>TTS 整句合成</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node"><span class="flow-step">06</span><strong>服务完成</strong><small>应答 / 转接坐席</small></div><span class="flow-arrow" aria-hidden="true">→</span>
+        <div class="flow-node"><span class="flow-step">07</span><strong>记录与质检</strong><small>录音 · 脱敏 · 质检</small></div>
+      </div>
+      <div class="flow-branches">
+        <span class="flow-branch-label">编排决策的分支 · 按条件选择下一步</span>
+        <div class="flow-branch-grid">
+          <div class="flow-branch"><span>知识检索</span><small>条件 · 需基于知识回答</small><p>RAG 检索知识库，生成有依据的回复。</p></div>
+          <div class="flow-branch"><span>业务工具</span><small>条件 · 需查询或办理业务</small><p>调用业务工具，返回结果并组织回复。</p></div>
+          <div class="flow-branch"><span>转人工</span><small>条件 · 客户要求或无法处理</small><p>转接坐席，上下文随会话移交。</p></div>
+        </div>
+      </div>
+      <div class="flow-loop"><span class="flow-loop-icon" aria-hidden="true">↻</span><span>多轮对话与兜底：未解决时回到「意图理解」继续；无法识别或超出能力时，澄清重问或转人工。</span></div>
+      <p class="flow-note">编排逻辑为流程示意；实际对话状态机以 IntelliCall-Pro 的 LangGraph 实现为准，知识、工具与转人工需按业务配置接入。</p>
+    </div>
+  </section>
+
+  <section class="section ecosystem" id="ecosystem" aria-labelledby="ecosystem-title">
+    <div class="container"><div class="section-heading"><div><p class="eyebrow">05 / 项目生态</p><h2 id="ecosystem-title">各有所长，一起构建。</h2></div><p class="section-intro">从业务底座到智能编排，从日常运营到质量验证。<br class="desktop-only">四个项目，连接一条持续演进的产品路径。</p></div>
+      <div class="project-grid">
+        <article class="project-card"><div class="project-heading"><span class="project-symbol">⌘</span><span class="project-type">通信与业务</span></div><h3>呼叫中心引擎</h3><code>ai-call-center</code><p>承载呼叫控制、多租户、智能路由和技能组，构建人工服务与 AI 接入的业务底座。</p><div class="project-bottom"><span>Java · FreeSWITCH</span><a href="https://github.com/dongjb741280/ai-call-center" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看 ai-call-center">↗</a></div></article>
+        <article class="project-card"><div class="project-heading"><span class="project-symbol">▦</span><span class="project-type">前端与运营</span></div><h3>坐席管理工作台</h3><code>ai-call-center-web</code><p>基于 Vue 3 的管理界面，整合 SIP 分机、网关配置、通话记录、运营报表与软电话。</p><div class="project-bottom"><span>Vue 3 · Element Plus</span><a href="https://github.com/dongjb741280/ai-call-center-web" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看 ai-call-center-web">↗</a></div></article>
+        <article class="project-card project-highlight"><div class="project-heading"><span class="project-symbol">✧</span><span class="project-type">AI 优先</span></div><h3>智能语音编排</h3><code>IntelliCall-Pro</code><p>连接 ASR、大模型、RAG 与 TTS，以 AI 接待为主，在需要时把对话交给人工坐席。</p><div class="project-bottom"><span>Python · LangGraph</span><a href="https://github.com/dongjb741280/IntelliCall-Pro" target="_blank" rel="noopener noreferrer" aria-label="在 GitHub 查看 IntelliCall-Pro">↗</a></div></article>
+        <article class="project-card"><div class="project-heading"><span class="project-symbol">✓</span><span class="project-type">持续验证</span></div><h3>自动化测试工程</h3><code>ai-call-center-test</code><p>面向呼叫中心前端的 E2E 测试，支持按模块回归、变更驱动测试与可配置 UI 适配。</p><div class="project-bottom"><span>Playwright · GitHub Actions</span><a href="./guide.html#testing" aria-label="了解 ai-call-center-test 测试工程">↗</a></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq-section" aria-labelledby="faq-title"><div class="container faq-layout"><div><p class="eyebrow">常见问题</p><h2 id="faq-title">开始之前，<br>你可能想了解。</h2><a class="text-link" href="./guide.html">阅读项目指南 <span aria-hidden="true">↗</span></a></div><div class="faq-list">
+    <details><summary>声枢和这几个项目是什么关系？<span aria-hidden="true">+</span></summary><p>声枢 VoxHub 是这些关联项目的统一介绍门户，帮助你理解各自的能力和组合方式。各项目保持独立，完整业务部署需要按文档配置和集成。</p></details>
+    <details><summary>这个网站可以直接拨打电话吗？<span aria-hidden="true">+</span></summary><p>当前网站是静态产品门户，场景演示在浏览器内本地运行。实际通话需要部署呼叫中心、配置 FreeSWITCH 和线路，并连接坐席或 AI 服务。</p></details>
+    <details><summary>AI 语音能力目前进展如何？<span aria-hidden="true">+</span></summary><p>IntelliCall-Pro 已实测跑通半双工语音闭环，并提供 RAG、业务工具、脱敏与质检等模块。当前 ASR/TTS 采用整句处理；合规与高可用配置仍需在目标环境进行实机验证。详见能力状态说明。</p></details>
+    <details><summary>可以私有化部署和接入自己的模型吗？<span aria-hidden="true">+</span></summary><p>呼叫与编排服务支持自主部署，FunASR 和 CosyVoice 可本地运行。现有大模型适配采用 Claude，替换其他模型需按协议实现适配，并验证工具调用、效果和延迟。</p></details>
+  </div></div></section>
+
+  <section class="start-section" id="start"><div class="container"><div class="start-panel"><div class="start-decoration" aria-hidden="true">(((</div><div><p class="eyebrow">YOUR NEXT CONVERSATION STARTS HERE</p><h2>让更好的客户沟通，<br>从这里开始。</h2><p>了解项目，选择适合你的能力，构建自己的智能联络平台。</p></div><div class="start-actions"><a href="./guide.html" class="button button-light">阅读部署与接入指南 <span aria-hidden="true">↗</span></a><a href="https://github.com/dongjb741280/ai-call-center" target="_blank" rel="noopener noreferrer" class="start-github">在 GitHub 探索项目 <span aria-hidden="true">↗</span></a></div></div></div></section>
+</main>
+<footer class="footer"><div class="container"><div class="footer-main"><div class="footer-brand"><a href="./index.html" class="brand"><img src="./assets/favicon.svg" width="34" height="34" alt=""><span>声枢<span class="brand-en">VoxHub</span></span></a><p>连接每一种声音，成就每一次服务。</p></div><div><strong>探索产品</strong><a href="#capabilities">产品能力</a><a href="#scenarios">应用场景</a><a href="#orchestration">流程编排</a></div><div><strong>开发者</strong><a href="./guide.html">部署与接入</a><a href="#ecosystem">项目生态</a></div><div><strong>关于声枢</strong><a href="./guide.html#about">项目介绍</a><a href="./guide.html#capability-status">能力与进展</a></div></div><div class="footer-bottom"><span>© <span data-year>2026</span> 声枢 VoxHub</span><span>用技术连接，用服务回应。<span class="footer-dot">●</span> 静态产品门户</span></div></div></footer>
+<dialog id="demo-dialog" class="demo-dialog" aria-labelledby="demo-title"><div class="demo-modal-header"><span class="eyebrow">交互演示 · 预设示例</span><button class="close-button" data-demo-close aria-label="关闭演示">×</button></div><h2 id="demo-title">一次服务，如何发生？</h2><p class="demo-intro">点击下一步，体验从呼叫接入到服务完成的过程。</p><ol class="demo-steps" id="demo-steps"><li class="current">呼叫接入</li><li>识别与理解</li><li>知识与业务</li><li>服务完成</li></ol><div class="demo-stage" aria-live="polite" aria-atomic="true"><span id="demo-step-label">01 / 呼叫接入</span><h3 id="demo-step-title">客户拨入服务号码</h3><p id="demo-step-text">FreeSWITCH 接收呼叫，并将会话交给语音编排服务。</p><div class="demo-quote" id="demo-step-quote">客户：“产品可以部署在自己的服务器吗？”</div></div><div class="demo-controls"><button class="text-link" id="demo-restart">重新开始</button><button class="button" id="demo-next">下一步 <span aria-hidden="true">→</span></button></div><p class="demo-disclaimer">本演示不使用麦克风，不拨打电话；内容为预设流程示例。</p></dialog>
+</body>
+</html>

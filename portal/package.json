@@ -1,0 +1,14 @@
+{
+  "name": "voxhub-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "声枢 VoxHub · 智能客户联络平台中文门户",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs dist",
+    "check": "node --check assets/main.js && node --test tests/site.test.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b746e"><meta name="description" content="声枢 VoxHub 项目指南：能力边界、技术架构、业务服务接入与 GitHub Pages 部署说明。"><title>项目指南 · 声枢 VoxHub</title><link rel="icon" href="./assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./assets/style.css"><script src="./assets/main.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳转到主要内容</a>
+<header class="header"><div class="container header-inner"><a href="./index.html" class="brand" aria-label="声枢 VoxHub 首页"><img src="./assets/favicon.svg" width="36" height="36" alt=""><span>声枢<span class="brand-en">VoxHub</span></span></a><button class="menu-toggle" aria-label="打开导航菜单" aria-controls="navigation" aria-expanded="false"><span></span><span></span><span></span></button><nav id="navigation" class="navigation" aria-label="主导航"><a href="./index.html#capabilities">产品能力</a><a href="./index.html#scenarios">应用场景</a><a href="./index.html#architecture">技术架构</a><a href="./index.html#orchestration">流程编排</a><a href="./index.html#ecosystem">项目生态</a></nav><div class="header-actions"><a class="docs-link" href="./guide.html" aria-current="page">开发者文档 <span aria-hidden="true">↗</span></a><a class="button button-small" href="./index.html#start">开始探索 <span aria-hidden="true">→</span></a></div></div></header>
+<main id="main">
+  <section class="guide-hero"><div class="container"><div class="breadcrumb"><a href="./index.html">首页</a><span>/</span><span>项目指南</span></div><p class="eyebrow">VOXHUB / PROJECT GUIDE</p><h1>从了解项目，到开始构建。</h1><p class="lead">了解声枢背后的项目分工、能力状态与部署路径。你可以从人工服务起步，也可以探索 AI 优先的语音服务。</p></div></section>
+  <div class="container guide-layout"><aside class="guide-toc" aria-label="页面目录"><strong>本页目录</strong><a href="#about">项目定位</a><a href="#capability-status">能力与进展</a><a href="#architecture-guide">技术架构</a><a href="#quick-start">业务服务接入</a><a href="#testing">自动化验证</a><a href="#github-pages">门户部署</a></aside>
+    <article class="guide-content">
+      <section id="about"><p class="eyebrow">ABOUT VOXHUB</p><h2>让每一种声音，都有连接的枢纽。</h2><p>「声枢」取“声音的枢纽”之意。Vox 代表声音，Hub 代表连接。门户汇聚四个关联项目，帮助团队理解从呼叫接入、坐席运营到 AI 编排和质量验证的完整路径。</p><p><code>ai-call-center</code> 面向人工呼入、呼出和呼叫底座；<code>ai-call-center-web</code> 提供管理工作台；<code>IntelliCall-Pro</code> 探索 AI 优先客服；<code>ai-call-center-test</code> 提供前端自动化回归。它们是独立工程，组合部署时需完成接口与配置集成。</p><div class="guide-note"><p>本门户为静态产品介绍网站。演示使用预设内容，不能直接拨号，也不调用真实 AI。业务服务需另外部署。</p></div></section>
+      <section id="capability-status"><p class="eyebrow">CAPABILITY STATUS</p><h2>明确能力，也明确当前边界。</h2><p>以下状态根据本地项目 README 与文档整理（2026 年 9 月），后续以各项目的最新文档为准。</p><div class="status-cards">
+        <div class="status-card"><h3>呼叫中心与工作台 <span class="status-label">已有实现</span></h3><p>呼叫控制、ACD 分配、技能组、多租户、坐席状态、通话统计，以及 Vue 管理界面和 WebRTC 软电话。实际使用需配置数据库、FreeSWITCH、线路与业务权限。</p></div>
+        <div class="status-card"><h3>AI 语音闭环 <span class="status-label">已实测跑通</span></h3><p>IntelliCall-Pro 已实测「呼入 → ASR → LLM → TTS → 播放」半双工链路。当前识别和合成为整句处理，不能视为低延迟全双工服务；CPU 上的语音合成速度有限。</p></div>
+        <div class="status-card"><h3>知识、工具与合规模块 <span class="status-label pending">模块已交付，需集成验证</span></h3><p>包括 RAG、业务工具、PII 脱敏、录音加密、留存清理和异步质检。录音与质检默认关闭，需按目标业务启用；合规模块尚未完成实机拨测。</p></div>
+        <div class="status-card"><h3>高可用与多副本 <span class="status-label pending">配置待实机验证</span></h3><p>已有 FreeSWITCH 池化、Kamailio 前置、ASR/TTS 多副本与 track-calls 等代码或配置，但相关配置尚未完成实机拨测，不作可用性或并发量承诺。</p></div>
+        <div class="status-card"><h3>自动化回归 <span class="status-label">测试框架已实现</span></h3><p>ai-call-center-test 的 README 记录覆盖 38 个前端页面，提供冒烟、baseline、模块增量和 UI 适配器。覆盖范围不等于当前全部通过，需对目标环境执行验证。</p></div>
+        <div class="status-card"><h3>外呼与任务触达 <span class="status-label pending">预留 · 规划中</span></h3><p>坐席可经工作台与软电话发起呼出并记录结果；任务外呼、预测式外呼、自动外呼，以及号码频控、黑名单与外呼时段等合规策略尚未实现，需在呼叫引擎与合规层面补充。</p></div>
+        <div class="status-card"><h3>实时监控与运营大屏 <span class="status-label pending">预留 · 规划中</span></h3><p>队列与坐席实时看板、通话监听与实时指标大屏尚未实现，当前以历史通话记录与运营报表为主。</p></div>
+        <div class="status-card"><h3>工单与客户管理 <span class="status-label pending">预留 · 规划中</span></h3><p>工单创建与流转、来电弹屏、客户画像与标签等尚未实现，需要独立业务系统，或与现有 CRM 完成接口集成。</p></div>
+        <div class="status-card"><h3>开放平台与统一 API <span class="status-label pending">预留 · 规划中</span></h3><p>各项目已有内部接口与 WebSocket 能力，但尚未提供统一的开放 API 门户、SDK 与 HTTP IVR 集成规范，面向外部集成需进一步收敛。</p></div>
+      </div></section>
+      <section id="architecture-guide"><p class="eyebrow">ARCHITECTURE</p><h2>根据业务阶段，组合合适的能力。</h2><h3>人工服务优先</h3><p>使用 <code>ai-call-center</code> 处理 FreeSWITCH 事件、路由与坐席状态，搭配 <code>ai-call-center-web</code> 做配置、运营与浏览器通话。底层服务采用 Spring Boot、Redis、业务数据库和 MinIO。</p><h3>AI 优先接待</h3><p>IntelliCall-Pro 使用 Python + LangGraph 编排通话状态，FunASR 识别语音，LlamaIndex + pgvector 检索知识，CosyVoice 合成回复。当前大模型适配为 Claude，其他模型需按接口接入并验证工具调用。</p><h3>关于数据部署边界</h3><p>语音识别、合成、数据库和编排服务可在自有环境运行。是否有数据传出环境，取决于你使用的模型 API 和其他业务接口；使用外部大模型 API 时，相关文本会发送到所选服务。</p><p>详细架构与实施状态见 <a href="https://github.com/dongjb741280/IntelliCall-Pro/blob/main/docs/architecture-spec.md" target="_blank" rel="noopener noreferrer">IntelliCall-Pro 架构规格</a>，仓库默认分支若有变化，请从仓库首页进入文档。</p></section>
+      <section id="quick-start"><p class="eyebrow">GET STARTED</p><h2>从一条可验证的链路开始。</h2><ol class="guide-steps">
+        <li><strong>准备呼叫底座。</strong><p>按照 <a href="https://github.com/dongjb741280/ai-call-center" target="_blank" rel="noopener noreferrer">ai-call-center README</a> 准备 Java、数据库、Redis 与 FreeSWITCH，启动管理服务和呼叫服务，配置分机、网关与拨号计划。</p></li>
+        <li><strong>接入管理工作台。</strong><p>按照 <a href="https://github.com/dongjb741280/ai-call-center-web" target="_blank" rel="noopener noreferrer">ai-call-center-web README</a> 安装依赖并设置后端代理。先确认登录、分机注册、坐席状态和人工通话可用。</p></li>
+        <li><strong>验证 AI 语音闭环。</strong><p>按照 <a href="https://github.com/dongjb741280/IntelliCall-Pro" target="_blank" rel="noopener noreferrer">IntelliCall-Pro README</a> 安装语音栈与模型、准备 Python 3.10 + uv、配置模型凭据与 FreeSWITCH 连接后，启动编排层：</p><div class="code-block"><button class="copy-button" data-copy aria-label="复制 AI 编排启动命令">复制</button><pre><code>cd IntelliCall-Pro/services/orchestrator
+uv sync
+uv run intellicall</code></pre></div><p>先验证呼入与语音应答，再逐项接入知识库、工具、人工转接、录音和质检。具体分机和环境变量以仓库 README 为准。</p></li>
+      </ol><div class="guide-note"><p>门户的业务场景是能力组合示意。例如回访反馈写入 CRM、跨系统同步对话上下文等，都需要自行对接相应业务接口。</p></div></section>
+      <section id="testing"><p class="eyebrow">QUALITY ASSURANCE</p><h2>让持续验证成为日常。</h2><p>本地 <code>ai-call-center-test</code> 工程通过 Playwright 覆盖登录、仪表盘、软电话，以及管理、服务、呼入、呼出、通话和报表模块。已提供按变更模块执行测试的工具和 CI 配置。</p><div class="code-block"><button class="copy-button" data-copy aria-label="复制业务测试命令">复制</button><pre><code>cd ai-call-center-test
+npm install
+npx playwright install chromium
+# 按 README 设置 .env 和测试账号，然后保存登录态
+npm run login
+npm run test:smoke
+npm test</code></pre></div><p>请先确认目标测试环境与专用测试账号，再运行涉及增删改查的用例。该工程尚未在本地配置 GitHub 远程地址，因此门户提供本说明作为入口。</p></section>
+      <section id="github-pages"><p class="eyebrow">STATIC SITE DEPLOYMENT</p><h2>门户无需后端，即可发布。</h2><p>门户只使用 HTML、CSS 和 JavaScript，字体、图标与静态资源随站点提供，不依赖 CDN。Node.js 20+ 仅用于本地预览、构建和检查。</p><div class="code-block"><button class="copy-button" data-copy aria-label="复制门户预览命令">复制</button><pre><code>cd voxhub-portal
+npm run dev
+# 浏览器访问 http://localhost:4173
+
+npm run check
+npm run build
+npm run preview</code></pre></div><h3>GitHub Pages · Actions 发布</h3><ol class="guide-steps"><li><strong>创建 GitHub 仓库。</strong><p>建议名称 <code>voxhub-portal</code>。将本目录作为仓库根目录提交，包含 <code>.github/workflows/deploy.yml</code>。</p></li><li><strong>开启 Pages。</strong><p>在仓库 Settings → Pages → Build and deployment 中，将 Source 设为 <code>GitHub Actions</code>。</p></li><li><strong>推送到 main 分支。</strong><p>工作流会检查站点、构建 <code>dist/</code> 并部署。首次启用 Pages 后，如自动运行已失败，可在 Actions 页面重新运行。</p></li><li><strong>访问生成的网址。</strong><p>通常为 <code>https://你的用户名.github.io/voxhub-portal/</code>。最终以部署工作流与 Pages 设置显示的地址为准。全部资源使用相对路径，兼容仓库子路径和自定义域名。</p></li></ol><p>也可使用传统的“Deploy from a branch”方式，选择包含源文件的分支与根目录；站点不需要 Jekyll 或服务端渲染。</p></section>
+    </article>
+  </div>
+</main>
+<footer class="footer"><div class="container"><div class="footer-main"><div class="footer-brand"><a href="./index.html" class="brand"><img src="./assets/favicon.svg" width="34" height="34" alt=""><span>声枢<span class="brand-en">VoxHub</span></span></a><p>连接每一种声音，成就每一次服务。</p></div><div><strong>探索产品</strong><a href="./index.html#capabilities">产品能力</a><a href="./index.html#scenarios">应用场景</a></div><div><strong>开发者</strong><a href="./guide.html">部署与接入</a><a href="./index.html#ecosystem">项目生态</a></div><div><strong>关于声枢</strong><a href="#about">项目介绍</a><a href="#capability-status">能力与进展</a></div></div><div class="footer-bottom"><span>© <span data-year>2026</span> 声枢 VoxHub</span><span>用技术连接，用服务回应。<span class="footer-dot">●</span> 静态产品门户</span></div></div></footer>
+</body>
+</html>
