@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="音视频通话">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f8f2"/>
+      <stop offset="1" stop-color="#dcefe4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <g fill="none" stroke="#0b746e" stroke-width="5" stroke-linecap="round" opacity=".45">
+    <path d="M88 98a54 54 0 0 1 0 44"/>
+    <path d="M62 76a86 86 0 0 1 0 88"/>
+  </g>
+  <rect x="128" y="24" width="144" height="192" rx="20" fill="#0b746e"/>
+  <rect x="135" y="31" width="130" height="178" rx="13" fill="#ffffff"/>
+  <rect x="142" y="40" width="116" height="126" rx="8" fill="#eaf4ef"/>
+  <circle cx="200" cy="98" r="34" fill="#0b746e"/>
+  <circle cx="200" cy="91" r="12" fill="#ffffff"/>
+  <path d="M176 122c0-9 10.7-15 24-15s24 6 24 15" fill="#ffffff"/>
+  <rect x="224" y="48" width="26" height="34" rx="5" fill="#d9ece2"/>
+  <circle cx="237" cy="62" r="6" fill="#0b746e"/>
+  <path d="M230 76c0-2.7 3.1-4.5 7-4.5s7 1.8 7 4.5" fill="#0b746e"/>
+  <circle cx="182" cy="186" r="11" fill="#2f9c8e"/>
+  <path d="M177 186l3.5 3.5 6-6" stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="218" cy="186" r="11" fill="#eef5f0" stroke="#b9cfc0" stroke-width="2"/>
+  <path d="M213 186h10" stroke="#7ba38e" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

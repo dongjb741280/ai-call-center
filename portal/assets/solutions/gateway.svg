@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="多协议网关">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f8f2"/>
+      <stop offset="1" stop-color="#dcefe4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="240" fill="url(#bg)"/>
+  <g stroke="#b9cfc0" stroke-width="3">
+    <line x1="200" y1="120" x2="200" y2="52"/>
+    <line x1="200" y1="120" x2="262" y2="88"/>
+    <line x1="200" y1="120" x2="262" y2="152"/>
+    <line x1="200" y1="120" x2="200" y2="188"/>
+    <line x1="200" y1="120" x2="138" y2="152"/>
+    <line x1="200" y1="120" x2="138" y2="88"/>
+  </g>
+  <rect x="192" y="44" width="16" height="16" rx="4" fill="#0b746e"/>
+  <rect x="254" y="80" width="16" height="16" rx="8" fill="#2f9c8e"/>
+  <circle cx="262" cy="160" r="8" fill="#0b746e"/>
+  <rect x="192" y="180" width="16" height="16" rx="4" fill="#2f9c8e"/>
+  <circle cx="138" cy="160" r="8" fill="#2f9c8e"/>
+  <rect x="130" y="80" width="16" height="16" rx="4" fill="#0b746e"/>
+  <circle cx="200" cy="120" r="26" fill="#0b746e"/>
+  <circle cx="200" cy="120" r="10" fill="#ffffff"/>
+</svg>
