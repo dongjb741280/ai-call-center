@@ -28,7 +28,8 @@ public class TransferIvrHandler extends BaseHandler {
             params.put("callId", callInfo.getCallId());
             params.put("deviceId", deviceInfo.getDeviceId());
             params.put("ivrId", ivrId);
-            ResponseEntity<String> responseEntity = httpClient.getForEntity("http://cc-ivr:7300/cc-ivr/index/start?callId={callId}&deviceId={deviceId}&ivrId={ivrId}", String.class, params);
+            params.put("mediaHost", callInfo.getMediaHost());
+            ResponseEntity<String> responseEntity = httpClient.getForEntity("http://voxai-ivr:7300/voxai-ivr/index/start?callId={callId}&deviceId={deviceId}&ivrId={ivrId}&mediaHost={mediaHost}", String.class, params);
             logger.info("transfer ivr success {}", callInfo.getCallId());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

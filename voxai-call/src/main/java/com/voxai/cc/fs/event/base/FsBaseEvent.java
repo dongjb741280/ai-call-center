@@ -2,7 +2,7 @@ package com.voxai.cc.fs.event.base;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.voxai.cc.fs.esl.internal.Context;
+import com.voxai.core.esl.internal.Context;
 
 import java.util.HashMap;
 import java.util.Map;

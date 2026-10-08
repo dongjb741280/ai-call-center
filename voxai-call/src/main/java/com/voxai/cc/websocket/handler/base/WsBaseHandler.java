@@ -19,7 +19,7 @@ import com.voxai.cc.cache.CacheService;
 import com.voxai.cc.command.GroupHandler;
 import com.voxai.cc.configration.Handler;
 import com.voxai.cc.fs.FsListen;
-import com.voxai.cc.fs.esl.transport.message.EslMessage;
+import com.voxai.core.esl.transport.message.EslMessage;
 import com.voxai.cc.service.AgentService;
 import com.voxai.cc.service.CallCdrService;
 import com.voxai.cc.websocket.WebSocketHandler;

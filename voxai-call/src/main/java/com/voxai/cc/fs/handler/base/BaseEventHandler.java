@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import com.voxai.cc.command.base.BaseHandler;
 import com.voxai.cc.configration.Handler;
-import com.voxai.cc.fs.esl.transport.SendMsg;
+import com.voxai.core.esl.transport.SendMsg;
 import com.voxai.cc.fs.event.base.FsBaseEvent;
 import com.voxai.cc.websocket.response.WsResponseEntity;
 

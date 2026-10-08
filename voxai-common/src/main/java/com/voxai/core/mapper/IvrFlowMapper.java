@@ -11,4 +11,6 @@ import java.util.List;
 
 public interface IvrFlowMapper {
     List<IvrFlow> selectByCallId(@Param("callId") Long callId);
+
+    int insertSelective(IvrFlow record);
 }

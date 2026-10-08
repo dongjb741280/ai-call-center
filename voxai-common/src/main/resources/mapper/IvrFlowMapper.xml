@@ -17,4 +17,72 @@
     <select id="selectByCallId" resultMap="BaseResultMap">
         select * from cc_ivr_flow where call_id = #{callId} order by start_time asc
     </select>
+
+    <insert id="insertSelective" parameterType="com.voxai.core.entity.IvrFlow">
+        insert into cc_ivr_flow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="cts != null">
+                cts,
+            </if>
+            <if test="callId != null">
+                call_id,
+            </if>
+            <if test="ivrId != null">
+                ivr_id,
+            </if>
+            <if test="nodeId != null">
+                node_id,
+            </if>
+            <if test="nodeType != null">
+                node_type,
+            </if>
+            <if test="nodeName != null">
+                node_name,
+            </if>
+            <if test="keyPress != null">
+                key_press,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="cts != null">
+                #{cts,jdbcType=BIGINT},
+            </if>
+            <if test="callId != null">
+                #{callId,jdbcType=BIGINT},
+            </if>
+            <if test="ivrId != null">
+                #{ivrId,jdbcType=BIGINT},
+            </if>
+            <if test="nodeId != null">
+                #{nodeId,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeType != null">
+                #{nodeType,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeName != null">
+                #{nodeName,jdbcType=VARCHAR},
+            </if>
+            <if test="keyPress != null">
+                #{keyPress,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=BIGINT},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
 </mapper>

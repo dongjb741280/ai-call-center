@@ -21,8 +21,7 @@
         <module>voxai-common</module>
         <module>voxai-admin</module>
         <module>voxai-call</module>
-        <!-- ivr程序运行有异常 -->
-        <!--<module>cc-ivr</module>-->
+        <module>voxai-ivr</module>
     </modules>
 
     <developers>

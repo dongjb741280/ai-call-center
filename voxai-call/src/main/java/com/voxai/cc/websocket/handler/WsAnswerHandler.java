@@ -7,7 +7,7 @@ import com.voxai.core.po.CallInfo;
 import com.voxai.core.po.DeviceInfo;
 import org.springframework.stereotype.Component;
 import com.voxai.cc.configration.HandlerType;
-import com.voxai.cc.fs.esl.transport.message.EslMessage;
+import com.voxai.core.esl.transport.message.EslMessage;
 import com.voxai.cc.websocket.handler.base.WsBaseHandler;
 import com.voxai.cc.websocket.response.WsResponseEntity;
 import com.voxai.cc.websocket.event.WsAnswerEvent;

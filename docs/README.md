@@ -24,6 +24,7 @@
 | **voxai-common** | — | `com.voxai.core` | 公共库：实体、MyBatis Mapper、枚举、常量、PO/VO、策略接口 |
 | **voxai-admin** | 7100（8080） | `com.voxai.api` | 管理 API：企业/坐席/技能组/技能/VDN/IVR/溢出/号码/路由/外呼任务/话单/统计/权限 CRUD，Quartz 定时统计 |
 | **voxai-call** | 7200（8081） | `com.voxai` | 呼叫控制：FreeSwitch ESL 事件、ACD 路由、WebSocket 实时通信、TCP 状态订阅 |
+| **voxai-ivr** | 7300 | `com.voxai.ivr` | IVR 引擎：放音/收键/按键分支，结束时回控 voxai-call 继续路由 |
 | **ai-call-center-web**（独立项目） | 3000 | — | Vue3 + Element Plus + Pinia + JsSIP 软电话坐席前端 |
 
 ### 外部协作服务
@@ -34,7 +35,7 @@
 | --- | --- |
 | `CC_API` | 管理 API（voxai-admin） |
 | `FS_API` | FreeSwitch API |
-| `CC_IVR`（:7300） | IVR 引擎，独立服务，通过 HTTP `/cc-ivr/index/start` 拉起 |
+| `CC_IVR`（:7300） | IVR 引擎（本仓库 `voxai-ivr` 模块），通过 HTTP `/voxai-ivr/index/start` 拉起 |
 | `FS_MEDIA`（:7430） | FreeSwitch 媒体服务，录音文件经此拉取后上传 MinIO |
 
 ## 核心概念速览
@@ -44,7 +45,7 @@
 - **技能组（Group）**：`cc_group`，呼叫路由与排队的核心容器，绑定分配策略与溢出策略。
 - **技能（Skill）**：`cc_skill`，可跨技能组的能力标签，用于精细路由。
 - **VDN（呼入路由）**：`cc_vdn_code` + `cc_vdn_phone`，按特服号/被叫号码将呼入电话路由到技能组/IVR/坐席/放音/外线。
-- **IVR**：`cc_ivr_workflow`，语音流程定义，由 `cc-ivr` 服务执行。
+- **IVR**：`cc_ivr_workflow`，语音流程定义，由 `voxai-ivr` 服务执行。
 - **AI 引擎**：`cc_ai_engine`，ASR/TTS（MRCP）配置，用于机器人、振铃识别（ring_asr）、语音合成放音。
 - **溢出策略**：`cc_overflow_config` 等，排队超时/队列超限时的处置（转组/转 IVR/转 VDN/挂机）。
 - **话单**：`cc_call_log`（主话单）、`cc_call_detail`（流程轨迹）、`cc_call_device`（分机明细）。

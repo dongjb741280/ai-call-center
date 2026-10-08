@@ -39,11 +39,11 @@ public class TaskJobOfSecond implements Job {
             return;
         }
         logger.debug("second job start :{} , next:{}", jobExecutionContext.getFireTime(), jobExecutionContext.getNextFireTime());
-        ServiceInstance serviceInstance = loadBalancerClient.choose("cc-ivr");
+        ServiceInstance serviceInstance = loadBalancerClient.choose("voxai-ivr");
         if (serviceInstance == null) {
             return;
         }
-//        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://" + serviceInstance.getServiceId() + ":" + serviceInstance.getPort() + "/cc-ivr/index/health", String.class);
+//        ResponseEntity<String> responseEntity = restTemplate.getForEntity("http://" + serviceInstance.getServiceId() + ":" + serviceInstance.getPort() + "/voxai-ivr/index/health", String.class);
 //        logger.info("{} ", responseEntity.getBody());
     }
 }

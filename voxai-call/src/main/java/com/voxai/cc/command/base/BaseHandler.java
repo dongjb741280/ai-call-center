@@ -20,7 +20,7 @@ import com.voxai.cc.service.AgentService;
 import com.voxai.cc.service.CallCdrService;
 import com.voxai.cc.service.GroupMemoryService;
 import com.voxai.cc.websocket.WebSocketHandler;
-import com.voxai.cc.fs.esl.transport.SendMsg;
+import com.voxai.core.esl.transport.SendMsg;
 
 /**
  * @author dongjb

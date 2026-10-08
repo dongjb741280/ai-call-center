@@ -7,11 +7,11 @@
 package com.voxai.esl;
 
 import io.netty.channel.Channel;
-import com.voxai.cc.fs.esl.internal.Context;
-import com.voxai.cc.fs.esl.internal.IModEslApi;
-import com.voxai.cc.fs.esl.transport.event.EslEvent;
-import com.voxai.cc.fs.esl.inbound.Client;
-import com.voxai.cc.fs.esl.inbound.IEslEventListener;
+import com.voxai.core.esl.internal.Context;
+import com.voxai.core.esl.internal.IModEslApi;
+import com.voxai.core.esl.transport.event.EslEvent;
+import com.voxai.core.esl.inbound.Client;
+import com.voxai.core.esl.inbound.IEslEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
