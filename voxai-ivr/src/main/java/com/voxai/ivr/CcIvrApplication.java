@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -24,6 +25,7 @@ public class CcIvrApplication {
         SpringApplication.run(CcIvrApplication.class, args);
     }
 
+    @LoadBalanced
     @Bean
     public RestTemplate restTemplate(@Value("${ivr.call.connectTimeout:100}") Integer connectTimeout,
                                      @Value("${ivr.call.readTimeout:3000}") Integer readTimeout) {
