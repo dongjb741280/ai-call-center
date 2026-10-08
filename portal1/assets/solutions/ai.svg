@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="人工智能">
+  <defs>
+    <linearGradient id="ai" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e879f9"/><stop offset=".5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="aiGlow" cx=".5" cy=".5" r=".6">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity=".3"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="240" rx="14" fill="#0c1322"/>
+  <rect x=".5" y=".5" width="399" height="239" rx="13.5" fill="none" stroke="#1f2a3d"/>
+  <circle cx="200" cy="120" r="90" fill="url(#aiGlow)"/>
+  <path d="M200 66l14 30 32 4-23 22 6 32-29-16-29 16 6-32-23-22 32-4z" fill="none" stroke="url(#ai)" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="200" cy="120" r="12" fill="url(#ai)"/>
+  <g fill="url(#ai)">
+    <circle cx="130" cy="80" r="3"/><circle cx="270" cy="80" r="3"/><circle cx="130" cy="160" r="3"/><circle cx="270" cy="160" r="3"/>
+  </g>
+  <g fill="none" stroke="#8b9cc3" stroke-opacity=".4" stroke-width="1.5">
+    <path d="M150 92l-14 4M250 92l14 4M150 148l-14-4M250 148l14-4"/>
+  </g>
+</svg>
