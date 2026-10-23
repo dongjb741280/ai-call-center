@@ -53,7 +53,7 @@ public class VdnSchedulePo extends VdnConfig implements Comparable<VdnSchedulePo
             return false;
         }
         LocalDate localDate = LocalDate.now();
-        int week = localDate.getDayOfMonth();
+        int week = localDate.getDayOfWeek().getValue();
 
         switch (week) {
             case 1:
@@ -100,25 +100,29 @@ public class VdnSchedulePo extends VdnConfig implements Comparable<VdnSchedulePo
         //判断是否在生效日期内
         int dayOfMonth = localDate.getDayOfMonth();
         if (StringUtils.isNotBlank(scheduleConfig.getStartDay())) {
-            LocalDate startDate = LocalDate.parse(scheduleConfig.getStartDay(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             if (scheduleConfig.getType() == 1) {
-                //相对时间
-                if (startDate.getDayOfMonth() > dayOfMonth) {
+                //指定时间：start_day/end_day 为完整日期 yyyy-MM-dd
+                LocalDate startDate = LocalDate.parse(scheduleConfig.getStartDay(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                if (startDate.isAfter(localDate)) {
                     return false;
                 }
-            } else if (startDate.isAfter(localDate)) {
-                return false;
+            } else {
+                //相对时间：start_day/end_day 为天号(1~31)
+                if (Integer.parseInt(scheduleConfig.getStartDay().trim()) > dayOfMonth) {
+                    return false;
+                }
             }
         }
         if (StringUtils.isNotBlank(scheduleConfig.getEndDay())) {
-            final LocalDate endDate = LocalDate.parse(scheduleConfig.getEndDay(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             if (scheduleConfig.getType() == 1) {
-                //相对时间
-                if (endDate.getDayOfMonth() < dayOfMonth) {
+                LocalDate endDate = LocalDate.parse(scheduleConfig.getEndDay(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                if (endDate.isBefore(localDate)) {
                     return false;
                 }
-            } else if (endDate.isBefore(localDate)) {
-                return false;
+            } else {
+                if (Integer.parseInt(scheduleConfig.getEndDay().trim()) < dayOfMonth) {
+                    return false;
+                }
             }
         }
 

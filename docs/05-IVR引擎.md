@@ -84,7 +84,7 @@ flowchart LR
 
 | 类 | 职责 |
 | --- | --- |
-| `CcIvrApplication` | 启动类，`@EnableDiscoveryClient` + `@MapperScan("com.voxai.core.mapper")`，`@LoadBalanced` RestTemplate 回控 |
+| `VoxaiIvrApplication` | 启动类，`@EnableDiscoveryClient` + `@MapperScan("com.voxai.core.mapper")`，`@LoadBalanced` RestTemplate 回控 |
 | `controller/IvrController` | `GET /index/start`（入口）、`GET /index/health` |
 | `flow/IvrFlowParser` | 解析 `content` JSON → 节点图 |
 | `flow/IvrExecutor` | 执行器状态机：`play`→放音、`input`→收键分支、`transfer`→回控；内存 `Map<deviceId, IvrSession>` |

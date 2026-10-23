@@ -2,10 +2,12 @@ package com.voxai.cc.command.base;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import com.voxai.core.entity.Playback;
 import com.voxai.core.po.CallInfo;
 import com.voxai.core.po.DeviceInfo;
 import com.voxai.core.po.GroupInfo;
 import com.voxai.core.po.NextCommand;
+import com.voxai.core.po.VdnSchedulePo;
 import com.voxai.core.util.SnowflakeIdWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,11 @@ import com.voxai.core.esl.transport.SendMsg;
  */
 public class BaseHandler {
     protected Logger logger = LoggerFactory.getLogger(BaseHandler.class);
+
+    /**
+     * 当前按键导航配置id（cc_vdn_config.id），收键后据此匹配路由
+     */
+    protected static final String DTMF_NAVIGATE_KEY = "dtmfNavigateId";
 
     @Value("${record.path:/Users/dongjb/soft/freeswitch/}")
     protected String recordPath;
@@ -103,17 +110,31 @@ public class BaseHandler {
      * @param callId
      * @param deviceId
      */
-    protected void receiveDtmf(String media, Long callId, String deviceId) {
+    /**
+     * 按键导航收键，收键参数取自 cc_vdn_config 的 dtmf_min/max/retry/dtfm_end
+     *
+     * @param media
+     * @param vdnSchedulePo
+     * @param deviceId
+     */
+    protected void receiveDtmf(String media, VdnSchedulePo vdnSchedulePo, String deviceId) {
         SendMsg play = new SendMsg(deviceId);
         play.addCallCommand("execute");
         play.addExecuteAppName("set");
         play.addExecuteAppArg("playback_delimiter=!");
         fsListen.sendMessage(media, play);
 
+        int min = vdnSchedulePo.getDtmfMin() == null ? 1 : vdnSchedulePo.getDtmfMin();
+        int max = vdnSchedulePo.getDtmfMax() == null ? 1 : vdnSchedulePo.getDtmfMax();
+        int retry = vdnSchedulePo.getRetry() == null ? 1 : vdnSchedulePo.getRetry();
+        String end = StringUtils.isBlank(vdnSchedulePo.getDtmfEnd()) ? "#" : vdnSchedulePo.getDtmfEnd();
+        Playback playback = cacheService.getPlayback(Long.parseLong(vdnSchedulePo.getRouteValue()));
+        String prompt = playback != null && StringUtils.isNotBlank(playback.getPlayback()) ? playback.getPlayback() : "silence_stream://250";
+
         SendMsg digits = new SendMsg(deviceId);
         digits.addCallCommand("execute");
         digits.addExecuteAppName("play_and_get_digits");
-        digits.addExecuteAppArg("3 3 2 5000 # 1295e6a58f9e2115332666.wav silence_stream://250 SYMWRD_DTMF_RETURN [\\*0-9#]+ 3000");
+        digits.addExecuteAppArg(String.format("%d %d %d 5000 %s %s silence_stream://250 SYMWRD_DTMF_RETURN [\\*0-9#]+ 3000", min, max, retry, end, prompt));
         fsListen.sendMessage(media, digits);
     }
 

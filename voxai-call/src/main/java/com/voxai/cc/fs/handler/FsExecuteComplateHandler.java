@@ -2,6 +2,7 @@ package com.voxai.cc.fs.handler;
 
 import org.apache.commons.lang3.StringUtils;
 import com.voxai.core.po.CallInfo;
+import com.voxai.core.po.DeviceInfo;
 import org.springframework.stereotype.Component;
 import com.voxai.cc.configration.HandlerType;
 import com.voxai.cc.fs.event.FsExecuteComplateEvent;
@@ -44,6 +45,10 @@ public class FsExecuteComplateHandler extends BaseEventHandler<FsExecuteComplate
 
             case "play_and_get_digits":
                 logger.info("deviceId:{}, get dtmf:{}", event.getDeviceId(), event.getDtmf());
+                DeviceInfo deviceInfo = callInfo.getDeviceInfoMap().get(event.getDeviceId());
+                if (deviceInfo != null) {
+                    vdnHandler.matchDtmf(callInfo, deviceInfo, event.getDtmf());
+                }
                 break;
 
             case "break":

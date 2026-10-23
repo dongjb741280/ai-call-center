@@ -19,10 +19,10 @@ import org.springframework.web.client.RestTemplate;
 @EnableDiscoveryClient
 @MapperScan("com.voxai.core.mapper")
 @SpringBootApplication
-public class CcIvrApplication {
+public class VoxaiIvrApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CcIvrApplication.class, args);
+        SpringApplication.run(VoxaiIvrApplication.class, args);
     }
 
     @LoadBalanced

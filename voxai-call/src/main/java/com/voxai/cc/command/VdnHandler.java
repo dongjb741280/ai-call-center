@@ -1,9 +1,12 @@
 package com.voxai.cc.command;
 
+import com.voxai.core.entity.Agent;
 import com.voxai.core.entity.CallDetail;
 import com.voxai.core.entity.Playback;
+import com.voxai.core.entity.VdnDtmf;
 import com.voxai.core.enums.NextType;
 import com.voxai.core.po.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import com.voxai.cc.command.base.BaseHandler;
 
@@ -95,7 +98,9 @@ public class VdnHandler extends BaseHandler {
                 /**
                  * 播放按键导航音
                  */
-                receiveDtmf(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
+                callInfo.getProcessData().put(DTMF_NAVIGATE_KEY, String.valueOf(vdnSchedulePo.getId()));
+                cacheService.addCallInfo(callInfo);
+                receiveDtmf(callInfo.getMediaHost(), vdnSchedulePo, deviceId);
                 break;
 
             case 3:
@@ -127,5 +132,114 @@ public class VdnHandler extends BaseHandler {
                 logger.warn("vdnCode not match callId:{} , case:{}", callInfo.getCallId(), vdnSchedulePo.getRouteType());
                 break;
         }
+    }
+
+    /**
+     * 按键导航收键后，匹配按键并路由
+     *
+     * @param callInfo
+     * @param deviceInfo
+     * @param dtmf
+     */
+    public void matchDtmf(CallInfo callInfo, DeviceInfo deviceInfo, String dtmf) {
+        if (StringUtils.isBlank(dtmf)) {
+            return;
+        }
+        Object navigateId = callInfo.getProcessData().get(DTMF_NAVIGATE_KEY);
+        if (navigateId == null) {
+            return;
+        }
+        VdnSchedulePo vdnSchedulePo = findSchedule(callInfo.getCompanyId(), navigateId.toString());
+        if (vdnSchedulePo == null || vdnSchedulePo.getDtmfList() == null || vdnSchedulePo.getDtmfList().isEmpty()) {
+            return;
+        }
+        VdnDtmf matched = null;
+        for (VdnDtmf vdnDtmf : vdnSchedulePo.getDtmfList()) {
+            if (dtmf.equals(vdnDtmf.getDtmf())) {
+                matched = vdnDtmf;
+                break;
+            }
+        }
+        if (matched == null) {
+            logger.info("callId:{} dtmf:{} not match, replay navigate", callInfo.getCallId(), dtmf);
+            receiveDtmf(callInfo.getMediaHost(), vdnSchedulePo, deviceInfo.getDeviceId());
+            return;
+        }
+        routeDtmf(callInfo, deviceInfo, matched);
+        cacheService.addCallInfo(callInfo);
+    }
+
+    private void routeDtmf(CallInfo callInfo, DeviceInfo deviceInfo, VdnDtmf vdnDtmf) {
+        String deviceId = deviceInfo.getDeviceId();
+        logger.info("callId:{} route dtmf:{} routeType:{} routeValue:{}", callInfo.getCallId(), vdnDtmf.getDtmf(), vdnDtmf.getRouteType(), vdnDtmf.getRouteValue());
+        /**
+         * 1:技能组,2:IVR,3:路由字码,4:坐席分机,5:挂机
+         */
+        switch (vdnDtmf.getRouteType()) {
+            case 1:
+                GroupInfo groupInfo = cacheService.getGroupInfo(vdnDtmf.getRouteValue());
+                if (groupInfo == null) {
+                    logger.warn("callId:{} dtmf join group is null", callInfo.getCallId());
+                    hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
+                    return;
+                }
+                callInfo.setGroupId(groupInfo.getId());
+                groupHandler.hander(callInfo, groupInfo, deviceId);
+                break;
+
+            case 2:
+                transferIvrHandler.handler(callInfo, deviceInfo, vdnDtmf.getRouteValue());
+                break;
+
+            case 3:
+                vdnHandler.hanlder(callInfo, deviceInfo, vdnDtmf.getRouteValue());
+                break;
+
+            case 4:
+                transferToAgent(callInfo, deviceInfo, vdnDtmf.getRouteValue());
+                break;
+
+            case 5:
+                hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
+                break;
+
+            default:
+                logger.warn("callId:{} dtmf routeType:{} not match", callInfo.getCallId(), vdnDtmf.getRouteType());
+                break;
+        }
+    }
+
+    private void transferToAgent(CallInfo callInfo, DeviceInfo deviceInfo, Long ext) {
+        Agent agent = agentService.getAgentBySip(String.valueOf(ext));
+        if (agent == null) {
+            logger.warn("callId:{} dtmf transfer agent sip:{} not found", callInfo.getCallId(), ext);
+            hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId());
+            return;
+        }
+        AgentInfo agentInfo = cacheService.getAgentInfo(agent.getAgentKey());
+        if (agentInfo == null || agentInfo.getAgentState() != AgentState.READY) {
+            logger.warn("callId:{} dtmf transfer agent:{} not ready", callInfo.getCallId(), agent.getAgentKey());
+            hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId());
+            return;
+        }
+        transferAgentHandler.hanlder(callInfo, agentInfo, deviceInfo.getDeviceId());
+    }
+
+    private VdnSchedulePo findSchedule(Long companyId, String navigateId) {
+        CompanyInfo companyInfo = cacheService.getCompany(companyId);
+        if (companyInfo == null || companyInfo.getVdnCodeMap() == null) {
+            return null;
+        }
+        for (VdnCodePo vdnCodePo : companyInfo.getVdnCodeMap().values()) {
+            if (vdnCodePo.getVdnSchedulePoList() == null) {
+                continue;
+            }
+            for (VdnSchedulePo vdnSchedulePo : vdnCodePo.getVdnSchedulePoList()) {
+                if (vdnSchedulePo.getId() != null && navigateId.equals(vdnSchedulePo.getId().toString())) {
+                    return vdnSchedulePo;
+                }
+            }
+        }
+        return null;
     }
 }
