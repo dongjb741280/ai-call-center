@@ -55,8 +55,10 @@ ai-call-center/
 ├── voxai-common/          # 核心业务模块（数据层）
 ├── voxai-admin/           # 管理API服务（端口 7100）
 ├── voxai-call/            # FreeSwitch集成服务（端口 7200）
+├── voxai-ivr/             # IVR 引擎服务（端口 7300）
 ├── freeswitch/            # FreeSwitch配置和Docker镜像
 ├── portal/                # 产品门户（声枢 VoxHub）
+├── docs/                  # 业务文档（范围/流程/数据模型/引擎接口）
 ├── .github/workflows/     # GitHub Actions（portal CI/CD）
 ├── .gitlab-ci.yml         # GitLab CI/CD 流水线
 └── Dockerfile             # 多阶段Docker构建
@@ -100,6 +102,12 @@ ai-call-center/
 - **WebSocket**: 实时通信
 - **TCP服务**: 坐席状态订阅
 - **事件处理**: FreeSwitch事件监听和处理
+
+### voxai-ivr（IVR 引擎服务）
+
+- **流程引擎**: 解析 `cc_ivr_workflow.content` 为节点图，按 play/input/transfer 执行
+- **交互**: 通过 FreeSwitch `playback` / `play_and_get_digits` 放音与收键
+- **回控**: 完成后回调 `voxai-call` 转技能组/坐席/VDN/挂机
 
 ## 核心功能
 
@@ -197,6 +205,9 @@ java -jar voxai-admin/target/voxai-admin-1.0.0.jar
 
 # voxai-call（呼叫服务，端口 7200）
 java -jar voxai-call/target/voxai-call-1.0.0.jar
+
+# voxai-ivr（IVR 引擎，端口 7300）
+java -jar voxai-ivr/target/voxai-ivr-1.0.0.jar
 ```
 
 #### 3. Jib 构建镜像（无需 Docker Daemon）
@@ -232,6 +243,7 @@ docker run -d --name voxai-admin --network host \
 
 - **voxai-admin**: 管理后台服务（端口：7100）
 - **voxai-call**: 呼叫控制服务（端口：7200）
+- **voxai-ivr**: IVR 引擎服务（端口：7300）
 - **freeswitch**: 呼叫引擎（端口：5060）
 
 ### 数据存储
