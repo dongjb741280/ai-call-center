@@ -12,6 +12,7 @@
 | [04-外部引擎接口约定](04-外部引擎接口约定.md) | IVR 引擎、外呼任务引擎的对外接口约定与缺口 |
 | [05-IVR引擎](05-IVR引擎.md) | IVR 引擎：架构、流程定义 JSON、数据模型、可视化编辑器与联调 |
 | [06-SIP分机注册流程](06-SIP分机注册流程.md) | 坐席分机 SIP 注册链路：软电话 REGISTER → FreeSWITCH → voxai-admin → cc_agent_sip |
+| [SQL 建库脚本](sql/voxai.sql) | `voxai` 库完整建表脚本 + 数据（MySQL 9.2.0，88 张表） |
 
 ## 系统一句话定位
 
