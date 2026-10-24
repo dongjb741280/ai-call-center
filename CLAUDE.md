@@ -59,7 +59,7 @@ This is a **call center platform** built as a multi-module Maven project (Spring
 
 ### Database
 
-MyBatis mappers in `voxai-common/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus). Supports MySQL, PostgreSQL, Oracle, SQL Server. SQL schema in `voxai-admin/src/main/resources/sql/`. Redis used for caching agent state, call state, and session data.
+MyBatis mappers in `voxai-common/src/main/java/com/voxai/core/mapper/` (no MyBatis-Plus), mapper XML in `voxai-common/src/main/resources/mapper/`. Supports MySQL, PostgreSQL, Oracle, SQL Server. No DDL scripts in this repo — table schema is maintained externally. Redis used for caching agent state, call state, and session data.
 
 ### Frontend State (独立项目 `ai-call-center-web`)
 
