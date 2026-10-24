@@ -130,7 +130,7 @@ voxai-call 与 voxai-ivr 共用（依赖 netty/guava/slf4j）。
 
 ## 7. 端到端联调（已验证）
 
-真实联调环境（FreeSwitch 8022 + MySQL voice9 + Nacos）下验证：
+真实联调环境（FreeSwitch 8022 + MySQL voxai + Nacos）下验证：
 
 1. `loopback/9999` 呼入 → FreeSwitch 拨号方案 `9999.xml`（answer+park）。
 2. `CHANNEL_PARK` → `FsParkHandler.inboundCall`（direction=inbound，按被叫 `9999` 匹配 VDN）。
