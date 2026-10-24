@@ -168,7 +168,7 @@ ai-call-center/
 ### 数据库配置
 
 1. 创建数据库
-2. 执行SQL脚本：`voxai-common/src/main/resources/sql/tables_mysql_innodb.sql`
+2. 初始化表结构（仓库内不含建表 DDL，表结构由外部维护；MyBatis Mapper XML 位于 `voxai-common/src/main/resources/mapper/`）
 3. 修改配置文件中的数据库连接信息
 
 ### 配置文件
@@ -326,34 +326,41 @@ docker run -d \
 
 ## API文档
 
+> 管理端上下文 `/voxai-admin`（端口 7100），呼叫端上下文 `/voxai-call`（端口 7200）。
+
 ### 主要接口
 
-#### 坐席管理
+#### 登录与探活
 
-- `POST /index/login` - 坐席登录
-- `GET /index/logout` - 坐席退出
-- `GET /agent/list` - 坐席列表
-- `POST /agent/add` - 添加坐席
+- `POST /voxai-admin/index/login` - 管理员登录
+- `GET /voxai-admin/index/logout` - 管理员退出
+- `GET /voxai-admin/index/health` - 管理端健康检查
+- `GET /voxai-call/index/health` - 呼叫端健康检查
 
-#### 呼叫管理
+#### 坐席与技能组（voxai-admin `/config`）
 
-- `POST /call/make` - 发起呼叫
-- `POST /call/answer` - 接听呼叫
-- `POST /call/hangup` - 挂断呼叫
-- `POST /call/transfer` - 转接呼叫
+- `GET /voxai-admin/config/agent` - 坐席列表
+- `POST /voxai-admin/config/agent` - 添加坐席
+- `GET /voxai-admin/config/group` - 技能组列表
+- `POST /voxai-admin/config/group` - 添加技能组
+- `GET /voxai-admin/config/group/agent/{id}` - 技能组坐席
 
-#### 技能组管理
+#### 呼叫控制（voxai-call `/cti`）
 
-- `GET /group/list` - 技能组列表
-- `POST /group/add` - 添加技能组
-- `POST /group/agent/add` - 添加坐席到技能组
+- `POST /voxai-call/cti/call/makeCall` - 发起呼叫
+- `POST /voxai-call/cti/call/hangup` - 挂断
+- `POST /voxai-call/cti/call/hold` / `cancelHold` - 保持 / 取消保持
+- `POST /voxai-call/cti/call/readyMute` / `cancelMute` - 静音 / 取消静音
+- `POST /voxai-call/cti/agent/ready` / `notReady` - 置闲 / 置忙
+- `POST /voxai-call/cti/agent/logout` - 坐席登出
+- `GET /voxai-call/cti/admin/call` - 通话列表
 
 ## 监控和运维
 
 ### 健康检查
 
-- `GET /voxai-admin/manager/health` - voxai-admin 健康检查（端口 7100）
-- `GET /voxai-call/manager/health` - voxai-call 健康检查（端口 7200）
+- `GET /voxai-admin/index/health` - voxai-admin 健康检查（端口 7100）
+- `GET /voxai-call/index/health` - voxai-call 健康检查（端口 7200）
 
 ### 日志管理
 
@@ -428,7 +435,7 @@ A: 在 `voxai-common` 模块中添加新的实体和接口，在 `voxai-admin` �
 
 - 作者: dongjianbin
 - 邮箱: <dongjb741280@gmail.com>
-- 项目地址: [GitHub Repository](https://github.com/your-username/ai-call-center)
+- 项目地址: [GitHub Repository](https://github.com/dongjb741280/ai-call-center)
 
 ## 更新日志
 
