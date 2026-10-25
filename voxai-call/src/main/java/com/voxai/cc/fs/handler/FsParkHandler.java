@@ -41,16 +41,13 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         logger.info("channel park:{}", event);
         CallInfo callInfo = cacheService.getCallInfo(event.getDeviceId());
         if (callInfo == null && Direction.INBOUND.name().equals(event.getDirection().toUpperCase())) {
-            if (event.getSipPort() == null) {
-                //呼入
-                inboundCall(event);
-                return;
-            }
-            if (!event.getSipContactPort().equals(event.getSipPort())) {
-                //硬话机外呼
+            if (event.getSipPort() != null && !event.getSipPort().equals(event.getSipContactPort())) {
+                //硬话机外呼（via port 与 contact port 不一致）
                 sipOutboundCall(event);
                 return;
             }
+            //呼入：trunk/loopback 无 via port，或软话机 via==contact
+            inboundCall(event);
             return;
         }
         if (callInfo == null || callInfo.getHangupDir() != null) {
