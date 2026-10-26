@@ -134,7 +134,7 @@ public class BaseHandler {
         SendMsg digits = new SendMsg(deviceId);
         digits.addCallCommand("execute");
         digits.addExecuteAppName("play_and_get_digits");
-        digits.addExecuteAppArg(String.format("%d %d %d 5000 %s %s silence_stream://250 SYMWRD_DTMF_RETURN [\\*0-9#]+ 3000", min, max, retry, end, prompt));
+        digits.addExecuteAppArg(String.format("%d %d %d 15000 %s %s silence_stream://250 SYMWRD_DTMF_RETURN [\\*0-9#]+ 3000", min, max, retry, end, prompt));
         fsListen.sendMessage(media, digits);
     }
 
