@@ -29,6 +29,11 @@ public class AgentInfo extends Agent {
     private List<String> sips;
 
     /**
+     * 坐席sip密码（对应 sips[0]，用于 WebRTC 分机注册）
+     */
+    private String sipPwd;
+
+    /**
      * 坐席技能
      */
     private List<SkillAgent> skillAgents;
@@ -187,6 +192,14 @@ public class AgentInfo extends Agent {
 
     public void setSips(List<String> sips) {
         this.sips = sips;
+    }
+
+    public String getSipPwd() {
+        return sipPwd;
+    }
+
+    public void setSipPwd(String sipPwd) {
+        this.sipPwd = sipPwd;
     }
 
     public List<SkillAgent> getSkillAgents() {

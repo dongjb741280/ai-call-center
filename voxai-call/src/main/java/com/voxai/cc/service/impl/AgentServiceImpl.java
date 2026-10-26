@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import com.voxai.core.constant.Constant;
 import com.voxai.core.entity.Agent;
+import com.voxai.core.entity.AgentSip;
 import com.voxai.core.entity.AgentStateLog;
 import com.voxai.core.mapper.AgentGroupMapper;
 import com.voxai.core.mapper.AgentMapper;
@@ -76,6 +77,7 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
         }
         BeanUtils.copyProperties(agent, agentInfo);
         agentInfo.setSips(this.getAgentSips(agent.getId()));
+        agentInfo.setSipPwd(this.getPrimarySipPwd(agentInfo.getSips()));
         agentInfo.setGroupIds(agentGroupMapper.selectByAgent(agent.getId()));
         agentInfo.setGroupId(agentGroupMapper.selectByAgent(agent.getId()).get(0));
         agentInfo.setLoginType(1);
@@ -91,6 +93,14 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
     @Override
     public List<String> getAgentSips(Long agentId) {
         return agentSipMapper.selectByAgent(agentId);
+    }
+
+    private String getPrimarySipPwd(List<String> sips) {
+        if (sips == null || sips.isEmpty()) {
+            return null;
+        }
+        AgentSip sip = agentSipMapper.selectBySip(Integer.parseInt(sips.get(0)));
+        return sip == null ? null : sip.getSipPwd();
     }
 
     @Override
