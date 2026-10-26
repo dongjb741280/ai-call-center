@@ -14,11 +14,13 @@
         <result column="username" jdbcType="VARCHAR" property="username"/>
         <result column="pwd" jdbcType="VARCHAR" property="pwd"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="ws_host" jdbcType="VARCHAR" property="wsHost"/>
+        <result column="ws_port" jdbcType="INTEGER" property="wsPort"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
         , cts, uts, application_id, app_name, application_type, application_group, application_host,
-    application_port, username, pwd, status
+    application_port, username, pwd, status, ws_host, ws_port
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -35,13 +37,13 @@
         insert into cc_station (id, cts, uts, application_id,
                                 application_type, application_group, application_host,
                                 application_port, username, pwd,
-                                status)
+                                status, ws_host, ws_port)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT},
                 #{applicationId,jdbcType=INTEGER},
                 #{applicationType,jdbcType=INTEGER}, #{applicationGroup,jdbcType=VARCHAR},
                 #{applicationHost,jdbcType=VARCHAR},
                 #{applicationPort,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{pwd,jdbcType=VARCHAR},
-                #{status,jdbcType=INTEGER})
+                #{status,jdbcType=INTEGER}, #{wsHost,jdbcType=VARCHAR}, #{wsPort,jdbcType=INTEGER})
     </insert>
     <insert id="insertSelective" parameterType="com.voxai.core.entity.Station">
         insert into cc_station
@@ -79,6 +81,12 @@
             <if test="status != null">
                 status,
             </if>
+            <if test="wsHost != null">
+                ws_host,
+            </if>
+            <if test="wsPort != null">
+                ws_port,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -113,6 +121,12 @@
             </if>
             <if test="status != null">
                 #{status,jdbcType=INTEGER},
+            </if>
+            <if test="wsHost != null">
+                #{wsHost,jdbcType=VARCHAR},
+            </if>
+            <if test="wsPort != null">
+                #{wsPort,jdbcType=INTEGER},
             </if>
         </trim>
     </insert>
@@ -149,6 +163,12 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
+            <if test="wsHost != null">
+                ws_host = #{wsHost,jdbcType=VARCHAR},
+            </if>
+            <if test="wsPort != null">
+                ws_port = #{wsPort,jdbcType=INTEGER},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -163,7 +183,9 @@
             application_port  = #{applicationPort,jdbcType=INTEGER},
             username          = #{username,jdbcType=VARCHAR},
             pwd               = #{pwd,jdbcType=VARCHAR},
-            status            = #{status,jdbcType=INTEGER}
+            status            = #{status,jdbcType=INTEGER},
+            ws_host           = #{wsHost,jdbcType=VARCHAR},
+            ws_port           = #{wsPort,jdbcType=INTEGER}
         where id = #{id,jdbcType=BIGINT}
     </update>
 

@@ -69,6 +69,16 @@ public class Station implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 软电话 WebSocket SIP 地址（浏览器可达）
+     */
+    private String wsHost;
+
+    /**
+     * 软电话 WebSocket SIP 端口
+     */
+    private Integer wsPort;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -167,6 +177,22 @@ public class Station implements Serializable {
         this.status = status;
     }
 
+    public String getWsHost() {
+        return wsHost;
+    }
+
+    public void setWsHost(String wsHost) {
+        this.wsHost = wsHost == null ? null : wsHost.trim();
+    }
+
+    public Integer getWsPort() {
+        return wsPort;
+    }
+
+    public void setWsPort(Integer wsPort) {
+        this.wsPort = wsPort;
+    }
+
     public String getHost() {
         return this.getApplicationHost() + ":" + this.getApplicationPort();
     }
@@ -188,6 +214,8 @@ public class Station implements Serializable {
         sb.append(", username=").append(username);
         sb.append(", pwd=").append(pwd);
         sb.append(", status=").append(status);
+        sb.append(", wsHost=").append(wsHost);
+        sb.append(", wsPort=").append(wsPort);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
