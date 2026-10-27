@@ -134,7 +134,7 @@ ai-call-center/
 ### 数据库配置
 
 1. 创建数据库
-2. 初始化表结构（仓库内不含建表 DDL，表结构由外部维护；MyBatis Mapper XML 位于 `voxai-common/src/main/resources/mapper/`）
+2. 初始化数据库：建表脚本与迁移 SQL 见 `docs/sql/`（`voxai.sql` 全量库导出、`migration_*.sql` 增量迁移）
 3. 修改配置文件中的数据库连接信息
 
 ### 配置文件
