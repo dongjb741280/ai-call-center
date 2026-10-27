@@ -66,7 +66,7 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         }
 
         // 班长监控（cdrType 6/7/8）：振铃后自动应答
-        if (deviceInfo.getCdrType() >= 6 && deviceInfo.getCdrType() <= 8) {
+        if (deviceInfo.getCdrType() != null && deviceInfo.getCdrType() >= 6 && deviceInfo.getCdrType() <= 8) {
             logger.info("monitor auto answer callId:{} deviceId:{} cdrType:{}",
                     callInfo.getCallId(), deviceInfo.getDeviceId(), deviceInfo.getCdrType());
             cacheService.addCallInfo(callInfo);
