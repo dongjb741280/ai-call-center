@@ -64,7 +64,7 @@ public class FsListen {
     @Autowired
     protected HashedWheelTimer hashedWheelTimer;
 
-    @Value("${audio.codecs:^^:PCMU:PCMA}")
+    @Value("${audio.codecs:OPUS,PCMU,PCMA}")
     private String codecs;
 
     @Value("${server.port}")
@@ -461,7 +461,7 @@ public class FsListen {
             for (int i = 0; i < sipHeaders.length; i++) {
                 sipBuffer.append(FsConstant.SIP_HEADER + sipHeaders[i]);
                 if (i < sipHeaders.length - 1) {
-                    sipBuffer.append(FsConstant.SPLIT);
+                    sipBuffer.append(";");
                 }
             }
         }
@@ -472,7 +472,7 @@ public class FsListen {
         params.put("called", called);
         if (StringUtils.isNoneBlank(routeGetway.getSipHeader1())) {
             if (StringUtils.isNoneBlank(sipBuffer)) {
-                sipBuffer.append(FsConstant.SPLIT);
+                sipBuffer.append(";");
             }
             String sipHeader1 = routeGetway.getSipHeader1();
             sipHeader1 = expression(sipHeader1, params);
@@ -480,7 +480,7 @@ public class FsListen {
         }
         if (StringUtils.isNoneBlank(routeGetway.getSipHeader2())) {
             if (StringUtils.isNoneBlank(sipBuffer)) {
-                sipBuffer.append(FsConstant.SPLIT);
+                sipBuffer.append(";");
             }
             String sipHeader2 = routeGetway.getSipHeader2();
             sipHeader2 = expression(sipHeader2, params);
@@ -488,20 +488,21 @@ public class FsListen {
         }
         if (StringUtils.isNoneBlank(routeGetway.getSipHeader3())) {
             if (StringUtils.isNoneBlank(sipBuffer)) {
-                sipBuffer.append(FsConstant.SPLIT);
+                sipBuffer.append(";");
             }
             sipBuffer.append(FsConstant.SIP_HEADER + routeGetway.getSipHeader3());
         }
+        // originate 的 {} 变量用 ^^; 转义为分号分隔，使 absolute_codec_string 能携带逗号（如 OPUS,PCMU,PCMA）
         StringBuilder builder = new StringBuilder();
-        builder.append("{return_ring_ready=true").append(FsConstant.SPLIT).append("sip_contact_user=").append(display).append(FsConstant.SPLIT).append("ring_asr=true").append(FsConstant.SPLIT).append("absolute_codec_string=").append(codecs).append(FsConstant.SPLIT).append("origination_caller_id_number=").append(display).append(FsConstant.SPLIT).append("origination_caller_id_name=").append(display).append(FsConstant.SPLIT).append("origination_uuid=").append(deviceId);
+        builder.append("{^^;return_ring_ready=true").append(";").append("sip_contact_user=").append(display).append(";").append("ring_asr=true").append(";").append("absolute_codec_string=").append(codecs).append(";").append("origination_caller_id_number=").append(display).append(";").append("origination_caller_id_name=").append(display).append(";").append("origination_uuid=").append(deviceId);
         if (autoAnswer) {
-            builder.append(FsConstant.SPLIT).append("sip_auto_answer=true");
+            builder.append(";").append("sip_auto_answer=true");
         }
         if (originateTimeout != null) {
-            builder.append(FsConstant.SPLIT).append("originate_timeout=" + originateTimeout);
+            builder.append(";").append("originate_timeout=" + originateTimeout);
         }
         if (StringUtils.isNoneBlank(sipBuffer)) {
-            builder.append(FsConstant.SPLIT).append(sipBuffer);
+            builder.append(";").append(sipBuffer);
         }
         if (StringUtils.isNotBlank(routeGetway.getMediaHost())) {
             builder.append("}").append(FsConstant.SOFIA + Constant.SK + routeGetway.getProfile() + Constant.SK).append(called).append(FsConstant.PARK);
