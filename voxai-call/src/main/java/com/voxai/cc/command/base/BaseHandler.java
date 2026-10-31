@@ -178,12 +178,22 @@ public class BaseHandler {
                 break;
 
             case NEXT_VDN:
+                vdnHandler.hanlder(callInfo, deviceInfo, Long.parseLong(nextCommand.getNextValue()));
                 break;
 
-            case NEXT_GROUP:
+            case NEXT_GROUP: {
+                GroupInfo nextGroupInfo = cacheService.getGroupInfo(Long.parseLong(nextCommand.getNextValue()));
+                if (nextGroupInfo == null) {
+                    logger.warn("callId:{} next group {} not found", callInfo.getCallId(), nextCommand.getNextValue());
+                    fsListen.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId());
+                    break;
+                }
+                groupHandler.hander(callInfo, nextGroupInfo, deviceInfo.getDeviceId());
                 break;
+            }
 
             case NEXT_IVR:
+                transferIvrHandler.handler(callInfo, deviceInfo, Long.parseLong(nextCommand.getNextValue()));
                 break;
 
             default:

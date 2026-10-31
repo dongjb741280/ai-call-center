@@ -90,8 +90,12 @@ public class VdnHandler extends BaseHandler {
                         default:
                             break;
                     }
+                    // 放音结束后由 FsPlaybackStopHandler 从 nextCommands 取出执行
+                    if (nextCommand != null) {
+                        callInfo.getNextCommands().add(nextCommand);
+                    }
+                    cacheService.addCallInfo(callInfo);
                     playback(callInfo.getMediaHost(), deviceId, playback.getPlayback());
-                    doNextCommand(callInfo, deviceInfo, nextCommand);
                     return;
                 }
 
