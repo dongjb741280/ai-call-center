@@ -9,6 +9,7 @@ import com.voxai.api.vo.excel.AgentImportExcel;
 import com.voxai.core.entity.*;
 import com.voxai.core.mapper.VdnCodeMapper;
 import com.voxai.core.mapper.VdnConfigMapper;
+import com.voxai.core.mapper.VdnDtmfMapper;
 import com.voxai.core.mapper.VdnScheduleMapper;
 import com.voxai.core.mapper.VdnPhoneMapper;
 import com.voxai.core.mapper.OverflowConfigMapper;
@@ -73,6 +74,9 @@ public class CompanyController extends BaseController {
 
     @Autowired
     private VdnConfigMapper vdnConfigMapper;
+
+    @Autowired
+    private VdnDtmfMapper vdnDtmfMapper;
 
     @Autowired
     private VdnScheduleMapper vdnScheduleMapper;
@@ -970,6 +974,60 @@ public class CompanyController extends BaseController {
         vdnConfig.setStatus(0);
         vdnConfig.setUts(Instant.now().getEpochSecond());
         vdnConfigMapper.updateByPrimaryKeySelective(vdnConfig);
+        return new CommonResponse<>();
+    }
+
+    // ==================== 按键导航分支管理 ====================
+
+    /**
+     * 按键导航分支列表
+     */
+    @GetMapping("vdn/config/{configId}/dtmf")
+    public CommonResponse<List<VdnDtmf>> vdnDtmfList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                                      @PathVariable Long configId) {
+        List<VdnDtmf> list = vdnDtmfMapper.selectByNavagite(configId);
+        return new CommonResponse<>(list);
+    }
+
+    /**
+     * 新增按键导航分支
+     */
+    @PostMapping("vdn/config/{configId}/dtmf")
+    public CommonResponse addVdnDtmf(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                      @PathVariable Long configId, @RequestBody VdnDtmf vdnDtmf) {
+        vdnDtmf.setId(null);
+        vdnDtmf.setNavigateId(configId);
+        vdnDtmf.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnDtmf.setCts(Instant.now().getEpochSecond());
+        vdnDtmf.setStatus(vdnDtmf.getStatus() != null ? vdnDtmf.getStatus() : 1);
+        vdnDtmfMapper.insertSelective(vdnDtmf);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 修改按键导航分支
+     */
+    @PutMapping("vdn/dtmf/{id}")
+    public CommonResponse updateVdnDtmf(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                         @PathVariable Long id, @RequestBody VdnDtmf vdnDtmf) {
+        vdnDtmf.setId(id);
+        vdnDtmf.setCompanyId(adminAccountInfo.getBindCompanyId());
+        vdnDtmf.setUts(Instant.now().getEpochSecond());
+        vdnDtmfMapper.updateByPrimaryKeySelective(vdnDtmf);
+        return new CommonResponse<>();
+    }
+
+    /**
+     * 删除按键导航分支
+     */
+    @DeleteMapping("vdn/dtmf/{id}")
+    public CommonResponse deleteVdnDtmf(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                         @PathVariable Long id) {
+        VdnDtmf vdnDtmf = new VdnDtmf();
+        vdnDtmf.setId(id);
+        vdnDtmf.setStatus(0);
+        vdnDtmf.setUts(Instant.now().getEpochSecond());
+        vdnDtmfMapper.updateByPrimaryKeySelective(vdnDtmf);
         return new CommonResponse<>();
     }
 
