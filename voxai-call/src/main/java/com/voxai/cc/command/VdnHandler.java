@@ -19,8 +19,16 @@ import java.time.Instant;
 @Component
 public class VdnHandler extends BaseHandler {
 
+    // 路由跳数上限，防止 VDN 间成环（如放音后转路由字码自指/互指）导致无限循环
+    private static final int MAX_ROUTING_HOPS = 20;
+
     public void hanlder(CallInfo callInfo, DeviceInfo deviceInfo, Long vdnId) {
         String deviceId = deviceInfo.getDeviceId();
+        if (callInfo.getCallDetails() != null && callInfo.getCallDetails().size() >= MAX_ROUTING_HOPS) {
+            logger.warn("callId:{} routing hops exceed {}, hangup", callInfo.getCallId(), MAX_ROUTING_HOPS);
+            hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
+            return;
+        }
         VdnCodePo vdnCodePo = cacheService.getCompany(callInfo.getCompanyId()).getVdnCodeMap().get(vdnId);
         if (vdnCodePo == null || vdnCodePo.getStatus() == 0) {
             hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
