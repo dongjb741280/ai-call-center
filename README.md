@@ -1,5 +1,7 @@
 # AI呼叫中心系统
 
+[English](README_EN.md) | 中文
+
 基于FreeSwitch和Spring Boot构建的企业级AI呼叫中心系统，支持多租户、多技能组、智能路由等完整呼叫中心功能。
 
 [![GitHub stars](https://img.shields.io/github/stars/dongjb741280/ai-call-center?style=social)](https://github.com/dongjb741280/ai-call-center)
