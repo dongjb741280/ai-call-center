@@ -8,6 +8,8 @@ An enterprise-grade AI call center system built on FreeSwitch and Spring Boot, p
 [![GitHub release](https://img.shields.io/github/v/release/dongjb741280/ai-call-center)](https://github.com/dongjb741280/ai-call-center/releases)
 [![GitHub stars](https://img.shields.io/github/stars/dongjb741280/ai-call-center?style=social)](https://github.com/dongjb741280/ai-call-center)
 
+<p align="center"><img src="docs/images/hero.png" alt="AI Call Center" width="760"></p>
+
 > 🌟 If this project helps you, please give it a ⭐ Star! 🙏
 
 Official site: <https://dongjb741280.github.io/ai-call-center/>
@@ -31,6 +33,10 @@ This is an AI call center solution built on a microservices architecture, integr
 | IVR Management | Agent Monitor |
 | --- | --- |
 | ![IVR Management](docs/images/ivr.png) | ![Agent Monitor](docs/images/agent-monitor.png) |
+
+## Demo
+
+<p align="center"><img src="docs/images/demo.gif" alt="Demo" width="760"></p>
 
 ## Technical Architecture
 

@@ -8,6 +8,8 @@
 [![GitHub release](https://img.shields.io/github/v/release/dongjb741280/ai-call-center)](https://github.com/dongjb741280/ai-call-center/releases)
 [![GitHub stars](https://img.shields.io/github/stars/dongjb741280/ai-call-center?style=social)](https://github.com/dongjb741280/ai-call-center)
 
+<p align="center"><img src="docs/images/hero.png" alt="AI 呼叫中心" width="760"></p>
+
 > 🌟 如果这个项目对你有帮助，恳请点个 ⭐ Star 支持！🙏
 
 官网：<https://dongjb741280.github.io/ai-call-center/>
@@ -31,6 +33,10 @@
 | IVR 管理 | 坐席监控 |
 | --- | --- |
 | ![IVR 管理](docs/images/ivr.png) | ![坐席监控](docs/images/agent-monitor.png) |
+
+## 演示
+
+<p align="center"><img src="docs/images/demo.gif" alt="演示" width="760"></p>
 
 ## 技术架构
 
