@@ -22,7 +22,33 @@
 >
 > <https://github.com/dongjb741280/IntelliCall-Pro>
 
+## 产品截图
+
+| 控制台 | 坐席管理 |
+| --- | --- |
+| ![控制台](docs/images/dashboard.png) | ![坐席管理](docs/images/agent-list.png) |
+
+| IVR 管理 | 坐席监控 |
+| --- | --- |
+| ![IVR 管理](docs/images/ivr.png) | ![坐席监控](docs/images/agent-monitor.png) |
+
 ## 技术架构
+
+```mermaid
+flowchart LR
+    AG[坐席前端<br/>Vue3 + JsSIP 软电话] -- WebSocket --> CALL
+    CP[客户话机] -- SIP/RTP --> FS[FreeSWITCH<br/>媒体/信令]
+    FS <-- "ESL 事件/命令" --> CALL[voxai-call<br/>呼叫控制 :7200]
+    CALL -- HTTP --> IVR[voxai-ivr<br/>IVR 引擎 :7300]
+    IVR -- 回控 --> CALL
+    ADMIN[voxai-admin<br/>管理 API :7100] -- 配置 --> CALL
+    CALL --> R[(Redis)]
+    CALL --> DB[(MySQL)]
+    CALL --> M[(MinIO)]
+    ADMIN --> DB
+    ADMIN --> N[Nacos]
+    CALL --> N
+```
 
 ### 项目结构
 

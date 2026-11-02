@@ -22,7 +22,33 @@ This is an AI call center solution built on a microservices architecture, integr
 >
 > <https://github.com/dongjb741280/IntelliCall-Pro>
 
+## Screenshots
+
+| Dashboard | Agent Management |
+| --- | --- |
+| ![Dashboard](docs/images/dashboard.png) | ![Agent Management](docs/images/agent-list.png) |
+
+| IVR Management | Agent Monitor |
+| --- | --- |
+| ![IVR Management](docs/images/ivr.png) | ![Agent Monitor](docs/images/agent-monitor.png) |
+
 ## Technical Architecture
+
+```mermaid
+flowchart LR
+    AG[Agent Console<br/>Vue3 + JsSIP Softphone] -- WebSocket --> CALL
+    CP[Caller / Customer] -- SIP/RTP --> FS[FreeSWITCH<br/>Media & Signaling]
+    FS <-- "ESL events / commands" --> CALL[voxai-call<br/>Call Control :7200]
+    CALL -- HTTP --> IVR[voxai-ivr<br/>IVR Engine :7300]
+    IVR -- callback --> CALL
+    ADMIN[voxai-admin<br/>Admin API :7100] -- config --> CALL
+    CALL --> R[(Redis)]
+    CALL --> DB[(MySQL)]
+    CALL --> M[(MinIO)]
+    ADMIN --> DB
+    ADMIN --> N[Nacos]
+    CALL --> N
+```
 
 ### Project Structure
 
