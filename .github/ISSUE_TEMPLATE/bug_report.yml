@@ -1,0 +1,37 @@
+name: 🐛 Bug 报告
+description: 提交一个 bug 报告
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: 感谢你花时间提交 bug 报告，请尽量提供完整信息以帮助我们复现。
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 清晰描述 bug 现象
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 最小复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+      description: 你期望发生什么
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: 如 v1.1 / 或 commit hash
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境信息
+      placeholder: JDK 版本、数据库、FreeSWITCH 版本、操作系统等
