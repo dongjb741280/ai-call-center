@@ -619,6 +619,13 @@ public class CompanyController extends BaseController {
         return new CommonResponse(groupService.groupAgentList(adminAccountInfo.getBindCompanyId(), id));
     }
 
+    @PutMapping("group/{id}/skills")
+    public CommonResponse saveGroupSkills(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                          @PathVariable Long id,
+                                          @Validated @RequestBody GroupSkillsVo groupSkillsVo) {
+        return new CommonResponse(groupService.saveGroupSkills(adminAccountInfo.getBindCompanyId(), id, groupSkillsVo));
+    }
+
 
     /**
      * 1.7.1 技能列表

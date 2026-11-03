@@ -8,6 +8,7 @@ import com.voxai.core.entity.AgentGroup;
 import com.voxai.core.entity.Group;
 import com.voxai.core.po.GroupInfo;
 import com.voxai.core.vo.GroupInfoVo;
+import com.voxai.core.vo.GroupSkillsVo;
 
 import java.util.List;
 
@@ -30,6 +31,8 @@ public interface GroupService extends BaseService<Group> {
      * @return
      */
     int saveOrUpdateGroup(GroupInfoVo groupInfoVo);
+
+    int saveGroupSkills(Long companyId, Long groupId, GroupSkillsVo groupSkillsVo);
 
 
     /**

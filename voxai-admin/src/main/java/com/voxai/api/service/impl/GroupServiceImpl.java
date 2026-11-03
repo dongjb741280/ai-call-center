@@ -11,19 +11,22 @@ import com.voxai.core.enums.ErrorCode;
 import com.voxai.core.mapper.base.BaseMapper;
 import com.voxai.core.po.GroupInfo;
 import com.voxai.core.vo.GroupInfoVo;
+import com.voxai.core.vo.GroupSkillsVo;
 import com.voxai.core.vo.SkillGroupVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import com.voxai.api.exception.BusinessException;
 import com.voxai.api.service.GroupService;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupService {
@@ -36,6 +39,9 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
 
     @Autowired
     private SkillGroupMapper skillGroupMapper;
+
+    @Autowired
+    private SkillMapper skillMapper;
 
     @Autowired
     private CompanyMapper companyMapper;
@@ -58,6 +64,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int saveOrUpdateGroup(GroupInfoVo groupInfoVo) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("companyId", groupInfoVo.getCompanyId());
@@ -71,10 +78,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
             }
         }
 
-        //技能组技能不能超过10个
-        if (groupInfoVo.getSkillList().size() > 10) {
-            throw new BusinessException(ErrorCode.GROUP_SKILL_OVER_LIMIT);
-        }
+        validateSkills(groupInfoVo);
         Group group = new Group();
         BeanUtils.copyProperties(groupInfoVo, group);
         if (groupInfoVo.getId() == null) {
@@ -89,18 +93,7 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
             groupMapper.insertSelective(group);
             Long id = groupMapper.selectByName(groupInfoVo.getCompanyId(), groupInfoVo.getName());
             group.setId(id);
-            //技能组技能关联
-            List<SkillGroup> skillGroupList = new ArrayList<>();
-            for (SkillGroupVo skillGroupVo : groupInfoVo.getSkillList()) {
-                SkillGroup skillGroup = new SkillGroup();
-                BeanUtils.copyProperties(skillGroupVo, skillGroup);
-                skillGroup.setGroupId(group.getId());
-                skillGroup.setCompanyId(groupInfoVo.getCompanyId());
-                skillGroup.setCts(Instant.now().getEpochSecond());
-                skillGroup.setStatus(1);
-                skillGroupList.add(skillGroup);
-            }
-            skillGroupMapper.batchInsert(skillGroupList);
+            saveGroupSkills(groupInfoVo, null);
 
             //坐席空闲策略
 
@@ -115,12 +108,85 @@ public class GroupServiceImpl extends BaseServiceImpl<Group> implements GroupSer
 
         group.setUts(Instant.now().getEpochSecond());
         groupMapper.updateByPrimaryKeySelective(group);
+        saveGroupSkills(groupInfoVo, skillGroupMapper.selectByGroup(groupInfoVo.getCompanyId(), groupInfoVo.getId()));
         //排队策略
 
 
         //溢出策略
 
         return 0;
+    }
+
+    private void validateSkills(GroupInfoVo groupInfoVo) {
+        validateSkills(groupInfoVo.getCompanyId(), groupInfoVo.getSkillList());
+    }
+
+    private void validateSkills(Long companyId, List<SkillGroupVo> skills) {
+        if (skills == null) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR, "技能组技能不能为空");
+        }
+        if (skills.size() > 10) {
+            throw new BusinessException(ErrorCode.GROUP_SKILL_OVER_LIMIT);
+        }
+        Set<Long> skillIds = new HashSet<>();
+        for (SkillGroupVo skill : skills) {
+            if (skill.getSkillId() == null || !skillIds.add(skill.getSkillId())) {
+                throw new BusinessException(ErrorCode.PARAMETER_ERROR, "技能组技能缺失或重复");
+            }
+            if (skillMapper.selectById(companyId, skill.getSkillId()) == null) {
+                throw new BusinessException(ErrorCode.DATA_NOT_EXIST, "技能不存在或已停用");
+            }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int saveGroupSkills(Long companyId, Long groupId, GroupSkillsVo groupSkillsVo) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("companyId", companyId);
+        params.put("id", groupId);
+        if (groupMapper.selectGroupInfo(params) == null) {
+            throw new BusinessException(ErrorCode.DATA_NOT_EXIST, "技能组不存在");
+        }
+        validateSkills(companyId, groupSkillsVo.getSkillList());
+        GroupInfoVo group = new GroupInfoVo();
+        group.setId(groupId);
+        group.setCompanyId(companyId);
+        group.setSkillList(groupSkillsVo.getSkillList());
+        saveGroupSkills(group, skillGroupMapper.selectByGroup(companyId, groupId));
+        return groupSkillsVo.getSkillList().size();
+    }
+
+    private void saveGroupSkills(GroupInfoVo groupInfoVo, List<SkillGroup> existingSkills) {
+        long now = Instant.now().getEpochSecond();
+        Map<Long, SkillGroup> existingBySkillId = new HashMap<>();
+        if (existingSkills != null) {
+            for (SkillGroup existing : existingSkills) {
+                existingBySkillId.put(existing.getSkillId(), existing);
+            }
+        }
+        for (SkillGroupVo skillVo : groupInfoVo.getSkillList()) {
+            SkillGroup skillGroup = existingBySkillId.remove(skillVo.getSkillId());
+            boolean insert = skillGroup == null;
+            if (insert) {
+                skillGroup = new SkillGroup();
+                skillGroup.setCts(now);
+                skillGroup.setCompanyId(groupInfoVo.getCompanyId());
+                skillGroup.setGroupId(groupInfoVo.getId());
+                skillGroup.setSkillId(skillVo.getSkillId());
+            }
+            BeanUtils.copyProperties(skillVo, skillGroup);
+            skillGroup.setStatus(1);
+            skillGroup.setUts(now);
+            if (insert) {
+                skillGroupMapper.insertSelective(skillGroup);
+            } else {
+                skillGroupMapper.updateByPrimaryKeySelective(skillGroup);
+            }
+        }
+        for (SkillGroup removed : existingBySkillId.values()) {
+            skillGroupMapper.deleteByPrimaryKey(removed.getId());
+        }
     }
 
     @Override

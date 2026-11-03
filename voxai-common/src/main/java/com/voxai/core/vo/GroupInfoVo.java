@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.Valid;
 import java.util.List;
 
 public class GroupInfoVo {
@@ -114,6 +115,7 @@ public class GroupInfoVo {
      * 技能组技能
      */
     @NotNull(message = "技能组技能不能为空")
+    @Valid
     private List<SkillGroupVo> skillList;
 
     /**
