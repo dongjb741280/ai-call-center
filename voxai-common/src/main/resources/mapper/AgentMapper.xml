@@ -14,7 +14,6 @@
         <result column="passwd" jdbcType="VARCHAR" property="passwd"/>
         <result column="sip_phone" jdbcType="VARCHAR" property="sipPhone"/>
         <result column="record" jdbcType="INTEGER" property="record"/>
-        <result column="group_id" jdbcType="BIGINT" property="groupId"/>
         <result column="after_interval" jdbcType="INTEGER" property="afterInterval"/>
         <result column="display" jdbcType="VARCHAR" property="display"/>
         <result column="ring_time" jdbcType="INTEGER" property="ringTime"/>
@@ -37,7 +36,6 @@
         <result column="agent_type" jdbcType="INTEGER" property="agentType"/>
         <result column="display" jdbcType="VARCHAR" property="display"/>
         <result column="sip_phone" jdbcType="VARCHAR" property="sipPhone"/>
-        <result column="group_id" jdbcType="BIGINT" property="groupId"/>
         <result column="record" jdbcType="INTEGER" property="record"/>
         <result column="host" jdbcType="VARCHAR" property="host"/>
         <result column="state" jdbcType="INTEGER" property="state"/>
@@ -52,14 +50,14 @@
     <sql id="Base_Column_List">
         id
         , cts, uts, company_id, agent_id, agent_key, agent_name, agent_code, agent_type,
-    sip_phone, record, group_id, after_interval, display, ring_time, host, ext1,
+    sip_phone, record, after_interval, display, ring_time, host, ext1,
     ext2, ext3, status
     </sql>
 
     <sql id="ALL_Column_List">
         id
         , cts, uts, company_id, agent_id, agent_key, agent_name, agent_code, agent_type,
-    passwd, sip_phone, record, group_id, after_interval, display, ring_time, host, ext1,
+    passwd, sip_phone, record, after_interval, display, ring_time, host, ext1,
     ext2, ext3, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -82,13 +80,13 @@
         insert into cc_agent (id, cts, uts, company_id,
                               agent_id, agent_key, agent_name,
                               agent_code, agent_type, passwd,
-                              sip_phone, record, group_id,
+                              sip_phone, record,
                               after_interval, display, ring_time, host,
                               ext1, ext2, ext3, status)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
                 #{agentId,jdbcType=VARCHAR}, #{agentKey,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
                 #{agentCode,jdbcType=VARCHAR}, #{agentType,jdbcType=INTEGER}, #{passwd,jdbcType=VARCHAR},
-                #{sipPhone,jdbcType=VARCHAR}, #{record,jdbcType=INTEGER}, #{groupId,jdbcType=BIGINT},
+                #{sipPhone,jdbcType=VARCHAR}, #{record,jdbcType=INTEGER},
                 #{afterInterval,jdbcType=INTEGER}, #{display,jdbcType=VARCHAR}, #{ringTime,jdbcType=INTEGER},
                 #{host,jdbcType=VARCHAR}, #{ext1,jdbcType=VARCHAR}, #{ext2,jdbcType=VARCHAR}, #{ext3,jdbcType=VARCHAR},
                 #{status,jdbcType=INTEGER})
@@ -131,9 +129,6 @@
             </if>
             <if test="record != null">
                 record,
-            </if>
-            <if test="groupId != null">
-                group_id,
             </if>
             <if test="afterInterval != null">
                 after_interval,
@@ -200,9 +195,6 @@
             <if test="record != null">
                 #{record,jdbcType=INTEGER},
             </if>
-            <if test="groupId != null">
-                #{groupId,jdbcType=BIGINT},
-            </if>
             <if test="afterInterval != null">
                 #{afterInterval,jdbcType=INTEGER},
             </if>
@@ -261,9 +253,6 @@
             </if>
             <if test="record != null">
                 record = #{record,jdbcType=INTEGER},
-            </if>
-            <if test="groupId != null">
-                group_id = #{groupId,jdbcType=BIGINT},
             </if>
             <if test="afterInterval != null">
                 after_interval = #{afterInterval,jdbcType=INTEGER},
@@ -387,7 +376,6 @@
                agent_type,
                sip_phone,
                display,
-               group_id,
                state
         from cc_agent
         where id = #{id}
@@ -406,7 +394,6 @@
                agent_type,
                sip_phone,
                display,
-               group_id,
                state
         from cc_agent
         where id = (select agent_id from cc_agent_sip where sip = #{sip})
@@ -459,7 +446,7 @@
 
     <select id="selectByIds" resultMap="SimpleResultMap">
         select
-            id, cts, uts, company_id, agent_id, agent_key, agent_name, agent_code, agent_type, sip_phone, display, group_id, state
+            id, cts, uts, company_id, agent_id, agent_key, agent_name, agent_code, agent_type, sip_phone, display, state
         from
             cc_agent
         where

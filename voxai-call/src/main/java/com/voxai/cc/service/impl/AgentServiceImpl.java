@@ -79,7 +79,7 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
         agentInfo.setSips(this.getAgentSips(agent.getId()));
         agentInfo.setSipPwd(this.getPrimarySipPwd(agentInfo.getSips()));
         agentInfo.setGroupIds(agentGroupMapper.selectByAgent(agent.getId()));
-        agentInfo.setGroupId(agentGroupMapper.selectByAgent(agent.getId()).get(0));
+        agentInfo.setGroupId(agentGroupMapper.selectPrimaryByAgent(agent.getId()));
         agentInfo.setLoginType(1);
         return agentInfo;
     }

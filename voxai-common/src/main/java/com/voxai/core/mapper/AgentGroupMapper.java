@@ -18,6 +18,14 @@ public interface AgentGroupMapper extends BaseMapper<AgentGroup> {
     List<Long> selectByAgent(Long agentId);
 
     /**
+     * 查询坐席的主技能组
+     *
+     * @param agentId
+     * @return 主技能组 id，无主组时返回 null
+     */
+    Long selectPrimaryByAgent(Long agentId);
+
+    /**
      * @param groupId
      * @return
      */

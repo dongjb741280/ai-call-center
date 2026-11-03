@@ -11,10 +11,11 @@
         <result column="agent_type" jdbcType="INTEGER" property="agentType"/>
         <result column="group_id" jdbcType="BIGINT" property="groupId"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="is_primary" jdbcType="TINYINT" property="isPrimary"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, company_id, agent_id, agent_key, agent_type, group_id, status
+        , cts, uts, company_id, agent_id, agent_key, agent_type, group_id, status, is_primary
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -30,10 +31,10 @@
     <insert id="insert" parameterType="com.voxai.core.entity.AgentGroup">
         insert into cc_agent_group (id, cts, uts, company_id,
                                     agent_id, agent_key, agent_type,
-                                    group_id, status)
+                                    group_id, status, is_primary)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
                 #{agentId,jdbcType=BIGINT}, #{agentKey,jdbcType=VARCHAR}, #{agentType,jdbcType=INTEGER},
-                #{groupId,jdbcType=BIGINT}, #{status,jdbcType=INTEGER})
+                #{groupId,jdbcType=BIGINT}, #{status,jdbcType=INTEGER}, #{isPrimary,jdbcType=TINYINT})
     </insert>
     <insert id="insertSelective" parameterType="com.voxai.core.entity.AgentGroup">
         insert into cc_agent_group
@@ -65,6 +66,9 @@
             <if test="status != null">
                 status,
             </if>
+            <if test="isPrimary != null">
+                is_primary,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -93,6 +97,9 @@
             </if>
             <if test="status != null">
                 #{status,jdbcType=INTEGER},
+            </if>
+            <if test="isPrimary != null">
+                #{isPrimary,jdbcType=TINYINT},
             </if>
         </trim>
     </insert>
@@ -123,6 +130,9 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
+            <if test="isPrimary != null">
+                is_primary = #{isPrimary,jdbcType=TINYINT},
+            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -135,7 +145,8 @@
             agent_key  = #{agentKey,jdbcType=VARCHAR},
             agent_type = #{agentType,jdbcType=INTEGER},
             group_id   = #{groupId,jdbcType=BIGINT},
-            status     = #{status,jdbcType=INTEGER}
+            status     = #{status,jdbcType=INTEGER},
+            is_primary = #{isPrimary,jdbcType=TINYINT}
         where id = #{id,jdbcType=BIGINT}
     </update>
 
@@ -156,6 +167,17 @@
         where agent_id = #{agentId}
           and a.group_id = b.id
           and b.status = 1
+    </select>
+
+    <select id="selectPrimaryByAgent" parameterType="Long" resultType="Long">
+        select group_id
+        from cc_agent_group a,
+             cc_group b
+        where agent_id = #{agentId}
+          and a.group_id = b.id
+          and b.status = 1
+          and a.is_primary = 1
+        limit 1
     </select>
 
     <delete id="deleteByGroup" parameterType="java.lang.Long">

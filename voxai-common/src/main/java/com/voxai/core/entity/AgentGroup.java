@@ -54,6 +54,11 @@ public class AgentGroup implements Serializable {
      */
     private Integer status;
 
+    /**
+     * 是否主技能组 1:是 0:否
+     */
+    private Integer isPrimary;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -128,6 +133,14 @@ public class AgentGroup implements Serializable {
         this.status = status;
     }
 
+    public Integer getIsPrimary() {
+        return isPrimary;
+    }
+
+    public void setIsPrimary(Integer isPrimary) {
+        this.isPrimary = isPrimary;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -143,6 +156,7 @@ public class AgentGroup implements Serializable {
         sb.append(", agentType=").append(agentType);
         sb.append(", groupId=").append(groupId);
         sb.append(", status=").append(status);
+        sb.append(", isPrimary=").append(isPrimary);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

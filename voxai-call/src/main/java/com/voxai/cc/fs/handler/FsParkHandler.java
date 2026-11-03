@@ -267,22 +267,29 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         //通过sip号码获取绑定的坐席
         Agent agent = agentService.getAgentBySip(event.getCaller());
         Long callId = snowflakeIdWorker.nextId();
-        if (agent == null || agent.getGroupId() == null) {
+        if (agent == null) {
             logger.warn("sipOutbound callId:{}  sip:{} called:{}", callId, event.getCaller(), event.getCalled());
-            hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
-            return;
-        }
-        //获取显号
-        GroupInfo groupInfo = cacheService.getGroupInfo(agent.getGroupId());
-        if (groupInfo == null && CollectionUtils.isEmpty(groupInfo.getCalledDisplays())) {
-            logger.warn("callId:{}, agent:{}, group is null", callId, agent.getAgentKey());
             hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
             return;
         }
         AgentInfo agentInfo = cacheService.getAgentInfo(agent.getAgentKey());
         if (agentInfo == null) {
             agentInfo = agentService.getAgentInfo(agent.getAgentKey());
-            cacheService.addAgentInfo(agentInfo);
+            if (agentInfo != null) {
+                cacheService.addAgentInfo(agentInfo);
+            }
+        }
+        if (agentInfo == null || agentInfo.getGroupId() == null) {
+            logger.warn("sipOutbound callId:{}  sip:{} called:{} no primary group", callId, event.getCaller(), event.getCalled());
+            hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
+            return;
+        }
+        //获取显号
+        GroupInfo groupInfo = cacheService.getGroupInfo(agentInfo.getGroupId());
+        if (groupInfo == null && CollectionUtils.isEmpty(groupInfo.getCalledDisplays())) {
+            logger.warn("callId:{}, agent:{}, group is null", callId, agent.getAgentKey());
+            hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
+            return;
         }
         logger.info("sipOutbound callId:{}  sip:{} called:{}", callId, event.getCaller(), event.getCalled());
         String calledDisplay = RandomUtil.getRandom(groupInfo.getCalledDisplays());

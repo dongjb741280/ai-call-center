@@ -70,11 +70,6 @@ public class Agent implements Serializable {
     private Integer record;
 
     /**
-     * 座席主要技能组  不能为空 必填项
-     */
-    private Long groupId;
-
-    /**
      * 总机坐席
      */
     private Integer agentOnline;
@@ -219,14 +214,6 @@ public class Agent implements Serializable {
         this.record = record;
     }
 
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
-
     public Integer getAgentOnline() {
         return agentOnline;
     }
@@ -325,7 +312,6 @@ public class Agent implements Serializable {
         sb.append(", passwd=").append(passwd);
         sb.append(", sipPhone=").append(sipPhone);
         sb.append(", record=").append(record);
-        sb.append(", groupId=").append(groupId);
         sb.append(", afterInterval=").append(afterInterval);
         sb.append(", display=").append(display);
         sb.append(", ringTime=").append(ringTime);
@@ -362,7 +348,6 @@ public class Agent implements Serializable {
             && (this.getPasswd() == null ? other.getPasswd() == null : this.getPasswd().equals(other.getPasswd()))
             && (this.getSipPhone() == null ? other.getSipPhone() == null : this.getSipPhone().equals(other.getSipPhone()))
             && (this.getRecord() == null ? other.getRecord() == null : this.getRecord().equals(other.getRecord()))
-            && (this.getGroupId() == null ? other.getGroupId() == null : this.getGroupId().equals(other.getGroupId()))
             && (this.getAfterInterval() == null ? other.getAfterInterval() == null : this.getAfterInterval().equals(other.getAfterInterval()))
             && (this.getDisplay() == null ? other.getDisplay() == null : this.getDisplay().equals(other.getDisplay()))
             && (this.getRingTime() == null ? other.getRingTime() == null : this.getRingTime().equals(other.getRingTime()))
@@ -388,7 +373,6 @@ public class Agent implements Serializable {
         result = prime * result + ((getPasswd() == null) ? 0 : getPasswd().hashCode());
         result = prime * result + ((getSipPhone() == null) ? 0 : getSipPhone().hashCode());
         result = prime * result + ((getRecord() == null) ? 0 : getRecord().hashCode());
-        result = prime * result + ((getGroupId() == null) ? 0 : getGroupId().hashCode());
         result = prime * result + ((getAfterInterval() == null) ? 0 : getAfterInterval().hashCode());
         result = prime * result + ((getDisplay() == null) ? 0 : getDisplay().hashCode());
         result = prime * result + ((getRingTime() == null) ? 0 : getRingTime().hashCode());

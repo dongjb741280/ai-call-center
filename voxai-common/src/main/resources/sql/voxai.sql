@@ -178,7 +178,6 @@ CREATE TABLE `cc_agent` (
   `passwd` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT '座席密码',
   `sip_phone` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT '绑定的电话号码',
   `record` int NOT NULL DEFAULT '0' COMMENT '是否录音 0 no 1 yes',
-  `group_id` bigint NOT NULL DEFAULT '0' COMMENT '座席主要技能组  不能为空 必填项',
   `after_interval` int NOT NULL DEFAULT '5' COMMENT '话后自动空闲间隔时长',
   `display` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
   `ring_time` int NOT NULL DEFAULT '10' COMMENT '振铃时长',
@@ -210,6 +209,7 @@ CREATE TABLE `cc_agent_group` (
   `agent_type` int NOT NULL DEFAULT '1',
   `group_id` bigint NOT NULL DEFAULT '0' COMMENT '技能组id',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  `is_primary` tinyint NOT NULL DEFAULT '0' COMMENT '是否主技能组 1:是 0:否',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uniq_agent_group_agent_group` (`group_id`,`agent_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='坐席技能组表';

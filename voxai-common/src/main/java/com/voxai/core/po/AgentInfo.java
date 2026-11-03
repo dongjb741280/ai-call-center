@@ -24,6 +24,11 @@ public class AgentInfo extends Agent {
     private List<Long> groupIds;
 
     /**
+     * 主技能组
+     */
+    private Long groupId;
+
+    /**
      * 坐席sip
      */
     private List<String> sips;
@@ -184,6 +189,14 @@ public class AgentInfo extends Agent {
 
     public void setGroupIds(List<Long> groupIds) {
         this.groupIds = groupIds;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
     public List<String> getSips() {
