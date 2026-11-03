@@ -286,7 +286,7 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         }
         //获取显号
         GroupInfo groupInfo = cacheService.getGroupInfo(agentInfo.getGroupId());
-        if (groupInfo == null && CollectionUtils.isEmpty(groupInfo.getCalledDisplays())) {
+        if (groupInfo == null || CollectionUtils.isEmpty(groupInfo.getCalledDisplays())) {
             logger.warn("callId:{}, agent:{}, group is null", callId, agent.getAgentKey());
             hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
             return;
