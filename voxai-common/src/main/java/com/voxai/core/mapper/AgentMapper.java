@@ -22,6 +22,8 @@ public interface AgentMapper extends BaseMapper<Agent> {
 
     int addAgent(Agent agent);
 
+    Agent selectForGroupUpdate(@Param("companyId") Long companyId, @Param("id") Long id);
+
     /**
      * 查询坐席
      *

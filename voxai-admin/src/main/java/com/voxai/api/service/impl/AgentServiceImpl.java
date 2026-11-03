@@ -19,6 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import com.voxai.core.constant.Constant;
 import com.voxai.core.entity.Agent;
+import com.voxai.core.entity.AgentGroup;
+import com.voxai.core.entity.Group;
+import com.voxai.core.entity.SkillAgent;
 import com.voxai.core.entity.AgentSip;
 import com.voxai.core.entity.Company;
 import com.voxai.core.enums.ErrorCode;
@@ -26,12 +29,17 @@ import com.voxai.core.mapper.AgentGroupMapper;
 import com.voxai.core.mapper.AgentMapper;
 import com.voxai.core.mapper.AgentSipMapper;
 import com.voxai.core.mapper.CompanyMapper;
+import com.voxai.core.mapper.GroupMapper;
+import com.voxai.core.mapper.SkillMapper;
+import com.voxai.core.mapper.SkillAgentMapper;
 import com.voxai.core.mapper.base.BaseMapper;
 import com.voxai.core.po.AgentInfo;
 import com.voxai.core.po.AgentSipPo;
 import com.voxai.core.po.CompanyInfo;
 import com.voxai.core.vo.AgentSipVo;
 import com.voxai.core.vo.AgentVo;
+import com.voxai.core.vo.AgentGroupsVo;
+import com.voxai.core.vo.AgentSkillVo;
 import com.voxai.core.vo.BatchAddAgentVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
 
 @Service
 public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentService {
@@ -73,6 +82,15 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
 
     @Autowired
     private AgentGroupMapper agentGroupMapper;
+
+    @Autowired
+    private GroupMapper groupMapper;
+
+    @Autowired
+    private SkillMapper skillMapper;
+
+    @Autowired
+    private SkillAgentMapper skillAgentMapper;
 
     @Override
     BaseMapper<Agent> baseMapper() {
@@ -107,24 +125,78 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
             if (StringUtils.isBlank(agentVo.getPasswd())) {
                 throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "坐席密码不能为空");
             }
-            agentVo.setPasswd(BcryptUtil.encrypt(agentVo.getPasswd()));
+            agent.setPasswd(BcryptUtil.encrypt(agentVo.getPasswd()));
             agent.setAgentKey(agentKey);
             agent.setCts(Instant.now().getEpochSecond());
             if (agent.getAgentType() == null) {
                 agent.setAgentType(1);
             }
-            return agentMapper.addAgent(agent);
+            if (agent.getStatus() == null) {
+                agent.setStatus(1);
+            }
+            // Create active before saving relations; disabling is applied last in the same transaction.
+            Integer requestedStatus = agent.getStatus();
+            agent.setStatus(1);
+            int result = agentMapper.insertSelective(agent);
+            saveAgentRelations(agentVo, agent.getId());
+            if (!Integer.valueOf(1).equals(requestedStatus)) {
+                agent.setStatus(requestedStatus);
+                agentMapper.updateByPrimaryKeySelective(agent);
+            }
+            return result;
         }
-        params.put("id", agentVo.getId());
-        Agent exist = agentMapper.selectAgentInfo(params);
+        Agent exist = agentMapper.selectForGroupUpdate(agentVo.getCompanyId(), agentVo.getId());
         if (exist == null) {
             throw new BusinessException(ErrorCode.DATA_NOT_EXIST);
         }
+        if (!exist.getAgentId().equals(agentVo.getAgentId())) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR, "坐席工号不可修改");
+        }
+        saveAgentRelations(agentVo, agentVo.getId());
         if (!StringUtils.isBlank(agentVo.getPasswd())) {
             agent.setPasswd(BcryptUtil.encrypt(agentVo.getPasswd()));
+        } else {
+            agent.setPasswd(null);
         }
         agent.setUts(Instant.now().getEpochSecond());
         return agentMapper.updateByPrimaryKeySelective(agent);
+    }
+
+    private void saveAgentRelations(AgentVo request, Long agentId) {
+        if (request.getGroups() != null) {
+            saveAgentGroups(request.getCompanyId(), agentId, request.getGroups(), request.getAgentType());
+        }
+        if (request.getSkillAgents() == null) {
+            return;
+        }
+        List<AgentSkillVo> skills = request.getSkillAgents();
+        if (skills.size() > 20) {
+            throw new BusinessException(ErrorCode.AGENT_SKILL_OVER_LIMIT);
+        }
+        HashSet<Long> ids = new HashSet<>();
+        List<SkillAgent> records = new ArrayList<>();
+        for (AgentSkillVo skill : skills) {
+            if (skill == null || skill.getSkillId() == null || !ids.add(skill.getSkillId())
+                    || skill.getRankValue() == null || skill.getRankValue() < 1 || skill.getRankValue() > 100) {
+                throw new BusinessException(ErrorCode.PARAMETER_ERROR, "技能不能重复，技能等级必须在1-100之间");
+            }
+            if (skillMapper.selectById(request.getCompanyId(), skill.getSkillId()) == null) {
+                throw new BusinessException(ErrorCode.DATA_NOT_EXIST, "技能不存在或不属于当前企业");
+            }
+            SkillAgent record = new SkillAgent();
+            record.setCompanyId(request.getCompanyId());
+            record.setAgentId(agentId);
+            record.setSkillId(skill.getSkillId());
+            record.setRankValue(skill.getRankValue());
+            record.setCts(Instant.now().getEpochSecond());
+            record.setStatus(1);
+            records.add(record);
+        }
+        skillAgentMapper.deleteByAgent(request.getCompanyId(), agentId);
+        for (SkillAgent record : records) {
+            // The legacy Oracle batch statement commits internally; use transactional inserts here.
+            skillAgentMapper.insert(record);
+        }
     }
 
     @Override
@@ -180,6 +252,48 @@ public class AgentServiceImpl extends BaseServiceImpl<Agent> implements AgentSer
             throw new BusinessException(ErrorCode.DATA_NOT_EXIST);
         }
         return agentInfo;
+    }
+
+    @Override
+    public int saveAgentGroups(Long companyId, Long id, AgentGroupsVo groups) {
+        return saveAgentGroups(companyId, id, groups, null);
+    }
+
+    private int saveAgentGroups(Long companyId, Long id, AgentGroupsVo groups, Integer agentType) {
+        // Lock the parent row so concurrent saves cannot create multiple primary groups.
+        Agent agent = agentMapper.selectForGroupUpdate(companyId, id);
+        if (agent == null) {
+            throw new BusinessException(ErrorCode.DATA_NOT_EXIST);
+        }
+        List<Long> groupIds = groups.getGroupIds();
+        if (groupIds == null || groupIds.contains(null)
+                || new HashSet<>(groupIds).size() != groupIds.size()
+                || (groupIds.isEmpty() ? groups.getGroupId() != null
+                : groups.getGroupId() == null || !groupIds.contains(groups.getGroupId()))) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR, "请选择所属技能组中的一个作为主技能组");
+        }
+        for (Long groupId : groupIds) {
+            Group group = groupMapper.selectByPrimaryKey(groupId);
+            if (group == null || !companyId.equals(group.getCompanyId()) || !Integer.valueOf(1).equals(group.getStatus())) {
+                throw new BusinessException(ErrorCode.DATA_NOT_EXIST, "技能组不存在或不属于当前企业");
+            }
+        }
+        agentGroupMapper.deleteByAgent(id);
+        long now = Instant.now().getEpochSecond();
+        for (Long groupId : groupIds) {
+            AgentGroup relation = new AgentGroup();
+            relation.setCompanyId(companyId);
+            relation.setAgentId(id);
+            relation.setAgentKey(agent.getAgentKey());
+            relation.setAgentType(agentType == null ? agent.getAgentType() : agentType);
+            relation.setGroupId(groupId);
+            relation.setIsPrimary(groupId.equals(groups.getGroupId()) ? 1 : 0);
+            relation.setStatus(1);
+            relation.setCts(now);
+            relation.setUts(now);
+            agentGroupMapper.insertSelective(relation);
+        }
+        return groupIds.size();
     }
 
     @Override

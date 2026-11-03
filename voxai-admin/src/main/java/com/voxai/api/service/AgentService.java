@@ -10,6 +10,7 @@ import com.voxai.core.po.AgentInfo;
 import com.voxai.core.po.AgentSipPo;
 import com.voxai.core.vo.AgentSipVo;
 import com.voxai.core.vo.AgentVo;
+import com.voxai.core.vo.AgentGroupsVo;
 import com.voxai.core.vo.BatchAddAgentVo;
 import com.voxai.api.vo.excel.AgentImportExcel;
 
@@ -46,6 +47,8 @@ public interface AgentService extends BaseService<Agent> {
      * @return
      */
     AgentInfo getAgentInfo(Long companyId, Long id);
+
+    int saveAgentGroups(Long companyId, Long id, AgentGroupsVo groups);
 
     /**
      * 删除坐席

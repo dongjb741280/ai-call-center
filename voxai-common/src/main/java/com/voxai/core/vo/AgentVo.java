@@ -5,6 +5,10 @@ import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Min;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author dongjb
@@ -67,8 +71,7 @@ public class AgentVo {
     /**
      * 座席密码,前端传过来已经是sha256加密过的。
      */
-    @NotBlank(message = "坐席密码不能为空")
-    @Size(min = 64, message = "密码长度不对")
+    @Pattern(regexp = "[a-fA-F0-9]{64}", message = "密码格式错误")
     private String passwd;
 
     /**
@@ -79,7 +82,39 @@ public class AgentVo {
     /**
      * 话后自动空闲间隔时长
      */
+    @Min(value = 0, message = "话后时长不能小于0")
     private Integer afterInterval;
+
+    private String display;
+
+    @Range(min = 1, max = 600, message = "振铃时长必须在1-600秒之间")
+    private Integer ringTime;
+
+    @Range(min = 0, max = 1)
+    private Integer record;
+
+    @Range(min = 0, max = 1)
+    private Integer status;
+
+    @Valid
+    private AgentGroupsVo groups;
+
+    @Valid
+    @Size(max = 20, message = "坐席技能不能超过20个")
+    private List<AgentSkillVo> skillAgents;
+
+    public String getDisplay() { return display; }
+    public void setDisplay(String display) { this.display = display; }
+    public Integer getRingTime() { return ringTime; }
+    public void setRingTime(Integer ringTime) { this.ringTime = ringTime; }
+    public Integer getRecord() { return record; }
+    public void setRecord(Integer record) { this.record = record; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+    public AgentGroupsVo getGroups() { return groups; }
+    public void setGroups(AgentGroupsVo groups) { this.groups = groups; }
+    public List<AgentSkillVo> getSkillAgents() { return skillAgents; }
+    public void setSkillAgents(List<AgentSkillVo> skillAgents) { this.skillAgents = skillAgents; }
 
 
     /**

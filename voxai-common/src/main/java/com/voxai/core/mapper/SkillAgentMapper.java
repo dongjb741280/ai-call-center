@@ -21,6 +21,8 @@ public interface SkillAgentMapper extends BaseMapper<SkillAgent> {
      */
     int batchInsert(List<SkillAgent> list);
 
+    int deleteByAgent(@Param("companyId") Long companyId, @Param("agentId") Long agentId);
+
 
     /**
      * 查询坐席技能

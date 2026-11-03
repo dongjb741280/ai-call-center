@@ -167,6 +167,7 @@
         where agent_id = #{agentId}
           and a.group_id = b.id
           and b.status = 1
+          and a.status = 1
     </select>
 
     <select id="selectPrimaryByAgent" parameterType="Long" resultType="Long">
@@ -177,6 +178,7 @@
           and a.group_id = b.id
           and b.status = 1
           and a.is_primary = 1
+          and a.status = 1
         limit 1
     </select>
 

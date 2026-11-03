@@ -55,6 +55,10 @@
     </update>
 
     <!-- 删除坐席技能 -->
+    <delete id="deleteByAgent">
+        delete from cc_skill_agent where company_id = #{companyId} and agent_id = #{agentId}
+    </delete>
+
     <delete id="deleteSkillAgent" parameterType="com.voxai.core.vo.SkillAgentsVo">
         delete from cc_skill_agent where company_id = #{companyId} and skill_id = #{skillId} and agent_id in
         <foreach

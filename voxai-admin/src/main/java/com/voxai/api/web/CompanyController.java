@@ -796,6 +796,12 @@ public class CompanyController extends BaseController {
         return new CommonResponse<>(agentService.saveOrUpdate(agentVo));
     }
 
+    @PutMapping("agent/{id}/groups")
+    public CommonResponse saveAgentGroups(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                         @PathVariable Long id, @Validated @RequestBody AgentGroupsVo groups) {
+        return new CommonResponse<>(agentService.saveAgentGroups(adminAccountInfo.getBindCompanyId(), id, groups));
+    }
+
     /**
      * 1.8.5 删除坐席
      *
