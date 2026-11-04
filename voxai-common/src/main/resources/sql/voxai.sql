@@ -1510,6 +1510,8 @@ CREATE TABLE `cc_company_display` (
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '号码池',
   `type` int NOT NULL DEFAULT '0' COMMENT '1:主叫显号,2:被叫显号',
+  `strategy` varchar(32) NOT NULL DEFAULT '随机' COMMENT '号码策略',
+  `location` varchar(100) NOT NULL DEFAULT '' COMMENT '归属地',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `uni_idx_company_display` (`company_id`,`name`) USING BTREE

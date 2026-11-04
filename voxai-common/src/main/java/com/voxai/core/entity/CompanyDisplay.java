@@ -39,6 +39,10 @@ public class CompanyDisplay implements Serializable {
      */
     private Integer type;
 
+    private String strategy;
+
+    private String location;
+
     /**
      * 状态
      */
@@ -93,6 +97,11 @@ public class CompanyDisplay implements Serializable {
     public void setType(Integer type) {
         this.type = type;
     }
+
+    public String getStrategy() { return strategy; }
+    public void setStrategy(String strategy) { this.strategy = strategy == null ? null : strategy.trim(); }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location == null ? null : location.trim(); }
 
     public Integer getStatus() {
         return status;

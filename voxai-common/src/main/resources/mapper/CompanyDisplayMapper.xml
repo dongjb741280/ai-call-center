@@ -8,13 +8,15 @@
         <result column="company_id" jdbcType="BIGINT" property="companyId"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="strategy" jdbcType="VARCHAR" property="strategy"/>
+        <result column="location" jdbcType="VARCHAR" property="location"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <collection property="companyPhoneList" column="id"
                     select="com.voxai.core.mapper.CompanyPhoneMapper.selectByDisplay"></collection>
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, company_id, name, type, status
+        , cts, uts, company_id, name, type, strategy, location, status
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -29,9 +31,9 @@
     </delete>
     <insert id="insert" parameterType="com.voxai.core.entity.CompanyDisplay">
         insert into cc_company_display (id, cts, uts, company_id,
-                                        name, type, status)
+                                        name, type, strategy, location, status)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{companyId,jdbcType=BIGINT},
-                #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER})
+                #{name,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{strategy,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER})
     </insert>
     <insert id="insertSelective" parameterType="com.voxai.core.entity.CompanyDisplay" useGeneratedKeys="true"
             keyProperty="id">
@@ -55,6 +57,8 @@
             <if test="type != null">
                 type,
             </if>
+            <if test="strategy != null">strategy,</if>
+            <if test="location != null">location,</if>
             <if test="status != null">
                 status,
             </if>
@@ -78,6 +82,8 @@
             <if test="type != null">
                 #{type,jdbcType=INTEGER},
             </if>
+            <if test="strategy != null">#{strategy,jdbcType=VARCHAR},</if>
+            <if test="location != null">#{location,jdbcType=VARCHAR},</if>
             <if test="status != null">
                 #{status,jdbcType=INTEGER},
             </if>
@@ -101,6 +107,8 @@
             <if test="type != null">
                 type = #{type,jdbcType=INTEGER},
             </if>
+            <if test="strategy != null">strategy = #{strategy,jdbcType=VARCHAR},</if>
+            <if test="location != null">location = #{location,jdbcType=VARCHAR},</if>
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
@@ -114,6 +122,8 @@
             company_id = #{companyId,jdbcType=BIGINT},
             name = #{name,jdbcType=VARCHAR},
             type = #{type,jdbcType=INTEGER},
+            strategy = #{strategy,jdbcType=VARCHAR},
+            location = #{location,jdbcType=VARCHAR},
             status = #{status,jdbcType=INTEGER}
         where id = #{id,jdbcType=BIGINT}
     </update>

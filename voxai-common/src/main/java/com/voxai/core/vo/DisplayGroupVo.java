@@ -44,6 +44,10 @@ public class DisplayGroupVo {
     @Range(min = 1, max = 3, message = "号码池类型错误")
     private Integer type;
 
+    private String strategy;
+
+    private String location;
+
 
     @NotNull(message = "号码池号码不能为空")
     private List<Long> phoneIds;
@@ -95,6 +99,11 @@ public class DisplayGroupVo {
     public void setType(Integer type) {
         this.type = type;
     }
+
+    public String getStrategy() { return strategy; }
+    public void setStrategy(String strategy) { this.strategy = strategy; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     public List<Long> getPhoneIds() {
         return phoneIds;
