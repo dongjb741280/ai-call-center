@@ -112,18 +112,16 @@ public class GroupHandler extends BaseHandler {
         switch (groupOverFlow.getHandleType()) {
             case 1:
                 logger.info("group:{} handleType is lineUp, queueTimeout:{}秒, busyType:{}, busyTimeoutType:{}, overflowType:{}, overflowValue:{}, callId:{}", groupInfo.getName(), groupOverFlow.getQueueTimeout(), groupOverFlow.getBusyType(), groupOverFlow.getBusyTimeoutType(), groupOverFlow.getOverflowType(), groupOverFlow.getOverflowValue(), callInfo.getCallId());
-                PriorityQueue<CallQueue> callQueues = callInfoMap.get(groupId);
-                if (callQueues == null) {
-                    callQueues = new PriorityQueue<CallQueue>();
-                }
+                PriorityQueue<CallQueue> callQueues = callInfoMap.computeIfAbsent(groupId, key -> new PriorityQueue<CallQueue>());
                 callInfo.setQueueStartTime(Instant.now().toEpochMilli());
                 if (callInfo.getFristQueueTime() == null) {
                     callInfo.setFristQueueTime(callInfo.getQueueStartTime());
                 }
                 Long queueLevel = groupOverFlow.getLineupStrategy().calculateLevel(callInfo);
                 callInfo.setQueueLevel(queueLevel);
-                callQueues.add(new CallQueue(callInfo.getQueueLevel(), callInfo.getCallId(), deviceId, callInfo.getQueueStartTime() / 1000, groupId, groupOverFlow));
-                callInfoMap.put(callInfo.getGroupId(), callQueues);
+                synchronized (callQueues) {
+                    callQueues.add(new CallQueue(callInfo.getQueueLevel(), callInfo.getCallId(), deviceId, callInfo.getQueueStartTime(), groupId, groupOverFlow));
+                }
                 cacheService.addCallInfo(callInfo);
 
                 /**
@@ -385,7 +383,9 @@ public class GroupHandler extends BaseHandler {
         if (callQueues == null) {
             return;
         }
-        callQueues.remove(callId);
+        synchronized (callQueues) {
+            callQueues.removeIf(callQueue -> callQueue.getCallId().equals(callId));
+        }
     }
 
     /**
@@ -400,10 +400,15 @@ public class GroupHandler extends BaseHandler {
         }
         for (GroupOverflowPo groupOverflowPo : groupInfo.getGroupOverflows()) {
             PriorityQueue<CallQueue> callQueues = callInfoMap.get(groupInfo.getId());
-            if (groupOverflowPo.isAvailable(callQueues == null ? 0 : callQueues.size(), groupInfo.getMaxWaitTime(), groupInfo.getCallInAnswer(), groupInfo.getCallInTotal())) {
+            int queueSize = 0;
+            if (callQueues != null) {
+                synchronized (callQueues) {
+                    queueSize = callQueues.size();
+                }
+            }
+            if (groupOverflowPo.isAvailable(queueSize, groupInfo.getMaxWaitTime(), groupInfo.getCallInAnswer(), groupInfo.getCallInTotal())) {
                 return groupOverflowPo;
             }
-            return null;
         }
         return null;
     }
@@ -489,32 +494,55 @@ public class GroupHandler extends BaseHandler {
                 continue;
             }
 
-            Iterator<CallQueue> iterator = entry.iterator();
-            while (iterator.hasNext()) {
-                CallQueue callQueue = iterator.next();
-                //正常排队超时
-                if (now / 1000 - callQueue.getStartTime() >= callQueue.getGroupOverflowPo().getQueueTimeout().longValue()) {
-                    callAgentService.execute(() -> {
-                        queueTimeout(callQueue);
-                    });
-                    iterator.remove();
-                    continue;
+            List<CallQueue> timeoutQueues = new ArrayList<>();
+            synchronized (entry) {
+                for (CallQueue callQueue : entry) {
+                    if (now - callQueue.getStartTime() >= TimeUnit.SECONDS.toMillis(callQueue.getGroupOverflowPo().getQueueTimeout().longValue())) {
+                        timeoutQueues.add(callQueue);
+                    }
                 }
+                entry.removeAll(timeoutQueues);
+            }
+            for (CallQueue callQueue : timeoutQueues) {
+                callAgentService.execute(() -> queueTimeout(callQueue));
+            }
 
+            while (true) {
+                CallQueue callQueue;
+                synchronized (entry) {
+                    callQueue = entry.peek();
+                }
+                if (callQueue == null) {
+                    break;
+                }
                 //查找空闲坐席
                 AgentInfo agentInfo = this.getAgentQueue(groupInfo.getId());
                 if (agentInfo == null) {
-                    if (!callQueue.isPlay()) {
-                        CallInfo callInfo = cacheService.getCallInfo(callQueue.getCallId());
-                        fsListen.playfile(callInfo.getMediaHost(), callQueue.getDeviceId(), "queue.wav");
-                        callQueue.setPlay(true);
+                    List<CallQueue> waitingCalls;
+                    synchronized (entry) {
+                        waitingCalls = new ArrayList<>(entry);
                     }
-                    continue;
+                    for (CallQueue waitingCall : waitingCalls) {
+                        if (!waitingCall.isPlay()) {
+                            CallInfo waitingCallInfo = cacheService.getCallInfo(waitingCall.getCallId());
+                            if (waitingCallInfo != null) {
+                                fsListen.playfile(waitingCallInfo.getMediaHost(), waitingCall.getDeviceId(), "queue.wav");
+                                waitingCall.setPlay(true);
+                            }
+                        }
+                    }
+                    break;
                 }
-                iterator.remove();
+                synchronized (entry) {
+                    if (!entry.remove(callQueue)) {
+                        agentFree(agentInfo);
+                        continue;
+                    }
+                }
                 //先停止放音
                 CallInfo callInfo = cacheService.getCallInfo(callQueue.getCallId());
                 if (callInfo == null) {
+                    agentFree(agentInfo);
                     continue;
                 }
                 callAgentService.execute(() -> {
@@ -538,7 +566,7 @@ public class GroupHandler extends BaseHandler {
     public void start() {
         scheduledExecutorService.scheduleAtFixedRate(() -> {
             acd();
-        }, 5, 1, TimeUnit.SECONDS);
+        }, 100, 100, TimeUnit.MILLISECONDS);
     }
 
 
@@ -663,7 +691,8 @@ public class GroupHandler extends BaseHandler {
 
         @Override
         public int compareTo(CallQueue o) {
-            return priority.compareTo(this.priority);
+            int priorityOrder = o.priority.compareTo(this.priority);
+            return priorityOrder != 0 ? priorityOrder : startTime.compareTo(o.startTime);
         }
     }
 }

@@ -25,7 +25,7 @@ public class GroupOverFlow extends OverflowConfig {
     private List<OverflowExp> overflowExps;
 
     public String getCalculateExp(){
-        return "";
+        return getLineupExpression();
     }
 
     public List<OverflowFront> getOverflowFronts() {

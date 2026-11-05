@@ -20,6 +20,6 @@ public class VipLineupStrategy implements LineupStrategy {
             vipLevel = Long.parseLong(callInfo.getProcessData().get(Constant.VIP_LEVEL).toString());
             logger.info("callId:{} lineup of vipLevel:{}", callInfo.getCallId(), vipLevel);
         }
-        return vipLevel - callInfo.getQueueStartTime();
+        return vipLevel;
     }
 }

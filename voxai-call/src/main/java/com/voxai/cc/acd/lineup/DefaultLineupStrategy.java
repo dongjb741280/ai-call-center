@@ -11,6 +11,6 @@ public class DefaultLineupStrategy implements LineupStrategy {
 
     @Override
     public Long calculateLevel(CallInfo callInfo) {
-        return -callInfo.getQueueStartTime();
+        return 0L;
     }
 }
