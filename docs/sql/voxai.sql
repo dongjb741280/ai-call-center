@@ -730,7 +730,8 @@ CREATE TABLE `cc_call_detail` (
   `ext2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_calldetail_call_id` (`call_id`) USING BTREE
+  KEY `idx_calldetail_call_id` (`call_id`) USING BTREE,
+  UNIQUE KEY `uniq_cdr_detail` (`call_id`,`detail_index`)
 ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='通话流程表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -763,7 +764,8 @@ CREATE TABLE `cc_call_detail_202610` (
   `reason` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '出队列原因:排队挂机或者转坐席',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_detail` (`call_id`,`detail_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -822,7 +824,8 @@ CREATE TABLE `cc_call_device` (
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_calldetail__call_id` (`call_id`) USING BTREE
+  KEY `idx_calldetail__call_id` (`call_id`) USING BTREE,
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=959 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='话单明细表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -879,7 +882,8 @@ CREATE TABLE `cc_call_device_202605` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -936,7 +940,8 @@ CREATE TABLE `cc_call_device_202606` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -993,7 +998,8 @@ CREATE TABLE `cc_call_device_202607` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1050,7 +1056,8 @@ CREATE TABLE `cc_call_device_202608` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1107,7 +1114,8 @@ CREATE TABLE `cc_call_device_202609` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1164,7 +1172,8 @@ CREATE TABLE `cc_call_device_202610` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1221,7 +1230,8 @@ CREATE TABLE `cc_call_device_202611` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1278,7 +1288,8 @@ CREATE TABLE `cc_call_device_202612` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1451,7 +1462,8 @@ CREATE TABLE `cc_call_log_202607` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1521,7 +1533,8 @@ CREATE TABLE `cc_call_log_202608` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1591,7 +1604,8 @@ CREATE TABLE `cc_call_log_202609` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1661,7 +1675,8 @@ CREATE TABLE `cc_call_log_202610` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1731,7 +1746,8 @@ CREATE TABLE `cc_call_log_202611` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1801,7 +1817,8 @@ CREATE TABLE `cc_call_log_202612` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3676,3 +3693,17 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-11-03  8:38:30
+
+CREATE TABLE IF NOT EXISTS cc_cdr_notify (
+    call_id BIGINT NOT NULL PRIMARY KEY,
+    company_id BIGINT NOT NULL,
+    cdr_notify_url VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    push_times INT NOT NULL DEFAULT 0,
+    push_response VARCHAR(255) NOT NULL DEFAULT '',
+    status INT NOT NULL DEFAULT 1 COMMENT '1 pending, 2 delivered, 3 exhausted',
+    next_attempt_at BIGINT NOT NULL COMMENT 'epoch milliseconds',
+    lease_until BIGINT NOT NULL DEFAULT 0 COMMENT 'epoch milliseconds',
+    lease_token VARCHAR(36) NOT NULL DEFAULT '',
+    KEY idx_cdr_notify_due (status, next_attempt_at, lease_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -538,9 +538,9 @@ DROP TABLE IF EXISTS `cc_call_detail`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_detail` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `start_time` bigint NOT NULL DEFAULT '0' COMMENT '开始时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `start_time` bigint NOT NULL DEFAULT '0' COMMENT '开始时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `detail_index` int NOT NULL DEFAULT '1' COMMENT '顺序',
   `transfer_type` int NOT NULL DEFAULT '0' COMMENT '1:进vdn,2:进ivr,3:技能组,4:按键收号,5:外线,6:机器人,10:服务评价',
@@ -550,7 +550,8 @@ CREATE TABLE `cc_call_detail` (
   `ext2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_calldetail_call_id` (`call_id`) USING BTREE
+  KEY `idx_calldetail_call_id` (`call_id`) USING BTREE,
+  UNIQUE KEY `uniq_cdr_detail` (`call_id`,`detail_index`)
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='通话流程表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -563,9 +564,9 @@ DROP TABLE IF EXISTS `cc_call_detail_202610`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_detail_202610` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `start_time` bigint NOT NULL DEFAULT '0' COMMENT '开始时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `start_time` bigint NOT NULL DEFAULT '0' COMMENT '开始时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `detail_index` int NOT NULL DEFAULT '1' COMMENT '顺序',
   `transfer_type` int NOT NULL DEFAULT '0' COMMENT '1:进vdn,2:进ivr,3:技能组,4:按键收号,5:外线,6:机器人,10:服务评价',
@@ -573,7 +574,8 @@ CREATE TABLE `cc_call_detail_202610` (
   `reason` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '出队列原因:排队挂机或者转坐席',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_detail` (`call_id`,`detail_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -586,8 +588,8 @@ DROP TABLE IF EXISTS `cc_call_device`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -601,15 +603,15 @@ CREATE TABLE `cc_call_device` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -622,7 +624,8 @@ CREATE TABLE `cc_call_device` (
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_calldetail__call_id` (`call_id`) USING BTREE
+  KEY `idx_calldetail__call_id` (`call_id`) USING BTREE,
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=947 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='话单明细表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -635,8 +638,8 @@ DROP TABLE IF EXISTS `cc_call_device_202605`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202605` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -650,15 +653,15 @@ CREATE TABLE `cc_call_device_202605` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -669,7 +672,8 @@ CREATE TABLE `cc_call_device_202605` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -682,8 +686,8 @@ DROP TABLE IF EXISTS `cc_call_device_202606`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202606` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -697,15 +701,15 @@ CREATE TABLE `cc_call_device_202606` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -716,7 +720,8 @@ CREATE TABLE `cc_call_device_202606` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -729,8 +734,8 @@ DROP TABLE IF EXISTS `cc_call_device_202607`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202607` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -744,15 +749,15 @@ CREATE TABLE `cc_call_device_202607` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -763,7 +768,8 @@ CREATE TABLE `cc_call_device_202607` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -776,8 +782,8 @@ DROP TABLE IF EXISTS `cc_call_device_202608`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202608` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -791,15 +797,15 @@ CREATE TABLE `cc_call_device_202608` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -810,7 +816,8 @@ CREATE TABLE `cc_call_device_202608` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -823,8 +830,8 @@ DROP TABLE IF EXISTS `cc_call_device_202609`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202609` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -838,15 +845,15 @@ CREATE TABLE `cc_call_device_202609` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -857,7 +864,8 @@ CREATE TABLE `cc_call_device_202609` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -870,8 +878,8 @@ DROP TABLE IF EXISTS `cc_call_device_202610`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202610` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -885,15 +893,15 @@ CREATE TABLE `cc_call_device_202610` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -904,7 +912,8 @@ CREATE TABLE `cc_call_device_202610` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -917,8 +926,8 @@ DROP TABLE IF EXISTS `cc_call_device_202611`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202611` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -932,15 +941,15 @@ CREATE TABLE `cc_call_device_202611` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -951,7 +960,8 @@ CREATE TABLE `cc_call_device_202611` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -964,8 +974,8 @@ DROP TABLE IF EXISTS `cc_call_device_202612`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_device_202612` (
   `id` bigint NOT NULL DEFAULT '0' COMMENT 'PK',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '租户id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '通话ID',
   `device_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '设备id',
@@ -979,15 +989,15 @@ CREATE TABLE `cc_call_device_202612` (
   `display` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '显号',
   `called_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
   `caller_location` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '被叫归属地',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间',
-  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间',
-  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `ring_start_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃开始时间（毫秒）',
+  `ring_end_time` bigint NOT NULL DEFAULT '0' COMMENT '振铃结束时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接通时间（毫秒）',
+  `bridge_time` bigint NOT NULL DEFAULT '0' COMMENT '桥接时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
   `sip_protocol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '信令协议(tcp/udp)',
   `record` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '录音地址',
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
@@ -998,7 +1008,8 @@ CREATE TABLE `cc_call_device_202612` (
   `sip_status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT 'sip状态',
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段1',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展字段2',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_cdr_device` (`call_id`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1030,8 +1041,8 @@ DROP TABLE IF EXISTS `cc_call_log`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1046,13 +1057,13 @@ CREATE TABLE `cc_call_log` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1064,12 +1075,12 @@ CREATE TABLE `cc_call_log` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1095,8 +1106,8 @@ DROP TABLE IF EXISTS `cc_call_log_202607`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202607` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1111,13 +1122,13 @@ CREATE TABLE `cc_call_log_202607` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1129,12 +1140,12 @@ CREATE TABLE `cc_call_log_202607` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1142,7 +1153,8 @@ CREATE TABLE `cc_call_log_202607` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1155,8 +1167,8 @@ DROP TABLE IF EXISTS `cc_call_log_202608`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202608` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1171,13 +1183,13 @@ CREATE TABLE `cc_call_log_202608` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1189,12 +1201,12 @@ CREATE TABLE `cc_call_log_202608` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1202,7 +1214,8 @@ CREATE TABLE `cc_call_log_202608` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1215,8 +1228,8 @@ DROP TABLE IF EXISTS `cc_call_log_202609`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202609` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1231,13 +1244,13 @@ CREATE TABLE `cc_call_log_202609` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1249,12 +1262,12 @@ CREATE TABLE `cc_call_log_202609` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1262,7 +1275,8 @@ CREATE TABLE `cc_call_log_202609` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1275,8 +1289,8 @@ DROP TABLE IF EXISTS `cc_call_log_202610`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202610` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1291,13 +1305,13 @@ CREATE TABLE `cc_call_log_202610` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1309,12 +1323,12 @@ CREATE TABLE `cc_call_log_202610` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1322,7 +1336,8 @@ CREATE TABLE `cc_call_log_202610` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1335,8 +1350,8 @@ DROP TABLE IF EXISTS `cc_call_log_202611`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202611` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1351,13 +1366,13 @@ CREATE TABLE `cc_call_log_202611` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1369,12 +1384,12 @@ CREATE TABLE `cc_call_log_202611` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1382,7 +1397,8 @@ CREATE TABLE `cc_call_log_202611` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1395,8 +1411,8 @@ DROP TABLE IF EXISTS `cc_call_log_202612`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cc_call_log_202612` (
   `id` bigint NOT NULL DEFAULT '0',
-  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间',
-  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `cts` bigint NOT NULL DEFAULT '0' COMMENT '落单时间（毫秒）',
+  `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间（毫秒）',
   `company_id` bigint NOT NULL DEFAULT '0' COMMENT '企业id',
   `call_id` bigint NOT NULL DEFAULT '0' COMMENT '话单id',
   `caller_display` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '主叫显号',
@@ -1411,13 +1427,13 @@ CREATE TABLE `cc_call_log_202612` (
   `task_id` bigint NOT NULL DEFAULT '0' COMMENT '任务ID',
   `ivr_id` bigint NOT NULL DEFAULT '0' COMMENT 'ivr',
   `bot_id` bigint NOT NULL DEFAULT '0' COMMENT '机器人id',
-  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间',
-  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间',
-  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间',
+  `call_time` bigint NOT NULL DEFAULT '0' COMMENT '呼叫开始时间（毫秒）',
+  `answer_time` bigint NOT NULL DEFAULT '0' COMMENT '接听时间（毫秒）',
+  `end_time` bigint NOT NULL DEFAULT '0' COMMENT '结束时间（毫秒）',
   `call_type` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫类型',
   `direction` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '呼叫方向',
   `answer_flag` int NOT NULL DEFAULT '0' COMMENT '通话标识(0:接通,1:坐席未接用户未接,2:坐席接通用户未接通,3:用户接通坐席未接通)',
-  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长',
+  `wait_time` bigint NOT NULL DEFAULT '0' COMMENT '累计等待时长（毫秒）',
   `answer_count` int NOT NULL DEFAULT '0' COMMENT '应答设备数',
   `hangup_dir` int NOT NULL DEFAULT '1' COMMENT '挂机方向(1:主叫挂机,2:被叫挂机,3:系统挂机)',
   `sdk_hangup` int NOT NULL DEFAULT '0' COMMENT '是否sdk挂机(1:sdk挂机)',
@@ -1429,12 +1445,12 @@ CREATE TABLE `cc_call_log_202612` (
   `record2` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备用录音地址',
   `record_type` int NOT NULL DEFAULT '1' COMMENT '录音状态',
-  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间',
-  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时间',
-  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长',
-  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间',
-  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间',
-  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间',
+  `record_start_time` bigint NOT NULL DEFAULT '0' COMMENT '录音开始时间（毫秒）',
+  `record_time` bigint NOT NULL DEFAULT '0' COMMENT '录音时长（毫秒）',
+  `talk_time` bigint NOT NULL DEFAULT '0' COMMENT '通话时长（毫秒）',
+  `frist_queue_time` bigint NOT NULL DEFAULT '0' COMMENT '第一次进队列时间（毫秒）',
+  `queue_start_time` bigint NOT NULL DEFAULT '0' COMMENT '进队列时间（毫秒）',
+  `queue_end_time` bigint NOT NULL DEFAULT '0' COMMENT '出队列时间（毫秒）',
   `month_time` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '月份',
   `follow_data` varchar(4096) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '通话随路数据(2048)',
   `uuid1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展1',
@@ -1442,7 +1458,8 @@ CREATE TABLE `cc_call_log_202612` (
   `ext1` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展3',
   `ext2` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展4',
   `ext3` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '扩展5',
-  `status` int NOT NULL DEFAULT '1' COMMENT '状态'
+  `status` int NOT NULL DEFAULT '1' COMMENT '状态',
+  UNIQUE KEY `uniq_calllog_call_id` (`call_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2771,3 +2788,17 @@ CREATE TABLE `QRTZ_TRIGGERS` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-10-27  8:48:13
+
+CREATE TABLE IF NOT EXISTS cc_cdr_notify (
+    call_id BIGINT NOT NULL PRIMARY KEY,
+    company_id BIGINT NOT NULL,
+    cdr_notify_url VARCHAR(255) NOT NULL,
+    content LONGTEXT NOT NULL,
+    push_times INT NOT NULL DEFAULT 0,
+    push_response VARCHAR(255) NOT NULL DEFAULT '',
+    status INT NOT NULL DEFAULT 1 COMMENT '1 pending, 2 delivered, 3 exhausted',
+    next_attempt_at BIGINT NOT NULL COMMENT 'epoch milliseconds',
+    lease_until BIGINT NOT NULL DEFAULT 0 COMMENT 'epoch milliseconds',
+    lease_token VARCHAR(36) NOT NULL DEFAULT '',
+    KEY idx_cdr_notify_due (status, next_attempt_at, lease_until)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
