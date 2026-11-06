@@ -119,9 +119,12 @@ public class CallInfo implements Serializable {
     private String record2;
 
     /**
-     * 录音开始时间
+     * 录音时长（毫秒）
      */
     private Long recordTime;
+
+    /** Recording start, epoch milliseconds. */
+    private Long recordStartTime;
 
     /**
      * 呼叫开始时间
@@ -180,7 +183,7 @@ public class CallInfo implements Serializable {
     private Long endTime;
 
     /**
-     * 通话时长(秒)
+     * 通话时长（毫秒）
      */
     private Long talkTime;
 
@@ -422,6 +425,9 @@ public class CallInfo implements Serializable {
     public void setRecord2(String record2) {
         this.record2 = record2;
     }
+
+    public Long getRecordStartTime() { return recordStartTime; }
+    public void setRecordStartTime(Long value) { recordStartTime = value; }
 
     public Long getRecordTime() {
         return recordTime;

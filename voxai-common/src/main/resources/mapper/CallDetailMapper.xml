@@ -121,7 +121,7 @@
         </trim>
     </insert>
 
-    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallDetail">
+    <sql id="CdrMonthInsert">
         insert into cc_call_detail${month}
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -199,6 +199,9 @@
                 #{status,jdbcType=INTEGER},
             </if>
         </trim>
+    </sql>
+    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallDetail">
+        <include refid="CdrMonthInsert"/>
     </insert>
 
 
@@ -282,4 +285,22 @@
         from cc_call_detail
         where start_time &lt; #{end}
     </delete>
+
+    <!-- Internal CDR upsert. month/monthTime is validated by CdrPersistenceService. -->
+    <insert id="upsertCdr" parameterType="com.voxai.core.entity.CallDetail">
+        <include refid="CdrMonthInsert"/>
+        on duplicate key update
+        <trim suffixOverrides=",">
+            <if test="startTime != null">start_time = values(start_time),</if>
+            <if test="endTime != null">end_time = values(end_time),</if>
+            <if test="detailIndex != null">detail_index = values(detail_index),</if>
+            <if test="transferType != null">transfer_type = values(transfer_type),</if>
+            <if test="transferId != null">transfer_id = values(transfer_id),</if>
+            <if test="reason != null">reason = values(reason),</if>
+            <if test="ext1 != null">ext1 = values(ext1),</if>
+            <if test="ext2 != null">ext2 = values(ext2),</if>
+            <if test="status != null">status = values(status),</if>
+            call_id = values(call_id),
+        </trim>
+    </insert>
 </mapper>

@@ -263,7 +263,7 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
             String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + deviceInfo.getDeviceId() + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
             super.record(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId(), record);
             deviceInfo.setRecord(record);
-            deviceInfo.setRecordTime(event.getTimestamp() / 1000);
+            deviceInfo.setRecordStartTime(event.getTimestamp() / 1000);
             callInfo.getDeviceInfoMap().put(deviceInfo.getDeviceId(), deviceInfo);
         }
 

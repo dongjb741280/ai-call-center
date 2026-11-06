@@ -305,7 +305,7 @@
             </if>
         </trim>
     </insert>
-    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallDevice">
+    <sql id="CdrMonthInsert">
         insert into cc_call_device${month}
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -527,6 +527,9 @@
                 #{status,jdbcType=INTEGER},
             </if>
         </trim>
+    </sql>
+    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallDevice">
+        <include refid="CdrMonthInsert"/>
     </insert>
 
     <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.CallDevice">
@@ -691,4 +694,46 @@
           order by call_time asc
     </select>
 
+
+    <!-- Internal CDR upsert. month/monthTime is validated by CdrPersistenceService. -->
+    <insert id="upsertCdr" parameterType="com.voxai.core.entity.CallDevice">
+        <include refid="CdrMonthInsert"/>
+        on duplicate key update
+        <trim suffixOverrides=",">
+            <if test="uts != null">uts = values(uts),</if>
+            <if test="companyId != null">company_id = values(company_id),</if>
+            <if test="deviceId != null">device_id = values(device_id),</if>
+            <if test="agentKey != null">agent_key = values(agent_key),</if>
+            <if test="agentName != null">agent_name = values(agent_name),</if>
+            <if test="deviceType != null">device_type = values(device_type),</if>
+            <if test="cdrType != null">cdr_type = values(cdr_type),</if>
+            <if test="fromAgent != null">from_agent = values(from_agent),</if>
+            <if test="caller != null">caller = values(caller),</if>
+            <if test="called != null">called = values(called),</if>
+            <if test="display != null">display = values(display),</if>
+            <if test="calledLocation != null">called_location = values(called_location),</if>
+            <if test="callerLocation != null">caller_location = values(caller_location),</if>
+            <if test="callTime != null">call_time = values(call_time),</if>
+            <if test="ringStartTime != null">ring_start_time = values(ring_start_time),</if>
+            <if test="ringEndTime != null">ring_end_time = values(ring_end_time),</if>
+            <if test="answerTime != null">answer_time = values(answer_time),</if>
+            <if test="bridgeTime != null">bridge_time = values(bridge_time),</if>
+            <if test="endTime != null">end_time = values(end_time),</if>
+            <if test="talkTime != null">talk_time = values(talk_time),</if>
+            <if test="recordStartTime != null">record_start_time = values(record_start_time),</if>
+            <if test="recordTime != null">record_time = values(record_time),</if>
+            <if test="sipProtocol != null">sip_protocol = values(sip_protocol),</if>
+            <if test="record != null">record = values(record),</if>
+            <if test="record2 != null">record2 = values(record2),</if>
+            <if test="record3 != null">record3 = values(record3),</if>
+            <if test="channelName != null">channel_name = values(channel_name),</if>
+            <if test="hangupCause != null">hangup_cause = values(hangup_cause),</if>
+            <if test="ringCause != null">ring_cause = values(ring_cause),</if>
+            <if test="sipStatus != null">sip_status = values(sip_status),</if>
+            <if test="ext1 != null">ext1 = values(ext1),</if>
+            <if test="ext2 != null">ext2 = values(ext2),</if>
+            <if test="status != null">status = values(status),</if>
+            call_id = values(call_id),
+        </trim>
+    </insert>
 </mapper>

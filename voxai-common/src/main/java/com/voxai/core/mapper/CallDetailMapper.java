@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CallDetailMapper extends BaseMapper<CallDetail> {
 
-    CallDetail selectByCallId(Long callId, String month);
+    java.util.List<CallDetail> selectByCallId(@Param("callId") Long callId, @Param("monthTime") String month);
 
     List<CallDetail> selectListByCallId(@Param("callId") Long callId, @Param("monthTime") String monthTime);
 
@@ -30,4 +30,5 @@ public interface CallDetailMapper extends BaseMapper<CallDetail> {
      * @param end
      */
     int clearTable( @Param("end") Long end);
+    int upsertCdr(CallDetail record);
 }

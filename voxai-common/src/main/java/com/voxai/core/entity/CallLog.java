@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author dongjb
  * @date   2025/09/03
  */
+/** Time points: epoch milliseconds. Durations: milliseconds. */
 public class CallLog implements Serializable {
     /**
      * 
@@ -191,12 +192,12 @@ public class CallLog implements Serializable {
     private Long recordStartTime;
 
     /**
-     * 录音时间
+     * 录音时长（毫秒）
      */
     private Long recordTime;
 
     /**
-     * 通话时长
+     * 通话时长（毫秒）
      */
     private Long talkTime;
 

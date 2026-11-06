@@ -33,6 +33,8 @@ public interface CallCdrService extends BaseService<CallLog> {
 
     int saveOrUpdateCallLog(CallLog callLog);
 
+    void completeCall(com.voxai.cc.cdr.CdrCompletion completion);
+
 
     /**
      * @param companyId

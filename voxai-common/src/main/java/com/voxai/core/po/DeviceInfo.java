@@ -4,6 +4,7 @@ package com.voxai.core.po;
  * @author dongjb
  * @date 2026/07/27
  */
+/** Time points: epoch milliseconds. Durations: milliseconds. */
 public class DeviceInfo {
 
     /**
@@ -102,7 +103,7 @@ public class DeviceInfo {
     private Long endTime;
 
     /**
-     * 通话时长
+     * 通话时长（毫秒）
      */
     private Long talkTime;
 
@@ -137,7 +138,7 @@ public class DeviceInfo {
     private String record;
 
     /**
-     * 录音时长
+     * 录音时长（毫秒）
      */
     private Long recordTime;
 

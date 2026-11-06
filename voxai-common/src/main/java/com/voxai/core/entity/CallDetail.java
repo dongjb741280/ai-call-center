@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author dongjb
  * @date   2025/09/03
  */
+/** Time points: epoch milliseconds. Durations: milliseconds. */
 public class CallDetail implements Serializable {
     /**
      * PK

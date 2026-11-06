@@ -14,7 +14,7 @@ public interface CallDeviceMapper extends BaseMapper<CallDevice> {
      * @param callId
      * @return
      */
-    CallDevice selectByCallId(Long callId , String month);
+    java.util.List<CallDevice> selectByCallId(@Param("callId") Long callId, @Param("monthTime") String month);
 
 
     /**
@@ -31,4 +31,5 @@ public interface CallDeviceMapper extends BaseMapper<CallDevice> {
      * @param end
      */
     int clearTable( @Param("end") Long end);
+    int upsertCdr(CallDevice record);
 }

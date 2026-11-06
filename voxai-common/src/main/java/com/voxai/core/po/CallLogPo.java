@@ -195,13 +195,16 @@ public class CallLogPo implements Serializable {
     private Integer recordType;
 
     /**
-     * 录音开始时间
+     * 录音时长（毫秒）
      */
     @JSONField(defaultValue = "0")
     private Long recordTime;
 
+    /** Recording start, epoch milliseconds. */
+    private Long recordStartTime;
+
     /**
-     * 通话时长(秒)
+     * 通话时长（毫秒）
      */
     @JSONField(defaultValue = "0")
     private Long talkTime;
@@ -534,6 +537,9 @@ public class CallLogPo implements Serializable {
     public void setRecordType(Integer recordType) {
         this.recordType = recordType;
     }
+
+    public Long getRecordStartTime() { return recordStartTime; }
+    public void setRecordStartTime(Long value) { recordStartTime = value; }
 
     public Long getRecordTime() {
         return recordTime;

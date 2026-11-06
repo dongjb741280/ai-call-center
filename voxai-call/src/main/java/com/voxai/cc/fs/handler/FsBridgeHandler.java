@@ -39,7 +39,7 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
             CallLog callLog = new CallLog();
             BeanUtils.copyProperties(callInfo, callLog);
             callLog.setDirection(callInfo.getDirection().name());
-            callLog.setCts(callInfo.getCallTime() / 1000);
+            callLog.setCts(callInfo.getCallTime());
             if (callInfo.getHiddenCustomer() == 1) {
                 //隐藏客户侧号码
                 if (Direction.INBOUND == callInfo.getDirection()) {

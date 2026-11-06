@@ -37,8 +37,8 @@
         <result column="record2" jdbcType="VARCHAR" property="record2"/>
         <result column="record3" jdbcType="VARCHAR" property="record3"/>
         <result column="record_type" jdbcType="INTEGER" property="recordType"/>
-        <result column="record_start_time" jdbcType="BIGINT" property="recordStartTime"/>
         <result column="record_time" jdbcType="BIGINT" property="recordTime"/>
+        <result column="record_start_time" jdbcType="BIGINT" property="recordStartTime"/>
         <result column="talk_time" jdbcType="BIGINT" property="talkTime"/>
         <result column="frist_queue_time" jdbcType="BIGINT" property="fristQueueTime"/>
         <result column="queue_start_time" jdbcType="BIGINT" property="queueStartTime"/>
@@ -75,6 +75,9 @@
     </delete>
 
     <insert id="insertSelective" parameterType="com.voxai.core.entity.CallLog">
+        <include refid="CdrCurrentInsert"/>
+    </insert>
+    <sql id="CdrCurrentInsert">
         insert into cc_call_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -374,8 +377,8 @@
                 #{status,jdbcType=INTEGER},
             </if>
         </trim>
-    </insert>
-    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallLog">
+    </sql>
+    <sql id="CdrMonthInsert">
         insert into cc_call_log${monthTime}
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -675,6 +678,9 @@
                 #{status,jdbcType=INTEGER},
             </if>
         </trim>
+    </sql>
+    <insert id="insertMonthSelective" parameterType="com.voxai.core.entity.CallLog">
+        <include refid="CdrMonthInsert"/>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.voxai.core.entity.CallLog">
         update cc_call_log
@@ -914,6 +920,7 @@
         <result column="record3" jdbcType="VARCHAR" property="record3"/>
         <result column="record_type" jdbcType="INTEGER" property="recordType"/>
         <result column="record_time" jdbcType="BIGINT" property="recordTime"/>
+        <result column="record_start_time" jdbcType="BIGINT" property="recordStartTime"/>
         <result column="talk_time" jdbcType="BIGINT" property="talkTime"/>
         <result column="frist_queue_time" jdbcType="BIGINT" property="fristQueueTime"/>
         <result column="queue_start_time" jdbcType="BIGINT" property="queueStartTime"/>
@@ -945,7 +952,7 @@
             <if test="callType != null">and call_type = #{callType,jdbcType=VARCHAR}</if>
             <if test="direction != null">and direction = #{direction,jdbcType=VARCHAR}</if>
             <if test="answerFlag != null">and answer_flag = #{answerFlag,jdbcType=INTEGER}</if>
-            <if test="hangupDir != null">hangup_dir = #{hangupDir,jdbcType=INTEGER}</if>
+            <if test="hangupDir != null">and hangup_dir = #{hangupDir,jdbcType=INTEGER}</if>
             <if test="hangupCode != null">and hangup_code = #{hangupCode,jdbcType=INTEGER}</if>
             <if test="mediaHost != null">and media_host = #{mediaHost,jdbcType=VARCHAR}</if>
             <if test="ctiHost != null">and cti_host = #{ctiHost,jdbcType=VARCHAR}</if>
@@ -1058,6 +1065,11 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
+            <if test="monthTime != null">month_time = #{monthTime},</if>
+            <if test="recordStartTime != null">record_start_time = #{recordStartTime},</if>
+            <if test="queueStartTime != null">queue_start_time = #{queueStartTime},</if>
+            <if test="queueEndTime != null">queue_end_time = #{queueEndTime},</if>
+            <if test="fristQueueTime != null">frist_queue_time = #{fristQueueTime},</if>
         </set>
         where call_id = #{callId,jdbcType=BIGINT}
     </update>
@@ -1092,13 +1104,13 @@
         select
         <include refid="Base_Column_List"/>
         from
-        cc_call_log
+        <choose><when test="monthTime != null and monthTime != ''">cc_call_log${monthTime}</when><otherwise>cc_call_log</otherwise></choose>
         <include refid="Base_Where"/>
         order by call_time desc
     </select>
 
     <select id="selectCountByMap" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(0) from cc_call_log
+        select count(0) from <choose><when test="monthTime != null and monthTime != ''">cc_call_log${monthTime}</when><otherwise>cc_call_log</otherwise></choose>
         <include refid="Base_Where"/>
     </select>
 
@@ -1106,7 +1118,7 @@
     <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from cc_call_log
+        from <choose><when test="monthTime != null and monthTime != ''">cc_call_log${monthTime}</when><otherwise>cc_call_log</otherwise></choose>
         <include refid="Base_Where"/>
         order by call_time desc
     </select>
@@ -1121,4 +1133,120 @@
         from cc_call_log
         where call_time &lt; #{end}
     </delete>
+
+    <!-- Internal CDR upsert. month/monthTime is validated by CdrPersistenceService. -->
+    <insert id="upsertCdr" parameterType="com.voxai.core.entity.CallLog">
+        <include refid="CdrMonthInsert"/>
+        on duplicate key update
+        <trim suffixOverrides=",">
+            <choose>
+                <when test="endTime != null and endTime > 0">
+                    <if test="uts != null">uts = values(uts),</if>
+                    <if test="companyId != null">company_id = values(company_id),</if>
+                    <if test="callerDisplay != null">caller_display = values(caller_display),</if>
+                    <if test="caller != null">caller = values(caller),</if>
+                    <if test="calledDisplay != null">called_display = values(called_display),</if>
+                    <if test="called != null">called = values(called),</if>
+                    <if test="numberLocation != null">number_location = values(number_location),</if>
+                    <if test="agentKey != null">agent_key = values(agent_key),</if>
+                    <if test="agentName != null">agent_name = values(agent_name),</if>
+                    <if test="groupId != null">group_id = values(group_id),</if>
+                    <if test="loginType != null">login_type = values(login_type),</if>
+                    <if test="taskId != null">task_id = values(task_id),</if>
+                    <if test="ivrId != null">ivr_id = values(ivr_id),</if>
+                    <if test="botId != null">bot_id = values(bot_id),</if>
+                    <if test="callTime != null">call_time = values(call_time),</if>
+                    <if test="answerTime != null">answer_time = values(answer_time),</if>
+                    <if test="endTime != null">end_time = values(end_time),</if>
+                    <if test="callType != null">call_type = values(call_type),</if>
+                    <if test="direction != null">direction = values(direction),</if>
+                    <if test="answerFlag != null">answer_flag = values(answer_flag),</if>
+                    <if test="waitTime != null">wait_time = values(wait_time),</if>
+                    <if test="answerCount != null">answer_count = values(answer_count),</if>
+                    <if test="hangupDir != null">hangup_dir = values(hangup_dir),</if>
+                    <if test="sdkHangup != null">sdk_hangup = values(sdk_hangup),</if>
+                    <if test="hangupCode != null">hangup_code = values(hangup_code),</if>
+                    <if test="mediaHost != null">media_host = values(media_host),</if>
+                    <if test="ctiHost != null">cti_host = values(cti_host),</if>
+                    <if test="clientHost != null">client_host = values(client_host),</if>
+                    <if test="record != null">record = values(record),</if>
+                    <if test="record2 != null">record2 = values(record2),</if>
+                    <if test="record3 != null">record3 = values(record3),</if>
+                    <if test="recordType != null">record_type = values(record_type),</if>
+                    <if test="recordStartTime != null">record_start_time = values(record_start_time),</if>
+                    <if test="recordTime != null">record_time = values(record_time),</if>
+                    <if test="talkTime != null">talk_time = values(talk_time),</if>
+                    <if test="fristQueueTime != null">frist_queue_time = values(frist_queue_time),</if>
+                    <if test="queueStartTime != null">queue_start_time = values(queue_start_time),</if>
+                    <if test="queueEndTime != null">queue_end_time = values(queue_end_time),</if>
+                    <if test="monthTime != null">month_time = values(month_time),</if>
+                    <if test="followData != null">follow_data = values(follow_data),</if>
+                    <if test="uuid1 != null">uuid1 = values(uuid1),</if>
+                    <if test="uuid2 != null">uuid2 = values(uuid2),</if>
+                    <if test="ext1 != null">ext1 = values(ext1),</if>
+                    <if test="ext2 != null">ext2 = values(ext2),</if>
+                    <if test="ext3 != null">ext3 = values(ext3),</if>
+                    <if test="status != null">status = values(status),</if>
+                </when>
+                <otherwise>call_id = values(call_id),</otherwise>
+            </choose>
+        </trim>
+    </insert>
+    <insert id="upsertCurrentCdr" parameterType="com.voxai.core.entity.CallLog">
+        <include refid="CdrCurrentInsert"/>
+        on duplicate key update
+        <trim suffixOverrides=",">
+            <choose>
+                <when test="endTime != null and endTime > 0">
+                    <if test="uts != null">uts = values(uts),</if>
+                    <if test="companyId != null">company_id = values(company_id),</if>
+                    <if test="callerDisplay != null">caller_display = values(caller_display),</if>
+                    <if test="caller != null">caller = values(caller),</if>
+                    <if test="calledDisplay != null">called_display = values(called_display),</if>
+                    <if test="called != null">called = values(called),</if>
+                    <if test="numberLocation != null">number_location = values(number_location),</if>
+                    <if test="agentKey != null">agent_key = values(agent_key),</if>
+                    <if test="agentName != null">agent_name = values(agent_name),</if>
+                    <if test="groupId != null">group_id = values(group_id),</if>
+                    <if test="loginType != null">login_type = values(login_type),</if>
+                    <if test="taskId != null">task_id = values(task_id),</if>
+                    <if test="ivrId != null">ivr_id = values(ivr_id),</if>
+                    <if test="botId != null">bot_id = values(bot_id),</if>
+                    <if test="callTime != null">call_time = values(call_time),</if>
+                    <if test="answerTime != null">answer_time = values(answer_time),</if>
+                    <if test="endTime != null">end_time = values(end_time),</if>
+                    <if test="callType != null">call_type = values(call_type),</if>
+                    <if test="direction != null">direction = values(direction),</if>
+                    <if test="answerFlag != null">answer_flag = values(answer_flag),</if>
+                    <if test="waitTime != null">wait_time = values(wait_time),</if>
+                    <if test="answerCount != null">answer_count = values(answer_count),</if>
+                    <if test="hangupDir != null">hangup_dir = values(hangup_dir),</if>
+                    <if test="sdkHangup != null">sdk_hangup = values(sdk_hangup),</if>
+                    <if test="hangupCode != null">hangup_code = values(hangup_code),</if>
+                    <if test="mediaHost != null">media_host = values(media_host),</if>
+                    <if test="ctiHost != null">cti_host = values(cti_host),</if>
+                    <if test="clientHost != null">client_host = values(client_host),</if>
+                    <if test="record != null">record = values(record),</if>
+                    <if test="record2 != null">record2 = values(record2),</if>
+                    <if test="record3 != null">record3 = values(record3),</if>
+                    <if test="recordType != null">record_type = values(record_type),</if>
+                    <if test="recordStartTime != null">record_start_time = values(record_start_time),</if>
+                    <if test="recordTime != null">record_time = values(record_time),</if>
+                    <if test="talkTime != null">talk_time = values(talk_time),</if>
+                    <if test="fristQueueTime != null">frist_queue_time = values(frist_queue_time),</if>
+                    <if test="queueStartTime != null">queue_start_time = values(queue_start_time),</if>
+                    <if test="queueEndTime != null">queue_end_time = values(queue_end_time),</if>
+                    <if test="monthTime != null">month_time = values(month_time),</if>
+                    <if test="followData != null">follow_data = values(follow_data),</if>
+                    <if test="uuid1 != null">uuid1 = values(uuid1),</if>
+                    <if test="uuid2 != null">uuid2 = values(uuid2),</if>
+                    <if test="ext1 != null">ext1 = values(ext1),</if>
+                    <if test="ext2 != null">ext2 = values(ext2),</if>
+                    <if test="ext3 != null">ext3 = values(ext3),</if>
+                    <if test="status != null">status = values(status),</if>
+                </when>
+                <otherwise>call_id = values(call_id),</otherwise>
+            </choose>
+        </trim>
+    </insert>
 </mapper>

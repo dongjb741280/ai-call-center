@@ -71,6 +71,7 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public PageInfo<CallLogPo> calllogList(Map<String, Object> params) {
+        validateMonth(params);
         Long start = (Long) params.get("start");
         Long end = (Long) params.get("end");
         if (start == null) {
@@ -87,6 +88,7 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
         List<CallLogPo> list = callLogMapper.getCallList(params);
         if (!CollectionUtils.isEmpty(list)) {
             list.forEach(callLogPo -> {
+                com.voxai.core.util.CdrTimes.normalize(callLogPo);
                 callLogPo.setOssServer(ossServer);
             });
         }
@@ -95,6 +97,7 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public void calllogExport(HttpServletResponse response, Map<String, Object> params) throws IOException {
+        validateMonth(params);
         Integer count = callLogMapper.selectCountByMap(params);
         if (count == 0L) {
             new BusinessException(ErrorCode.EXPORT_EMPTY);
@@ -115,11 +118,12 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
             ExcelOutboundCallLogEntity entity = null;
             for (CallLog callLog : callLogs) {
                 entity = new ExcelOutboundCallLogEntity();
+                com.voxai.core.util.CdrTimes.normalize(callLog);
                 BeanUtils.copyProperties(callLog, entity);
                 entity.setCallTime(DateTimeUtil.format(callLog.getCallTime()));
                 entity.setAnswerTime(DateTimeUtil.format(callLog.getAnswerTime()));
                 entity.setEndTime(DateTimeUtil.format(callLog.getEndTime()));
-                entity.setRecordTime(DateTimeUtil.format(callLog.getRecordTime()));
+                entity.setRecordTime(String.valueOf(callLog.getRecordTime() == null ? 0 : callLog.getRecordTime() / 1000L));
                 entityList.add(entity);
             }
             workbook = ExcelExportUtil.exportExcel(new ExportParams(null, direction, ExcelType.XSSF), ExcelOutboundCallLogEntity.class, entityList);
@@ -128,11 +132,12 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
             ExcelInboundCallLogEntity entity = null;
             for (CallLog callLog : callLogs) {
                 entity = new ExcelInboundCallLogEntity();
+                com.voxai.core.util.CdrTimes.normalize(callLog);
                 BeanUtils.copyProperties(callLog, entity);
                 entity.setCallTime(DateTimeUtil.format(callLog.getCallTime()));
                 entity.setAnswerTime(DateTimeUtil.format(callLog.getAnswerTime()));
                 entity.setEndTime(DateTimeUtil.format(callLog.getEndTime()));
-                entity.setRecordTime(DateTimeUtil.format(callLog.getRecordTime()));
+                entity.setRecordTime(String.valueOf(callLog.getRecordTime() == null ? 0 : callLog.getRecordTime() / 1000L));
                 entity.setFristQueueTime(DateTimeUtil.format(callLog.getFristQueueTime()));
                 entity.setQueueStartTime(DateTimeUtil.format(callLog.getQueueStartTime()));
                 entity.setQueueEndTime(DateTimeUtil.format(callLog.getQueueEndTime()));
@@ -171,7 +176,22 @@ public class CallLogServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public List<CallDevice> callDeviceList(Map<String, Object> params) {
-        return callDeviceMapper.selectListByMap(params);
+        Object month = params.get("monthTime");
+        if (month != null && !month.toString().isEmpty()) { validateMonthSuffix(month.toString()); }
+        List<CallDevice> devices = callDeviceMapper.selectListByMap(params);
+        devices.forEach(com.voxai.core.util.CdrTimes::normalize);
+        return devices;
+    }
+
+    private static void validateMonthSuffix(String month) {
+        if (!month.matches("_[0-9]{4}(0[1-9]|1[0-2])")) throw new IllegalArgumentException("Invalid CDR month suffix");
+    }
+
+    private void validateMonth(Map<String, Object> params) {
+        Object month = params.get("monthTime");
+        if (month != null && !month.toString().isEmpty()) {
+            validateMonthSuffix(month.toString());
+        }
     }
 
 

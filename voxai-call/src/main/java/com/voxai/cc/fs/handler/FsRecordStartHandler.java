@@ -22,9 +22,13 @@ public class FsRecordStartHandler extends BaseEventHandler<FsRecordStartEvent> {
             return;
         }
         DeviceInfo deviceInfo = callInfo.getDeviceInfoMap().get(event.getDeviceId());
-        deviceInfo.setRecordTime(event.getTimestamp() / 1000);
-        if (callInfo.getRecordTime() == null) {
-            callInfo.setRecordTime(deviceInfo.getRecordTime());
+        if (deviceInfo == null) { return; }
+        long startedAt = event.getTimestamp() / 1000L; // ESL microseconds -> epoch milliseconds.
+        deviceInfo.setRecordStartTime(startedAt);
+        deviceInfo.setRecordTime(0L);
+        if (callInfo.getRecordStartTime() == null || startedAt < callInfo.getRecordStartTime()) {
+            callInfo.setRecordStartTime(startedAt);
         }
+        cacheService.addCallInfo(callInfo);
     }
 }

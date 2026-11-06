@@ -1,16 +1,11 @@
 package com.voxai.cc.fs.handler;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.voxai.core.entity.CallDevice;
-import com.voxai.core.entity.CallLog;
 import com.voxai.core.po.AgentInfo;
 import com.voxai.core.po.AgentState;
 import com.voxai.core.po.CallInfo;
-import com.voxai.core.po.CallLogPo;
 import com.voxai.core.po.CompanyInfo;
 import com.voxai.core.po.DeviceInfo;
-import com.voxai.core.util.DateTimeUtil;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
@@ -18,9 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -30,9 +22,7 @@ import com.voxai.cc.fs.event.FsHangupCompleteEvent;
 import com.voxai.cc.fs.handler.base.BaseEventHandler;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author dongjb
@@ -55,8 +45,6 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             return;
         }
         logger.info("callId:{} deviceList:{}", callInfo.getCallId(), callInfo.getDeviceList());
-        Integer count = callInfo.getDeviceList().size();
-        callInfo.getDeviceList().remove(event.getDeviceId());
 
         /**
          * 挂机原因
@@ -66,14 +54,16 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             logger.warn("device:{} is null, callId:{}", event.getDeviceId(), callInfo.getCallId());
             return;
         }
+        callInfo.getDeviceList().remove(event.getDeviceId());
         deviceInfo.setHangupCause(event.getHangupCause());
         deviceInfo.setSipProtocol(event.getSipProtocol());
         deviceInfo.setSipStatus(event.getSipStatus());
         deviceInfo.setChannelName(event.getChannelName());
         deviceInfo.setEndTime(event.getTimestamp() / 1000);
-        //计算录音时长
+        deviceInfo.setTalkTime(com.voxai.core.util.CdrTimes.duration(deviceInfo.getAnswerTime(), deviceInfo.getEndTime()));
+        //计算录音时长（毫秒）
         if (deviceInfo.getRecordStartTime() != null) {
-            deviceInfo.setRecordTime(deviceInfo.getEndTime() - deviceInfo.getRecordStartTime());
+            deviceInfo.setRecordTime(com.voxai.core.util.CdrTimes.duration(deviceInfo.getRecordStartTime(), deviceInfo.getEndTime()));
         }
         logger.info("callId:{} deviceId:{} deviceType:{} display:{} called:{} sipStatus:{} sipProtocol:{} hangupCause:{}", callInfo.getCallId(), deviceInfo.getDeviceId(), deviceInfo.getDeviceType(), deviceInfo.getDisplay(), deviceInfo.getCalled(), event.getSipStatus(), event.getSipProtocol(), event.getHangupCause());
         /**
@@ -97,8 +87,8 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
 
         CallDevice callDevice = new CallDevice();
         BeanUtils.copyProperties(deviceInfo, callDevice);
-        callDevice.setCts(deviceInfo.getEndTime() / 1000);
-        callDevice.setUts(callDevice.getEndTime() / 1000);
+        callDevice.setCts(deviceInfo.getEndTime());
+        callDevice.setUts(callDevice.getEndTime());
         callDevice.setCompanyId(callInfo.getCompanyId());
         callCdrService.saveCallDevice(callDevice);
         callInfo.getDeviceInfoMap().put(callDevice.getDeviceId(), deviceInfo);
@@ -106,7 +96,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         /**
          * 一般情况下，挂断其他所有设备
          */
-        if (deviceInfo.getCdrType() <= 3 && callInfo.getEndTime() == null) {
+        if ((deviceInfo.getCdrType() == null || deviceInfo.getCdrType() <= 3) && callInfo.getEndTime() == null) {
             callInfo.setEndTime(deviceInfo.getEndTime());
             if (!CollectionUtils.isEmpty(callInfo.getDeviceList())) {
                 callInfo.getDeviceList().forEach(s -> {
@@ -116,7 +106,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         }
         cacheService.addCallInfo(callInfo);
         //最后一个设备挂机
-        if (count == 1) {
+        if (callInfo.getDeviceList().isEmpty()) {
             hangup(callInfo);
         }
     }
@@ -127,42 +117,11 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
      * @param callInfo
      */
     private void hangup(CallInfo callInfo) {
-        List<CallDevice> callDeviceList = new ArrayList<>();
-        //call_device
-        callInfo.getDeviceInfoMap().forEach((k, v) -> {
-            CallDevice callDevice = new CallDevice();
-            BeanUtils.copyProperties(v, callDevice);
-            callDeviceList.add(callDevice);
-
-        });
-
-        CallLog callLog = new CallLog();
-        BeanUtils.copyProperties(callInfo, callLog);
-        callLog.setCts(callInfo.getCallTime() / 1000);
-        callLog.setUts(callInfo.getEndTime() / 1000);
-        callLog.setEndTime(callInfo.getEndTime());
-        //防止跨月份落单
-        String time = DateTimeUtil.format(callLog.getCallTime(), DateTimeUtil.YYYYMM);
-        String month = "_" + time.substring(0, 6);
-        callLog.setMonthTime(month);
-
-        callLog.setCallType(callInfo.getCallType().name());
-        callLog.setDirection(callInfo.getDirection().name());
-        if (!CollectionUtils.isEmpty(callInfo.getFollowData())) {
-            callLog.setFollowData(JSON.toJSONString(callInfo.getFollowData()));
-        }
-        if (callInfo.getAnswerTime() == null || callInfo.getAnswerTime() == 0L) {
-            //未接通
-            callInfo.setTalkTime(0L);
-        } else {
-            callLog.setTalkTime(callInfo.getEndTime() - callInfo.getAnswerTime());
-            callInfo.setTalkTime(callLog.getTalkTime());
-            callInfo.setAnswerFlag(0);
-        }
-        callCdrService.saveCallDetail(callInfo.getCallDetails());
-        callCdrService.saveOrUpdateCallLog(callLog);
-
         CompanyInfo companyInfo = cacheService.getCompany(callInfo.getCompanyId());
+        com.voxai.cc.cdr.CdrCompletion completion = com.voxai.cc.cdr.CdrAssembler.complete(callInfo,
+                companyInfo == null ? null : companyInfo.getNotifyUrl());
+        // The complete snapshot is persisted or broker-confirmed before Redis is removed.
+        callCdrService.completeCall(completion);
 
         //清空坐席通话状态
         if (callInfo.getAgentKey() != null) {
@@ -176,28 +135,6 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         }
         //清空电话信息
         cacheService.removeCallInfo(callInfo.getCallId());
-        String notifyUrl = companyInfo.getNotifyUrl();
-        if (StringUtils.isBlank(notifyUrl)) {
-            return;
-        }
-        //话单推送
-        CallLogPo callLogPo = new CallLogPo();
-        BeanUtils.copyProperties(callLog, callLogPo);
-
-        callLogPo.setCallDeviceList(callDeviceList);
-        callLogPo.setCaller(callInfo.getCaller());
-        callLogPo.setCalled(callInfo.getCalled());
-        String payload = JSON.toJSONString(callLogPo, SerializerFeature.WriteMapNullValue);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<String>(payload, headers);
-        try {
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(notifyUrl, requestEntity, String.class);
-            logger.info("push call:{} to {} success, statusCode:{} response:{}", callInfo.getCallId(), notifyUrl, responseEntity.getStatusCode(), responseEntity.getBody());
-        } catch (Exception e) {
-            logger.error("push call:{} to {} error, payload:{}", callInfo.getCallId(), notifyUrl, payload);
-        }
     }
 
 }

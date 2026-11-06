@@ -80,6 +80,8 @@ public class Constant {
     public final static String DEVOCE_KEY = "DEVICE";
     public final static String DETAIL_KEY = "DETAIL";
     public final static String CALLLOG_KEY = "CALLLOG";
+    public final static String CALL_COMPLETE_KEY = "COMPLETE";
+    public final static String CALL_COMPLETE_QUEUE = "CALL-COMPLETE-QUEUE";
 
 
     public final static String AGENT_STATE_EXCHANGE = "AGENT-STATE-EXCHANGE";

@@ -1,6 +1,10 @@
 package com.voxai.cc.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.voxai.cc.cdr.CdrCompletion;
+import com.voxai.cc.cdr.CdrPersistenceService;
+import com.voxai.cc.cdr.CdrPublisher;
+import com.voxai.core.util.CdrTimes;
 import com.voxai.core.entity.*;
 import com.voxai.core.mapper.*;
 import com.voxai.core.po.*;
@@ -37,6 +41,10 @@ import java.util.Map;
  */
 @Component
 public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements CallCdrService {
+
+    @Autowired private CdrPersistenceService cdrPersistence;
+    @Autowired private CdrPublisher cdrPublisher;
+    @Value("${cdr.notify.version:1}") private int notifyVersion;
 
     @Autowired
     private CallLogMapper callLogMapper;
@@ -81,71 +89,49 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
     }
 
     @Override
-    public int saveCallDevice(CallDevice callDevice) {
-        if (callCdrPressure == 0) {
-            callDeviceMapper.insertSelective(callDevice);
-            callDevice.setMonth(DateTimeUtil.getNowMonth());
-            return callDeviceMapper.insertMonthSelective(callDevice);
-        }
-        rabbitTemplate.convertAndSend(Constant.CALL_LOG_EXCHANGE, Constant.DEVOCE_KEY, JSON.toJSONString(callDevice));
-        /*kafkaTemplate.send(Constants.CALL_DEVICE, JSON.toJSONString(callDevice));*/
-        return 1;
+    public int saveCallDevice(CallDevice device) {
+        if (callCdrPressure == 1 && cdrPublisher.publish(Constant.DEVOCE_KEY, device)) { return 1; }
+        return cdrPersistence.saveDevice(device);
     }
 
     @Override
-    public int saveCallDetail(List<CallDetail> callDetails) {
-        if (CollectionUtils.isEmpty(callDetails)) {
-            return 0;
-        }
-        String month = DateTimeUtil.getNowMonth();
-        callDetails.forEach(callDetail -> {
-            callDetail.setMonth(month);
-            if (callCdrPressure == 1) {
-                /*kafkaTemplate.send(Constants.CALL_DETAIL, JSON.toJSONString(callDetail));*/
-                rabbitTemplate.convertAndSend(Constant.CALL_LOG_EXCHANGE, Constant.DETAIL_KEY, JSON.toJSONString(callDetail));
-            } else {
-                callDetailMapper.insertSelective(callDetail);
-                callDetailMapper.insertMonthSelective(callDetail);
+    public int saveCallDetail(List<CallDetail> details) {
+        if (CollectionUtils.isEmpty(details)) { return 0; }
+        for (CallDetail detail : details) {
+            if (callCdrPressure != 1 || !cdrPublisher.publish(Constant.DETAIL_KEY, detail)) {
+                cdrPersistence.saveDetails(java.util.Collections.singletonList(detail));
             }
-        });
-        return 1;
+        }
+        return details.size();
     }
 
     @Override
-    public int saveOrUpdateCallLog(CallLog callLog) {
-        if (callLog == null) {
-            return 0;
-        }
-        logger.info("callId:{}, answerTime:{}, endTime:{}", callLog.getCallId(), callLog.getAnswerTime(), callLog.getEndTime());
-        if (callCdrPressure == 1) {
-            /*kafkaTemplate.send(Constants.CALL_LOG, JSON.toJSONString(callLog));*/
-            rabbitTemplate.convertAndSend(Constant.CALL_LOG_EXCHANGE, Constant.CALLLOG_KEY, JSON.toJSONString(callLog));
-            return 0;
-        }
-        if (callLog.getEndTime() != null) {
-            callLogMapper.insertMonthSelective(callLog);
-        }
+    public int saveOrUpdateCallLog(CallLog log) {
+        if (log == null) { return 0; }
+        if (callCdrPressure == 1 && cdrPublisher.publish(Constant.CALLLOG_KEY, log)) { return 1; }
+        return cdrPersistence.saveLog(log);
+    }
 
-        if (callLog.getAnswerTime() != null && callLog.getEndTime() == null) {
-            //呼通
-            return callLogMapper.insertSelective(callLog);
+    @Override
+    public void completeCall(CdrCompletion completion) {
+        completion.setNotifyVersion(notifyVersion);
+        if (callCdrPressure != 1 || !cdrPublisher.publish(Constant.CALL_COMPLETE_KEY, completion)) {
+            cdrPersistence.complete(completion);
         }
-        if (callLog.getAnswerTime() == null && callLog.getEndTime() != null) {
-            //没有呼通
-            return callLogMapper.insertSelective(callLog);
-        }
-        int result = callLogMapper.updateByCallId(callLog);
-        if (result == 0) {
-            result = callLogMapper.insertSelective(callLog);
-        }
-        return result;
     }
 
     @Override
     public CallLogPo getCall(Long companyId, Long callId) {
-        Long time = DateTimeUtil.getCallTime(callId);
         CallLogPo callLogPo = callLogMapper.getCall(companyId, callId, null);
+        if (callLogPo == null) {
+            try {
+                callLogPo = callLogMapper.getCall(companyId, callId, CdrTimes.month(callId));
+            } catch (org.springframework.jdbc.BadSqlGrammarException error) {
+                if (error.getSQLException().getErrorCode() != 1146) { throw error; }
+            }
+        }
         if (callLogPo != null) {
+            CdrTimes.normalize(callLogPo);
             callLogPo.setOssServer(ossServer);
         }
         return callLogPo;
@@ -223,7 +209,13 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public List<CallDevice> callDeviceList(Map<String, Object> params) {
-        return callDeviceMapper.selectListByMap(params);
+        Object month = params.get("monthTime");
+        if (month != null && !month.toString().isEmpty()) {
+            com.voxai.cc.cdr.CdrMonthTables.validate(month.toString());
+        }
+        List<CallDevice> devices = callDeviceMapper.selectListByMap(params);
+        devices.forEach(CdrTimes::normalize);
+        return devices;
     }
 
     /**

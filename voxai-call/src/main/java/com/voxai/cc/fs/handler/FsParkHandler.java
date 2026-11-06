@@ -150,7 +150,8 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
             Long uuid = snowflakeIdWorker.nextId();
             CallLog callLog = new CallLog();
             callLog.setCallId(callId);
-            callLog.setCts(Instant.now().getEpochSecond());
+            callLog.setCts(Instant.now().toEpochMilli());
+            callLog.setCallTime(callLog.getCts());
             callLog.setUts(callLog.getCts());
             callLog.setEndTime(callLog.getCts());
             callLog.setCaller(event.getCaller());

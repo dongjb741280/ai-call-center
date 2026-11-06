@@ -72,4 +72,7 @@ public interface CallLogMapper extends BaseMapper<CallLog> {
      * @return
      */
     List<CallLogPo> getCallList(Map<String, Object> params);
+    int upsertCdr(CallLog record);
+
+    int upsertCurrentCdr(CallLog record);
 }
