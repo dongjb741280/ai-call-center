@@ -61,6 +61,9 @@ public class WsMakeCallEvent extends WsBaseEvent {
      */
     private String media;
 
+    /** Optional outbound task ID supplied by the external dialer. */
+    private Long taskId;
+
 
     public String getState() {
         return state;
@@ -141,6 +144,9 @@ public class WsMakeCallEvent extends WsBaseEvent {
     public void setMedia(String media) {
         this.media = media;
     }
+
+    public Long getTaskId() { return taskId; }
+    public void setTaskId(Long taskId) { this.taskId = taskId; }
 
     @Override
     public String toString() {

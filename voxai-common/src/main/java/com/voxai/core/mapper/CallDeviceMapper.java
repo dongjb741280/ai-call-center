@@ -14,7 +14,7 @@ public interface CallDeviceMapper extends BaseMapper<CallDevice> {
      * @param callId
      * @return
      */
-    java.util.List<CallDevice> selectByCallId(@Param("callId") Long callId, @Param("monthTime") String month);
+    java.util.List<CallDevice> selectByCallId(@Param("companyId") Long companyId, @Param("callId") Long callId, @Param("monthTime") String month);
 
 
     /**

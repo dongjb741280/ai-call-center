@@ -46,4 +46,16 @@ public class TaskContact implements Serializable {
     public void setAgentCode(String agentCode) { this.agentCode = agentCode; }
     public Long getBridgeTime() { return bridgeTime; }
     public void setBridgeTime(Long bridgeTime) { this.bridgeTime = bridgeTime; }
+    private Long sourceId;
+    public Long getSourceId() { return sourceId; }
+    public void setSourceId(Long value) { this.sourceId = value; }
+    private String customData;
+    public String getCustomData() { return customData; }
+    public void setCustomData(String value) { this.customData = value; }
+    private String activeAttemptId;
+    public String getActiveAttemptId() { return activeAttemptId; }
+    public void setActiveAttemptId(String value) { this.activeAttemptId = value; }
+    private Long nextAttemptAt;
+    public Long getNextAttemptAt() { return nextAttemptAt; }
+    public void setNextAttemptAt(Long value) { this.nextAttemptAt = value; }
 }

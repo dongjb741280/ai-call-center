@@ -33,4 +33,7 @@ public class TaskSource implements Serializable {
     public void setFieldCount(Integer fieldCount) { this.fieldCount = fieldCount; }
     public Integer getListCount() { return listCount; }
     public void setListCount(Integer listCount) { this.listCount = listCount; }
+    private Long version;
+    public Long getVersion() { return version; }
+    public void setVersion(Long value) { this.version = value; }
 }

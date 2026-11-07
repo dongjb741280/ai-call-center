@@ -15,7 +15,7 @@
     </resultMap>
 
     <select id="selectByCallId" resultMap="BaseResultMap">
-        select * from cc_ivr_flow where call_id = #{callId} order by start_time asc
+        select f.* from cc_ivr_flow f join cc_call_log l on l.call_id=f.call_id where l.company_id = #{companyId} and f.call_id = #{callId} order by f.start_time asc
     </select>
 
     <insert id="insertSelective" parameterType="com.voxai.core.entity.IvrFlow">

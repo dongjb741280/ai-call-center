@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface IvrFlowMapper {
-    List<IvrFlow> selectByCallId(@Param("callId") Long callId);
+    List<IvrFlow> selectByCallId(@Param("companyId") Long companyId, @Param("callId") Long callId);
 
     int insertSelective(IvrFlow record);
 }

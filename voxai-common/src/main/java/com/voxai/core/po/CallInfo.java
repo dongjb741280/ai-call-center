@@ -38,6 +38,7 @@ public class CallInfo implements Serializable {
      */
     private Long groupId;
 
+
     /**
      * 隐藏客户号码(0:不隐藏;1:隐藏)
      */
@@ -297,6 +298,7 @@ public class CallInfo implements Serializable {
     public void setGroupId(Long groupId) {
         this.groupId = groupId;
     }
+
 
     public int getHiddenCustomer() {
         return hiddenCustomer;

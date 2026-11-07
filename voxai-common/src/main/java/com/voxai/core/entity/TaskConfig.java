@@ -97,4 +97,31 @@ public class TaskConfig implements Serializable {
     public void setPauseStartTime(Long pauseStartTime) { this.pauseStartTime = pauseStartTime; }
     public Long getPauseEndTime() { return pauseEndTime; }
     public void setPauseEndTime(Long pauseEndTime) { this.pauseEndTime = pauseEndTime; }
+    private Long sourceId;
+    public Long getSourceId() { return sourceId; }
+    public void setSourceId(Long value) { this.sourceId = value; }
+    private Long transferId;
+    public Long getTransferId() { return transferId; }
+    public void setTransferId(Long value) { this.transferId = value; }
+    private Long numberPoolId;
+    public Long getNumberPoolId() { return numberPoolId; }
+    public void setNumberPoolId(Long value) { this.numberPoolId = value; }
+    private Long version;
+    public Long getVersion() { return version; }
+    public void setVersion(Long value) { this.version = value; }
+    private Integer archived;
+    public Integer getArchived() { return archived; }
+    public void setArchived(Integer value) { this.archived = value; }
+    private Integer requestedStatus;
+    public Integer getRequestedStatus() { return requestedStatus; }
+    public void setRequestedStatus(Integer value) { this.requestedStatus = value; }
+    private String commandId;
+    public String getCommandId() { return commandId; }
+    public void setCommandId(String value) { this.commandId = value; }
+    private Long commandTime;
+    public Long getCommandTime() { return commandTime; }
+    public void setCommandTime(Long value) { this.commandTime = value; }
+    private Integer retryInterval;
+    public Integer getRetryInterval() { return retryInterval; }
+    public void setRetryInterval(Integer value) { this.retryInterval = value; }
 }

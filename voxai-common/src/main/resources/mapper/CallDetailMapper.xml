@@ -266,7 +266,9 @@
         from
         cc_call_detail${monthTime}
         where
-        call_id = #{callId,jdbcType=BIGINT} order by start_time asc
+        call_id = #{callId,jdbcType=BIGINT}
+        and exists (select 1 from cc_call_log${monthTime} l where l.call_id = cc_call_detail${monthTime}.call_id and l.company_id = #{companyId,jdbcType=BIGINT})
+        order by start_time asc
     </select>
 
     <!-- 每个月创建新表 -->
@@ -277,7 +279,9 @@
     <select id="selectListByCallId" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/>
         from cc_call_detail${monthTime}
-        where call_id = #{callId,jdbcType=BIGINT} order by start_time asc
+        where call_id = #{callId,jdbcType=BIGINT}
+        and exists (select 1 from cc_call_log${monthTime} l where l.call_id = cc_call_detail${monthTime}.call_id and l.company_id = #{companyId,jdbcType=BIGINT})
+        order by start_time asc
     </select>
 
     <delete id="clearTable">

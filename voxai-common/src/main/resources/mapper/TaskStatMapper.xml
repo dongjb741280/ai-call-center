@@ -28,27 +28,28 @@
             coalesce(t.transfer_name, t.transfer_type, '') as transfer_name,
             greatest(t.uts, t.cts) as stats_time,
             t.status,
-            t.total_count as list_total,
-            coalesce(t.dialed_count, 0) as dialed_count,
-            coalesce(t.answered_count, 0) as answered_count,
+            (select count(*) from cc_task_contact c where c.task_id=t.id) as list_total,
+            (select count(*) from cc_task_attempt a where a.task_id=t.id and a.call_id is not null) as dialed_count,
+            (select count(*) from cc_task_attempt a where a.task_id=t.id and a.call_id is not null and a.result='answered') as answered_count,
             concat(
                 round(
-                    case when coalesce(t.dialed_count, 0) > 0
-                    then coalesce(t.answered_count, 0) * 100.0 / t.dialed_count
+                    case when (select count(*) from cc_task_attempt a where a.task_id=t.id and a.call_id is not null) > 0
+                    then (select count(*) from cc_task_attempt a where a.task_id=t.id and a.call_id is not null and a.result='answered') * 100.0 / (select count(*) from cc_task_attempt a where a.task_id=t.id and a.call_id is not null)
                     else 0 end, 1
                 ), '%'
             ) as answer_rate,
-            0 as pending_count,
-            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'OUT_CALL' and l.company_id = t.company_id), 0) as in_call,
-            0 as queue_count,
-            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state != 'LOGOUT' and l.company_id = t.company_id), 0) as signed_in_agents,
-            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'READY' and l.company_id = t.company_id), 0) as idle_agents,
-            coalesce((select count(distinct l.agent_id) from cc_agent_state_log l where l.state = 'NOT_READY' and l.company_id = t.company_id), 0) as busy_agents,
-            0 as after_call_agents,
-            0 as abandoned_count
+            (select count(*) from cc_task_contact c where c.task_id=t.id and c.call_status in ('pending','retry')) as pending_count,
+            (select count(*) from cc_task_contact c where c.task_id=t.id and c.call_status in ('dialing','ringing','answered')) as in_call,
+            cast(null as signed) as queue_count,
+            (select count(distinct l.agent_id) from cc_agent_state_log l where l.company_id=t.company_id and l.state!='LOGOUT' and l.id=(select l2.id from cc_agent_state_log l2 where l2.company_id=l.company_id and l2.agent_id=l.agent_id order by l2.cts desc,l2.id desc limit 1)) as signed_in_agents,
+            (select count(distinct l.agent_id) from cc_agent_state_log l where l.company_id=t.company_id and l.state='READY' and l.id=(select l2.id from cc_agent_state_log l2 where l2.company_id=l.company_id and l2.agent_id=l.agent_id order by l2.cts desc,l2.id desc limit 1)) as idle_agents,
+            (select count(distinct l.agent_id) from cc_agent_state_log l where l.company_id=t.company_id and l.state in ('NOT_READY','OUT_CALL') and l.id=(select l2.id from cc_agent_state_log l2 where l2.company_id=l.company_id and l2.agent_id=l.agent_id order by l2.cts desc,l2.id desc limit 1)) as busy_agents,
+            cast(null as signed) as after_call_agents,
+            cast(null as signed) as abandoned_count
         from cc_task_config t
         <where>
-            <if test="companyId!=null">t.company_id = #{companyId}</if>
+            t.archived = 0
+            <if test="companyId!=null">and t.company_id = #{companyId}</if>
             <if test="taskId!=null">and t.id = #{taskId}</if>
             <if test="status!=null">and t.status = #{status}</if>
         </where>

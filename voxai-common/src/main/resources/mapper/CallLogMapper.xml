@@ -932,9 +932,9 @@
         <result column="ext1" jdbcType="VARCHAR" property="ext1"/>
         <result column="ext2" jdbcType="VARCHAR" property="ext2"/>
         <result column="ext3" jdbcType="VARCHAR" property="ext3"/>
-        <collection property="callDeviceList" column="{callId=call_id,monthTime=month_time}"
+        <collection property="callDeviceList" column="{companyId=company_id,callId=call_id,monthTime=month_time}"
                     select="com.voxai.core.mapper.CallDeviceMapper.selectByCallId"></collection>
-        <collection property="callDetailList" column="{callId=call_id,monthTime=month_time}"
+        <collection property="callDetailList" column="{companyId=company_id,callId=call_id,monthTime=month_time}"
                     select="com.voxai.core.mapper.CallDetailMapper.selectByCallId"></collection>
     </resultMap>
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voxai.core.mapper.TaskManagementMapper">
+  <resultMap id="AttemptResultMap" type="com.voxai.core.entity.TaskAttempt">
+    <result column="attempt_id" property="attemptId"/>
+    <result column="company_id" property="companyId"/>
+    <result column="task_id" property="taskId"/>
+    <result column="contact_id" property="contactId"/>
+    <result column="request_id" property="requestId"/>
+    <result column="lease_token" property="leaseToken"/>
+    <result column="lease_until" property="leaseUntil"/>
+    <result column="call_id" property="callId"/>
+    <result column="round" property="round"/>
+    <result column="state" property="state"/>
+    <result column="result" property="result"/>
+    <result column="cts" property="cts"/>
+    <result column="uts" property="uts"/>
+  </resultMap>
+  <select id="lockTask" resultMap="com.voxai.core.mapper.TaskConfigMapper.BaseResultMap">select * from cc_task_config where id=#{id} and company_id=#{companyId} and archived=0 for update</select>
+  <select id="selectTaskForCall" resultMap="com.voxai.core.mapper.TaskConfigMapper.BaseResultMap">select * from cc_task_config where id=#{id} and company_id=#{companyId} and status=1 and requested_status is null and archived=0</select>
+  <select id="lockSource" resultMap="com.voxai.core.mapper.TaskSourceMapper.BaseResultMap">select * from cc_task_source where id=#{id} and company_id=#{companyId} for update</select>
+  <select id="lockField" resultMap="com.voxai.core.mapper.TaskFieldMapper.BaseResultMap">select * from cc_task_field where id=#{id} and company_id=#{companyId} for update</select>
+  <insert id="insertTask" useGeneratedKeys="true" keyProperty="id">
+    insert into cc_task_config (cts,uts,company_id,name,call_start_time,call_end_time,close_time,source_id,data_source,transfer_type,transfer_id,transfer_name,display_number,call_rounds,cruise_type,concurrency,number_pool_id,number_pool_name,after_call_duration,call_timeout,status_notify,traffic_notify,retry_interval,status,version,archived)
+    values (#{cts},#{uts},#{companyId},#{name},#{callStartTime},#{callEndTime},#{closeTime},#{sourceId},#{dataSource},#{transferType},#{transferId},#{transferName},#{displayNumber},#{callRounds},#{cruiseType},#{concurrency},#{numberPoolId},#{numberPoolName},#{afterCallDuration},#{callTimeout},#{statusNotify},#{trafficNotify},#{retryInterval},2,0,0)
+  </insert>
+  <update id="editTask">update cc_task_config set name=#{name},call_start_time=#{callStartTime},call_end_time=#{callEndTime},close_time=#{closeTime},source_id=#{sourceId},data_source=#{dataSource},transfer_type=#{transferType},transfer_id=#{transferId},transfer_name=#{transferName},display_number=#{displayNumber},call_rounds=#{callRounds},cruise_type=#{cruiseType},concurrency=#{concurrency},number_pool_id=#{numberPoolId},number_pool_name=#{numberPoolName},after_call_duration=#{afterCallDuration},call_timeout=#{callTimeout},status_notify=#{statusNotify},traffic_notify=#{trafficNotify},retry_interval=#{retryInterval},uts=#{uts},version=version+1 where id=#{id} and company_id=#{companyId} and version=#{version} and status=2 and archived=0 and requested_status is null</update>
+  <update id="archiveTask">update cc_task_config set archived=1,version=version+1 where id=#{id} and company_id=#{companyId} and status=3 and requested_status is null</update>
+  <update id="issueCommand">update cc_task_config set requested_status=#{requestedStatus},command_id=#{commandId},command_time=#{commandTime},uts=#{uts},version=version+1 where id=#{id} and company_id=#{companyId} and version=#{version} and requested_status is null and archived=0</update>
+  <update id="acknowledgeCommand">update cc_task_config set status=#{status},requested_status=null,uts=#{uts},version=version+1,pause_start_time=#{pauseStartTime},pause_end_time=#{pauseEndTime} where id=#{id} and company_id=#{companyId} and command_id=#{commandId} and requested_status is not null and archived=0</update>
+  <update id="bumpSource">update cc_task_source set version=version+1 where id=#{id} and company_id=#{companyId} and version=#{version}</update>
+  <update id="clearFields">update cc_task_field set source_id=null where source_id=#{sourceId} and company_id=#{companyId}</update>
+  <update id="bindField">update cc_task_field set source_id=#{sourceId} where id=#{id} and company_id=#{companyId} and (source_id is null or source_id=0 or source_id=#{sourceId})</update>
+  <select id="sourceReferences" resultType="int">select count(*) from cc_task_config where company_id=#{companyId} and source_id=#{id}</select>
+  <delete id="deleteSource">delete from cc_task_source where id=#{id} and company_id=#{companyId}</delete>
+  <delete id="deleteField">delete from cc_task_field where id=#{id} and company_id=#{companyId} and (source_id is null or source_id=0)</delete>
+  <select id="contacts" resultMap="com.voxai.core.mapper.TaskContactMapper.BaseResultMap">select c.* from cc_task_contact c join cc_task_config t on t.id=c.task_id where t.company_id=#{companyId} and t.id=#{taskId} and t.archived=0 <if test="callStatus != null">and c.call_status=#{callStatus}</if> <if test="round != null">and c.current_round=#{round}</if> order by c.id</select>
+  <select id="pauses" resultMap="com.voxai.core.mapper.TaskPauseMapper.BaseResultMap">select p.* from cc_task_pause p join cc_task_config t on t.id=p.task_id where t.company_id=#{companyId} and t.id=#{taskId} and t.archived=0 order by p.id desc</select>
+  <insert id="insertContact" useGeneratedKeys="true" keyProperty="id">insert into cc_task_contact(task_id,source_id,name,phone,uuid,custom_data,current_round,call_status,next_attempt_at) values(#{taskId},#{sourceId},#{name},#{phone},#{uuid},#{customData},0,'pending',0)</insert>
+  <select id="countPhoneFields" resultType="int">select count(*) from cc_task_field where company_id=#{companyId} and source_id=#{sourceId} and is_phone=1 and status=1</select>
+  <select id="countDuplicateContact" resultType="int">select count(*) from cc_task_contact where task_id=#{taskId} and uuid=#{uuid}</select>
+  <update id="releaseExpired">update cc_task_contact c join cc_task_attempt a on a.attempt_id=c.active_attempt_id set c.call_status='retry',c.current_round=greatest(c.current_round-1,0),c.active_attempt_id=null,c.next_attempt_at=#{now} where a.company_id=#{companyId} and a.task_id=#{taskId} and c.task_id=#{taskId} and a.lease_until &lt;= #{now} and a.state='claimed'</update>
+  <update id="expireAttempts">update cc_task_attempt set state='expired',uts=#{now} where company_id=#{companyId} and task_id=#{taskId} and lease_until &lt;= #{now} and state='claimed'</update>
+  <select id="claimContacts" resultMap="com.voxai.core.mapper.TaskContactMapper.BaseResultMap">
+    select c.* from cc_task_contact c join cc_task_config t on t.id=c.task_id
+    where t.id=#{taskId} and t.company_id=#{companyId} and t.status=1 and t.requested_status is null and t.archived=0
+      and c.call_status in ('pending','retry') and c.current_round &lt; t.call_rounds and c.next_attempt_at &lt;= #{now}
+    order by c.id limit #{limit} for update skip locked
+  </select>
+  <select id="countActiveContacts" resultType="int">select count(*) from cc_task_contact c join cc_task_config t on t.id=c.task_id where t.id=#{taskId} and t.company_id=#{companyId} and t.archived=0 and c.call_status in ('dialing','ringing','answered')</select>
+  <select id="countActiveAttempts" resultType="int">select count(*) from cc_task_attempt where company_id=#{companyId} and task_id=#{taskId} and state='claimed'</select>
+  <select id="countTaskCall" resultType="int">select count(*) from cc_call_log where company_id=#{companyId} and task_id=#{taskId} and call_id=#{callId}</select>
+  <select id="countCallAttempts" resultType="int">select count(*) from cc_task_attempt where company_id=#{companyId} and task_id=#{taskId} and call_id=#{callId}</select>
+  <update id="leaseContact">
+    update cc_task_contact set call_status='dialing',current_round=current_round+1,active_attempt_id=#{attemptId},next_attempt_at=#{leaseUntil}
+    where id=#{contactId} and task_id=#{taskId} and call_status in ('pending','retry') and next_attempt_at &lt;= #{now}
+  </update>
+  <insert id="insertAttempt">insert into cc_task_attempt(attempt_id,company_id,task_id,contact_id,request_id,lease_token,lease_until,round,state,cts,uts) values(#{attemptId},#{companyId},#{taskId},#{contactId},#{requestId},#{leaseToken},#{leaseUntil},#{round},'claimed',#{cts},#{uts})</insert>
+  <select id="attemptByRequest" resultMap="AttemptResultMap">select * from cc_task_attempt where company_id=#{companyId} and request_id=#{requestId}</select>
+  <select id="contactByAttempt" resultMap="com.voxai.core.mapper.TaskContactMapper.BaseResultMap">select c.* from cc_task_contact c join cc_task_attempt a on a.contact_id=c.id where a.attempt_id=#{attemptId}</select>
+  <update id="renewAttempt">update cc_task_attempt set lease_until=#{leaseUntil},uts=#{now} where attempt_id=#{attemptId} and company_id=#{companyId} and task_id=#{taskId} and lease_token=#{leaseToken} and state='claimed' and lease_until &gt; #{now}</update>
+  <update id="completeAttempt">update cc_task_attempt set call_id=#{callId},state='completed',result=#{result},uts=#{uts} where attempt_id=#{attemptId} and company_id=#{companyId} and task_id=#{taskId} and contact_id=#{contactId} and request_id=#{requestId} and lease_token=#{leaseToken} and state='claimed' and lease_until &gt; #{uts}</update>
+  <update id="completeContact">update cc_task_contact set call_time=#{callTime},answer_time=#{answerTime},bridge_time=#{bridgeTime},call_status=#{callStatus},call_result=#{callResult},agent_code=#{agentCode},active_attempt_id=null,next_attempt_at=#{nextAttemptAt} where id=#{id} and task_id=#{taskId} and active_attempt_id=#{activeAttemptId}</update>
+  <update id="updateTaskCounters">update cc_task_config set total_count=(select count(*) from cc_task_contact where task_id=#{id}),list_total=(select count(*) from cc_task_contact where task_id=#{id}),dialed_count=(select count(*) from cc_task_attempt where task_id=#{id} and call_id is not null),answered_count=(select count(*) from cc_task_contact where task_id=#{id} and call_result='answered' and call_status='completed'),completed_count=(select count(*) from cc_task_contact where task_id=#{id} and call_status='completed'),uts=#{now} where id=#{id} and company_id=#{companyId}</update>
+  <insert id="openPause">insert into cc_task_pause(task_id,pause_start_time) values(#{id},#{now})</insert>
+  <update id="closePause">update cc_task_pause set pause_end_time=#{now} where task_id=#{id} and pause_end_time is null</update>
+</mapper>

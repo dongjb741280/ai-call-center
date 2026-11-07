@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface CallDetailMapper extends BaseMapper<CallDetail> {
 
-    java.util.List<CallDetail> selectByCallId(@Param("callId") Long callId, @Param("monthTime") String month);
+    java.util.List<CallDetail> selectByCallId(@Param("companyId") Long companyId, @Param("callId") Long callId, @Param("monthTime") String month);
 
-    List<CallDetail> selectListByCallId(@Param("callId") Long callId, @Param("monthTime") String monthTime);
+    List<CallDetail> selectListByCallId(@Param("companyId") Long companyId, @Param("callId") Long callId, @Param("monthTime") String monthTime);
 
     /**
      * 迁移表

@@ -14,8 +14,12 @@
         <result column="call_result" jdbcType="VARCHAR" property="callResult"/>
         <result column="agent_code" jdbcType="VARCHAR" property="agentCode"/>
         <result column="bridge_time" jdbcType="BIGINT" property="bridgeTime"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="custom_data" property="customData"/>
+        <result column="active_attempt_id" property="activeAttemptId"/>
+        <result column="next_attempt_at" property="nextAttemptAt"/>
     </resultMap>
-    <sql id="Base_Column_List">id, task_id, name, phone, current_round, uuid, call_time, answer_time, call_status, call_result, agent_code, bridge_time</sql>
+    <sql id="Base_Column_List">id, task_id, name, phone, current_round, uuid, call_time, answer_time, call_status, call_result, agent_code, bridge_time, source_id, custom_data, active_attempt_id, next_attempt_at</sql>
     <select id="selectByTaskId" parameterType="Long" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from cc_task_contact where task_id = #{taskId} order by id
     </select>

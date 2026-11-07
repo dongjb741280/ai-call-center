@@ -19,7 +19,7 @@
     <delete id="deleteByPrimaryKey" parameterType="Long">
         delete from cc_task_field where id = #{id}
     </delete>
-    <insert id="insertSelective" parameterType="com.voxai.core.entity.TaskField">
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.voxai.core.entity.TaskField">
         insert into cc_task_field
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if><if test="cts != null">cts,</if><if test="uts != null">uts,</if>
@@ -42,7 +42,7 @@
             <if test="fieldType != null">field_type = #{fieldType},</if>
             <if test="status != null">status = #{status},</if>
         </set>
-        where id = #{id}
+        where id = #{id} and company_id = #{companyId}
     </update>
     <select id="selectListByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from cc_task_field

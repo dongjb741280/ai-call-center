@@ -112,6 +112,9 @@ public class CompanyController extends BaseController {
     private TaskStatMapper taskStatMapper;
 
     @Autowired
+    private com.voxai.api.service.TaskManagementService taskManagementService;
+
+    @Autowired
     private AdminLogMapper adminLogMapper;
 
     @Autowired
@@ -1366,6 +1369,7 @@ public class CompanyController extends BaseController {
     public CommonResponse<PageInfo<TaskConfig>> taskList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                           PageInfo pageInfo, String query) {
         Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        params.put("companyId", adminAccountInfo.getBindCompanyId());
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("id desc");
         List<TaskConfig> list = (List<TaskConfig>) (List<?>) taskConfigMapper.selectListByMap(params);
@@ -1375,44 +1379,77 @@ public class CompanyController extends BaseController {
     @GetMapping("task/{id}")
     public CommonResponse<TaskConfig> taskDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                   @PathVariable Long id) {
-        return new CommonResponse<>(taskConfigMapper.selectByPrimaryKey(id));
+        return new CommonResponse<>(taskManagementService.task(adminAccountInfo.getBindCompanyId(), id));
     }
 
     @PostMapping("task")
-    public CommonResponse addTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
-                                   @RequestBody TaskConfig config) {
-        config.setId(null);
-        config.setCompanyId(adminAccountInfo.getBindCompanyId());
-        config.setCts(Instant.now().getEpochSecond());
-        taskConfigMapper.insertSelective(config);
-        return new CommonResponse<>();
+    public CommonResponse<TaskConfig> addTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+                                   @RequestBody com.voxai.api.vo.task.TaskEdit edit) {
+        return new CommonResponse<>(taskManagementService.saveTask(adminAccountInfo.getBindCompanyId(), null, edit));
     }
 
     @PutMapping("task/{id}")
     public CommonResponse updateTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
-                                      @PathVariable Long id, @RequestBody TaskConfig config) {
-        config.setId(id);
-        config.setCompanyId(adminAccountInfo.getBindCompanyId());
-        config.setUts(Instant.now().getEpochSecond());
-        taskConfigMapper.updateByPrimaryKeySelective(config);
-        return new CommonResponse<>();
+                                      @PathVariable Long id, @RequestBody com.voxai.api.vo.task.TaskEdit edit) {
+        return new CommonResponse<>(taskManagementService.saveTask(adminAccountInfo.getBindCompanyId(), id, edit));
+    }
+
+    @PostMapping("task/{id}/command")
+    public CommonResponse<TaskConfig> taskCommand(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long id, @RequestBody com.voxai.api.vo.task.TaskCommand command) {
+        return new CommonResponse<>(taskManagementService.command(account.getBindCompanyId(), id, command));
+    }
+
+    @PostMapping("task/{id}/command/{commandId}/ack")
+    public CommonResponse<TaskConfig> taskCommandAck(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long id, @PathVariable String commandId, @RequestParam(defaultValue = "true") boolean success) {
+        return new CommonResponse<>(taskManagementService.acknowledge(account.getBindCompanyId(), id, commandId, success));
     }
 
     @DeleteMapping("task/{id}")
     public CommonResponse deleteTask(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                       @PathVariable Long id) {
-        taskConfigMapper.deleteByPrimaryKey(id);
+        taskManagementService.archive(adminAccountInfo.getBindCompanyId(), id);
         return new CommonResponse<>();
     }
 
     @GetMapping("task/{taskId}/contact")
-    public CommonResponse<List<TaskContact>> taskContactList(@PathVariable Long taskId) {
-        return new CommonResponse<>(taskContactMapper.selectByTaskId(taskId));
+    public CommonResponse<PageInfo<TaskContact>> taskContactList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long taskId, @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "20") int pageSize, String callStatus, Integer round) {
+        return new CommonResponse<>(taskManagementService.contacts(account.getBindCompanyId(), taskId, pageNum, pageSize, callStatus, round));
+    }
+
+    @PostMapping("task/{taskId}/contact/import")
+    public CommonResponse<Integer> taskContactImport(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long taskId, @RequestBody com.voxai.api.vo.task.TaskImport input) {
+        return new CommonResponse<>(taskManagementService.importContacts(account.getBindCompanyId(), taskId, input));
+    }
+
+    @PostMapping("task/{taskId}/claim")
+    public CommonResponse<List<com.voxai.api.vo.task.TaskClaimResult>> claimTaskContact(
+            @ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long taskId,
+            @RequestBody com.voxai.api.vo.task.TaskClaim claim) {
+        return new CommonResponse<>(taskManagementService.claim(account.getBindCompanyId(), taskId, claim));
+    }
+
+    @PostMapping("task/{taskId}/attempt/heartbeat")
+    public CommonResponse heartbeatTaskAttempt(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long taskId, @RequestBody com.voxai.api.vo.task.TaskClaim claim) {
+        taskManagementService.heartbeat(account.getBindCompanyId(), taskId, claim);
+        return new CommonResponse<>();
+    }
+
+    @PostMapping("task/{taskId}/attempt/result")
+    public CommonResponse completeTaskAttempt(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long taskId, @RequestBody com.voxai.api.vo.task.TaskClaim result) {
+        taskManagementService.completeAttempt(account.getBindCompanyId(), taskId, result);
+        return new CommonResponse<>();
     }
 
     @GetMapping("task/{taskId}/pause")
-    public CommonResponse<List<TaskPause>> taskPauseList(@PathVariable Long taskId) {
-        return new CommonResponse<>(taskPauseMapper.selectByTaskId(taskId));
+    public CommonResponse<List<TaskPause>> taskPauseList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long taskId) {
+        return new CommonResponse<>(taskManagementService.pauses(account.getBindCompanyId(), taskId));
     }
 
     // ==================== 数据源管理 ====================
@@ -1422,6 +1459,7 @@ public class CompanyController extends BaseController {
     public CommonResponse<PageInfo<TaskSource>> taskSourceList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                                 PageInfo pageInfo, String query) {
         Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        params.put("companyId", adminAccountInfo.getBindCompanyId());
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("id desc");
         List<TaskSource> list = (List<TaskSource>) (List<?>) taskSourceMapper.selectListByMap(params);
@@ -1429,31 +1467,25 @@ public class CompanyController extends BaseController {
     }
 
     @GetMapping("taskSource/{id}")
-    public CommonResponse<TaskSource> taskSourceDetail(@PathVariable Long id) {
-        return new CommonResponse<>(taskSourceMapper.selectByPrimaryKey(id));
+    public CommonResponse<TaskSource> taskSourceDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long id) {
+        return new CommonResponse<>(taskManagementService.source(account.getBindCompanyId(), id));
     }
 
     @PostMapping("taskSource")
-    public CommonResponse addTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+    public CommonResponse<TaskSource> addTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
                                          @RequestBody TaskSource source) {
-        source.setId(null); source.setCompanyId(adminAccountInfo.getBindCompanyId());
-        source.setCts(Instant.now().getEpochSecond());
-        taskSourceMapper.insertSelective(source);
-        return new CommonResponse<>();
+        return new CommonResponse<>(taskManagementService.saveSource(account.getBindCompanyId(), null, source));
     }
 
     @PutMapping("taskSource/{id}")
-    public CommonResponse updateTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+    public CommonResponse<TaskSource> updateTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
                                             @PathVariable Long id, @RequestBody TaskSource source) {
-        source.setId(id); source.setCompanyId(adminAccountInfo.getBindCompanyId());
-        source.setUts(Instant.now().getEpochSecond());
-        taskSourceMapper.updateByPrimaryKeySelective(source);
-        return new CommonResponse<>();
+        return new CommonResponse<>(taskManagementService.saveSource(account.getBindCompanyId(), id, source));
     }
 
     @DeleteMapping("taskSource/{id}")
-    public CommonResponse deleteTaskSource(@PathVariable Long id) {
-        taskSourceMapper.deleteByPrimaryKey(id);
+    public CommonResponse deleteTaskSource(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long id) {
+        taskManagementService.deleteSource(account.getBindCompanyId(), id);
         return new CommonResponse<>();
     }
 
@@ -1464,6 +1496,7 @@ public class CompanyController extends BaseController {
     public CommonResponse<PageInfo<TaskField>> taskFieldList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                               PageInfo pageInfo, String query) {
         Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        params.put("companyId", adminAccountInfo.getBindCompanyId());
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("id desc");
         List<TaskField> list = (List<TaskField>) (List<?>) taskFieldMapper.selectListByMap(params);
@@ -1471,41 +1504,32 @@ public class CompanyController extends BaseController {
     }
 
     @PostMapping("taskField")
-    public CommonResponse addTaskField(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
+    public CommonResponse<TaskField> addTaskField(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
                                         @RequestBody TaskField field) {
-        field.setId(null); field.setCompanyId(adminAccountInfo.getBindCompanyId());
-        field.setCts(Instant.now().getEpochSecond());
-        taskFieldMapper.insertSelective(field);
-        return new CommonResponse<>();
+        return new CommonResponse<>(taskManagementService.saveField(account.getBindCompanyId(), null, field));
     }
 
     @PutMapping("taskField/{id}")
-    public CommonResponse updateTaskField(@PathVariable Long id, @RequestBody TaskField field) {
-        field.setId(id); field.setUts(Instant.now().getEpochSecond());
-        taskFieldMapper.updateByPrimaryKeySelective(field);
-        return new CommonResponse<>();
+    public CommonResponse<TaskField> updateTaskField(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long id, @RequestBody TaskField field) {
+        return new CommonResponse<>(taskManagementService.saveField(account.getBindCompanyId(), id, field));
     }
 
     @DeleteMapping("taskField/{id}")
-    public CommonResponse deleteTaskField(@PathVariable Long id) {
-        taskFieldMapper.deleteByPrimaryKey(id);
+    public CommonResponse deleteTaskField(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long id) {
+        taskManagementService.deleteField(account.getBindCompanyId(), id);
         return new CommonResponse<>();
     }
 
     @GetMapping("taskSource/{sourceId}/fields")
-    public CommonResponse<List<TaskField>> sourceFieldList(@PathVariable Long sourceId) {
-        return new CommonResponse<>(taskFieldMapper.selectBySourceId(sourceId));
+    public CommonResponse<List<TaskField>> sourceFieldList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long sourceId) {
+        return new CommonResponse<>(taskManagementService.sourceFields(account.getBindCompanyId(), sourceId));
     }
 
     @PutMapping("taskSource/{sourceId}/fields")
-    public CommonResponse updateSourceFields(@PathVariable Long sourceId, @RequestBody java.util.Map<String, Object> body) {
-        taskFieldMapper.clearSourceId(sourceId);
-        java.util.List<Integer> rawIds = (java.util.List<Integer>) body.get("fieldIds");
-        if (rawIds != null && !rawIds.isEmpty()) {
-            java.util.List<Long> fieldIds = new java.util.ArrayList<>();
-            for (Integer id : rawIds) { fieldIds.add(id.longValue()); }
-            taskFieldMapper.batchSetSourceId(sourceId, fieldIds);
-        }
+    public CommonResponse updateSourceFields(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @PathVariable Long sourceId, @RequestBody com.voxai.api.vo.task.TaskFieldsEdit edit) {
+        taskManagementService.bind(account.getBindCompanyId(), sourceId, edit);
         return new CommonResponse<>();
     }
 
@@ -1516,6 +1540,7 @@ public class CompanyController extends BaseController {
     public CommonResponse<PageInfo<TaskStat>> taskStatList(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                             PageInfo pageInfo, String query) {
         Map<String, Object> params = parseMap(adminAccountInfo, pageInfo, query);
+        params.put("companyId", adminAccountInfo.getBindCompanyId());
         PageHelper.startPage((Integer) params.get("pageNum"), (Integer) params.get("pageSize"));
         PageHelper.orderBy("t.id desc");
         List<TaskStat> list = (List<TaskStat>) (List<?>) taskStatMapper.selectListByMap(params);
@@ -1612,22 +1637,23 @@ public class CompanyController extends BaseController {
     }
 
     @GetMapping("callDevice/{callId}")
-    public CommonResponse<List<CallDevice>> callDeviceList(@PathVariable String callId) {
+    public CommonResponse<List<CallDevice>> callDeviceList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable String callId) {
         Map<String, Object> params = new java.util.HashMap<>();
         params.put("callId", Long.parseLong(callId));
+        params.put("companyId", account.getBindCompanyId());
         params.put("monthTime", "");
         List<CallDevice> list = callDeviceMapper.selectListByMap(params);
         return new CommonResponse<>(list);
     }
 
     @GetMapping("callDetail/{callId}")
-    public CommonResponse<List<CallDetail>> callDetailList(@PathVariable String callId) {
-        return new CommonResponse<>(callDetailMapper.selectListByCallId(Long.parseLong(callId), ""));
+    public CommonResponse<List<CallDetail>> callDetailList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable String callId) {
+        return new CommonResponse<>(callDetailMapper.selectListByCallId(account.getBindCompanyId(), Long.parseLong(callId), ""));
     }
 
     @GetMapping("ivrFlow/{callId}")
-    public CommonResponse<List<IvrFlow>> ivrFlowList(@PathVariable String callId) {
-        return new CommonResponse<>(ivrFlowMapper.selectByCallId(Long.parseLong(callId)));
+    public CommonResponse<List<IvrFlow>> ivrFlowList(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable String callId) {
+        return new CommonResponse<>(ivrFlowMapper.selectByCallId(account.getBindCompanyId(), Long.parseLong(callId)));
     }
 
     // ==================== 话单推送 ====================

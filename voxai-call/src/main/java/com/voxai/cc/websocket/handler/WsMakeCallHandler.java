@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.voxai.core.po.*;
 import org.apache.commons.lang3.StringUtils;
 import com.voxai.core.entity.RouteGetway;
+import com.voxai.core.mapper.TaskManagementMapper;
+import com.voxai.core.entity.TaskConfig;
 import com.voxai.core.enums.CallType;
 import com.voxai.core.enums.Direction;
 import com.voxai.core.enums.ErrorCode;
@@ -26,6 +28,9 @@ import java.time.Instant;
 @Component
 @HandlerType("WS_MAKE_CALL")
 public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private TaskManagementMapper taskManagementMapper;
 
     @Override
     public void handleEvent(WsMakeCallEvent event) {
@@ -49,6 +54,13 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
             }
         }
         AgentInfo agentInfo = getAgent(event);
+        if (event.getTaskId() != null) {
+            TaskConfig task = taskManagementMapper.selectTaskForCall(agentInfo.getCompanyId(), event.getTaskId());
+            if (task == null) {
+                sendMessage(event, new WsResponseEntity<>(ErrorCode.PARAMETER_ERROR, AgentState.OUT_CALL.name(), event.getAgentKey()));
+                return;
+            }
+        }
         if (agentInfo.getAgentState().name().contains("CALL") || agentInfo.getAgentState() == AgentState.TALKING) {
             sendMessage(event, new WsResponseEntity<>(ErrorCode.AGENT_CALLING, event.getCmd(), event.getAgentKey()));
             return;
@@ -93,6 +105,7 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
         Long callId = snowflakeIdWorker.nextId();
         Long now = Instant.now().toEpochMilli();
         CallInfo callInfo = CallInfo.CallInfoBuilder.builder().withCallId(callId).withAgentKey(agentInfo.getAgentKey()).withAgentName(agentInfo.getAgentName()).withLoginType(agentInfo.getLoginType()).withCompanyId(agentInfo.getCompanyId()).withGroupId(agentInfo.getGroupId()).withCaller(caller).withCalled(event.getCalled()).withCallerDisplay(callerDisplay).withCalledDisplay(calledDisplay).withDirection(Direction.OUTBOUND).withCallType(event.getCallType()).withCallTime(now).withCtiHost(agentInfo.getHost()).withFollowData(event.getFollowData()).build();
+        callInfo.setTaskId(event.getTaskId());
 
         switch (event.getCallType()) {
             case INNER_CALL:

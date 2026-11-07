@@ -647,7 +647,7 @@
         from
         cc_call_device${monthTime}
         where
-        call_id = #{callId,jdbcType=BIGINT} order by call_time asc
+        company_id = #{companyId,jdbcType=BIGINT} and call_id = #{callId,jdbcType=BIGINT} order by call_time asc
     </select>
 
     <!-- 每个月创建新表 -->
