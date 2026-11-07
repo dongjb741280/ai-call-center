@@ -17,6 +17,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private AdminUserMapper adminUserMapper;
 
+    @Autowired private com.voxai.core.mapper.CompanyMapper companyMapper;
+    @Autowired private org.springframework.data.redis.core.RedisTemplate redisTemplate;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/admin/")
@@ -27,7 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new HttpRequestInteceptor(adminUserMapper))
+        registry.addInterceptor(new HttpRequestInteceptor(adminUserMapper, companyMapper, redisTemplate))
                 .addPathPatterns("/call/**")
                 .addPathPatterns("/config/**")
                 .addPathPatterns("/admin/**")

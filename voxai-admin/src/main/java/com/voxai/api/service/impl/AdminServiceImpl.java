@@ -66,6 +66,9 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
     @Autowired
     private AiEngineMapper aiEngineMapper;
 
+    @Value("${admin.session.seconds:28800}")
+    private long sessionSeconds = 28800L;
+
     @Override
     public AdminLoginResult login(AdminLogin adminLogin) {
         AdminUser adminUser = adminUserMapper.adminLogin(adminLogin.getUsername());
@@ -87,11 +90,11 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
         }
 
         CompanyInfo companyInfo = companyMapper.selectById(adminUser.getCompanyId());
-        if (companyInfo == null) {
+        if (companyInfo == null || !Integer.valueOf(1).equals(companyInfo.getStatus())) {
             //企业禁用
             throw new BusinessException(ErrorCode.COMPANY_NOT_AVALIABLE);
         }
-        String token = AuthUtil.createToken(adminUser.getUsername(), adminUser.getCompanyId(), companyInfo.getSecretKey());
+        String token = java.util.UUID.randomUUID().toString() + java.util.UUID.randomUUID().toString();
 
         AdminLoginResult result = new AdminLoginResult();
         result.setCts(Instant.now().getEpochSecond());
@@ -106,13 +109,15 @@ public class AdminServiceImpl extends BaseServiceImpl<AdminUser> implements Admi
         userInfo.setClientIp(adminLogin.getClientIp());
         result.setUserInfo(userInfo);
         result.setMenus(getMenus(adminUser.getId()));
-        redisTemplate.opsForValue().set(Constant.ADMIN_TOKEN + token, result);
+        redisTemplate.opsForValue().set(Constant.ADMIN_INFO + token, adminUser.getId() + ":" + adminUser.getCompanyId(), sessionSeconds, java.util.concurrent.TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(Constant.ADMIN_TOKEN + token, result, sessionSeconds, java.util.concurrent.TimeUnit.SECONDS);
         return result;
     }
 
     @Override
     public Boolean logout(String token) {
-        return redisTemplate.delete("token:" + token);
+        redisTemplate.delete(Constant.ADMIN_INFO + token);
+        return redisTemplate.delete(Constant.ADMIN_TOKEN + token);
     }
 
     @Override

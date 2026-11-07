@@ -156,6 +156,7 @@ class AdminServiceImplTest {
 
         CompanyInfo companyInfo = new CompanyInfo();
         companyInfo.setId(100L);
+        companyInfo.setStatus(1);
         companyInfo.setSecretKey("secret-key-for-test");
         companyInfo.setName("Test Company");
         companyInfo.setCompanyCode("TC001");
@@ -184,17 +185,19 @@ class AdminServiceImplTest {
         assertEquals("192.168.1.1", result.getUserInfo().getClientIp());
         assertEquals("/avatars/admin.png", result.getUserInfo().getAvatar());
 
-        verify(redisTemplate.opsForValue()).set(startsWith(Constant.ADMIN_TOKEN), eq(result));
+        verify(redisTemplate.opsForValue()).set(startsWith(Constant.ADMIN_TOKEN), eq(result), eq(28800L), eq(java.util.concurrent.TimeUnit.SECONDS));
+        verify(redisTemplate.opsForValue()).set(startsWith(Constant.ADMIN_INFO), contains(":"), eq(28800L), eq(java.util.concurrent.TimeUnit.SECONDS));
     }
 
     // ---- logout ----
 
     @Test
     void shouldLogoutSuccessfully() {
-        when(redisTemplate.delete("token:my-token")).thenReturn(true);
+        when(redisTemplate.delete(anyString())).thenReturn(true);
 
         Boolean result = service.logout("my-token");
         assertTrue(result);
+        verify(redisTemplate).delete(Constant.ADMIN_INFO + "my-token");
     }
 
     // ---- saveBlackPhone ----
