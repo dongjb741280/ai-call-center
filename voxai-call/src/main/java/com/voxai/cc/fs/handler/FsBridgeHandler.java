@@ -65,7 +65,7 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
         }
 
         GroupInfo groupInfo = cacheService.getGroupInfo(callInfo.getGroupId());
-        if (groupInfo.getRecordType() > 0) {
+        if (groupInfo != null && groupInfo.getRecordType() != null && groupInfo.getRecordType() > 0) {
             /**
              * 手动外呼：接通录音时在此录音
              * 呼入: 在此录音
@@ -74,7 +74,7 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
                 String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + callInfo.getDeviceList().get(0) + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
                 super.record(event.getRemoteAddress(), callInfo.getCallId(), callInfo.getDeviceList().get(0), record);
                 deviceInfo1.setRecord(record);
-            } else if (callInfo.getCallType() == CallType.INBOUND_CALL) {
+            } else if (callInfo.getCallType() == CallType.INBOUND_CALL || callInfo.getCallType() == CallType.AUTO_CALL) {
                 String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + event.getDeviceId() + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
                 super.record(event.getRemoteAddress(), callInfo.getCallId(), event.getDeviceId(), record);
                 deviceInfo1.setRecord(record);
@@ -85,14 +85,15 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
             return;
         }
 
-        if (deviceInfo1.getCdrType() == 5) {
+        if (deviceInfo1 == null || deviceInfo2 == null) { return; }
+        if (Integer.valueOf(5).equals(deviceInfo1.getCdrType())) {
             sendAgentState(callInfo, deviceInfo1.getAgentKey(), AgentState.CONSULTED_TALKING);
             if (deviceInfo2.getCdrType() == 2 && deviceInfo2.getDeviceType() == 1) {
                 sendAgentState(callInfo, deviceInfo2.getAgentKey(), AgentState.CONSULT_TALKING);
             }
             return;
         }
-        if (deviceInfo2.getCdrType() == 5) {
+        if (Integer.valueOf(5).equals(deviceInfo2.getCdrType())) {
             sendAgentState(callInfo, deviceInfo2.getAgentKey(), AgentState.CONSULTED_TALKING);
             if (deviceInfo1.getCdrType() == 2 && deviceInfo1.getDeviceType() == 1) {
                 sendAgentState(callInfo, deviceInfo1.getAgentKey(), AgentState.CONSULT_TALKING);

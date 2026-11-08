@@ -64,6 +64,7 @@ ai-call-center/
 ├── voxai-admin/           # Admin API service (port 7100)
 ├── voxai-call/            # FreeSwitch integration service (port 7200)
 ├── voxai-ivr/             # IVR engine service (port 7300)
+├── voxai-dialer/          # External outbound scheduler (HTTP client, disabled by default)
 ├── freeswitch/            # FreeSwitch configuration and Docker image
 ├── portal/                # Product portal (VoxHub)
 ├── docs/                  # Business docs (scope/flows/data model/engine interfaces)
@@ -116,6 +117,10 @@ ai-call-center/
 - **Flow engine**: parses `cc_ivr_workflow.content` into a node graph, executes by play/input/transfer
 - **Interaction**: playback and digit collection via FreeSwitch `playback` / `play_and_get_digits`
 - **Handoff**: calls back `voxai-call` on completion to route to skill group/agent/VDN/hangup
+
+### voxai-dialer (Outbound Task Engine)
+
+Independent scheduler with cruise/predictive pacing, command acknowledgements, lease recovery and CDR result submission. See [deployment and recovery](docs/15-外部拨号引擎.md) before enabling.
 
 ## Core Features
 

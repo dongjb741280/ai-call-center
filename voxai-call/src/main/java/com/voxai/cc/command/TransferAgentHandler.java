@@ -32,6 +32,12 @@ public class TransferAgentHandler extends BaseHandler {
         //坐席没有sip或者分机不存在
         if (StringUtils.isBlank(caller)) {
             logger.error("agent:{} sip is error, callId:{}", agentInfo.getAgentKey(), callInfo.getCallId());
+            if (callInfo.getTaskId()!=null) { fsListen.hangupCall(callInfo.getMediaHost(),callInfo.getCallId(),thisDeviceId); }
+            return;
+        }
+        RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), caller);
+        if (routeGetway == null) {
+            fsListen.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), thisDeviceId);
             return;
         }
         if (callInfo.getHiddenCustomer() == 1) {
@@ -52,19 +58,23 @@ public class TransferAgentHandler extends BaseHandler {
         callInfo.getDeviceList().add(deviceId);
         callInfo.getDeviceInfoMap().put(deviceId, deviceInfo);
         callInfo.setAgentKey(agentInfo.getAgentKey());
-        callInfo.setCalled(agentInfo.getCalled());
+        if (callInfo.getTaskId() == null) { callInfo.setCalled(agentInfo.getCalled()); }
+        else {
+            callInfo.setAgentName(agentInfo.getAgentName()); callInfo.setLoginType(agentInfo.getLoginType());
+            deviceInfo.setCdrType(2); deviceInfo.setAgentName(agentInfo.getAgentName());
+        }
         callInfo.getNextCommands().add(new NextCommand(deviceId, NextType.NEXT_CALL_BRIDGE, thisDeviceId));
         cacheService.addCallInfo(callInfo);
         cacheService.addDevice(deviceId, callInfo.getCallId());
 
-        RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), caller);
-        if (routeGetway == null) {
-            fsListen.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), thisDeviceId);
-            return;
-        }
         agentInfo.setCallId(callInfo.getCallId());
         agentInfo.setDeviceId(deviceId);
+        if (callInfo.getTaskId() != null) {
+            agentInfo.setBeforeState(agentInfo.getAgentState()); agentInfo.setBeforeTime(agentInfo.getStateTime());
+            agentInfo.setStateTime(Instant.now().getEpochSecond()); agentInfo.setAgentState(com.voxai.core.po.AgentState.OUT_CALL);
+            if (agentInfo.getGroupIds() != null) { groupHandler.agentNotReady(agentInfo); }
+        }
         cacheService.addAgentInfo(agentInfo);
-        fsListen.makeCall(routeGetway, callInfo.getCaller(), caller, callInfo.getCallId(), deviceId, null, null);
+        fsListen.makeCall(callInfo.getMediaHost(), routeGetway, callInfo.getCaller(), caller, callInfo.getCallId(), deviceId, null, null);
     }
 }

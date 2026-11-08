@@ -12,6 +12,11 @@ import java.util.Map;
  * @date 2026/07/27
  */
 public class FsBaseEvent {
+    @JSONField(name = "variable_callId")
+    private Long callId;
+    public Long getCallId() { return callId; }
+    public void setCallId(Long value) { callId = value; }
+
 
     @JSONField(name = "Event-Name")
     protected String eventName;

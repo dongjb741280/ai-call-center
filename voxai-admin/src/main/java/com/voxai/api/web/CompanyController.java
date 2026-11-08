@@ -1376,6 +1376,21 @@ public class CompanyController extends BaseController {
         return new CommonResponse<>(new PageInfo<>(list));
     }
 
+    @GetMapping("task/engine")
+    public CommonResponse<List<TaskConfig>> engineTasks(@ModelAttribute("adminAccountInfo") AdminAccountInfo account,
+            @RequestParam(defaultValue="0") Long afterId, @RequestParam(defaultValue="100") int limit) {
+        return new CommonResponse<>(taskManagementService.engineTasks(account.getBindCompanyId(), afterId, limit));
+    }
+    @GetMapping("task/{id}/attempt/active")
+    public CommonResponse<List<com.voxai.core.po.dialer.DialerWork>> activeTaskAttempts(
+            @ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long id,
+            @RequestParam(defaultValue="") String afterAttemptId, @RequestParam(defaultValue="100") int limit) {
+        return new CommonResponse<>(taskManagementService.activeAttempts(account.getBindCompanyId(), id, afterAttemptId, limit));
+    }
+    @GetMapping("task/{id}/engine/pending")
+    public CommonResponse<Integer> pendingTaskContacts(@ModelAttribute("adminAccountInfo") AdminAccountInfo account, @PathVariable Long id) {
+        return new CommonResponse<>(taskManagementService.pendingContacts(account.getBindCompanyId(), id));
+    }
     @GetMapping("task/{id}")
     public CommonResponse<TaskConfig> taskDetail(@ModelAttribute("adminAccountInfo") AdminAccountInfo adminAccountInfo,
                                                   @PathVariable Long id) {

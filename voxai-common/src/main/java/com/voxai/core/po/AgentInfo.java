@@ -11,6 +11,10 @@ import java.util.List;
  * @date 2026/07/27
  */
 public class AgentInfo extends Agent {
+    private Long taskAfterUntil;
+    public Long getTaskAfterUntil() { return taskAfterUntil; }
+    public void setTaskAfterUntil(Long value) { taskAfterUntil = value; }
+
 
 
     /**

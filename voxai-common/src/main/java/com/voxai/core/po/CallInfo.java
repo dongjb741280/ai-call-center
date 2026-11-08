@@ -259,6 +259,16 @@ public class CallInfo implements Serializable {
      */
     private List<CallDetail> callDetails = new ArrayList<>();
 
+    private String taskTransferType;
+    public String getTaskTransferType() { return taskTransferType; }
+    public void setTaskTransferType(String value) { taskTransferType = value; }
+    private Long taskTransferId;
+    public Long getTaskTransferId() { return taskTransferId; }
+    public void setTaskTransferId(Long value) { taskTransferId = value; }
+    private Integer taskAfterDuration;
+    public Integer getTaskAfterDuration() { return taskAfterDuration; }
+    public void setTaskAfterDuration(Integer value) { taskAfterDuration = value; }
+
     public String getCoreUuid() {
         return coreUuid;
     }

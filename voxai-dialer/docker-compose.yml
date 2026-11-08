@@ -1,0 +1,14 @@
+services:
+  dialer:
+    build: .
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DIALER_ENABLED: "true"
+      DIALER_COMPANY_ID: ${DIALER_COMPANY_ID:?Set the worker company ID}
+      DIALER_ADMIN_USER: ${DIALER_ADMIN_USER:?Set a dedicated admin account}
+      DIALER_ADMIN_PASSWORD: ${DIALER_ADMIN_PASSWORD:?Set the admin account password}
+      DIALER_CALL_TOKEN: ${DIALER_CALL_TOKEN:?Set a matching call control token}
+      DIALER_ADMIN_URL: ${DIALER_ADMIN_URL:-http://host.docker.internal:7100/voxai-admin}
+      DIALER_CALL_URL: ${DIALER_CALL_URL:-http://host.docker.internal:7200/voxai-call}

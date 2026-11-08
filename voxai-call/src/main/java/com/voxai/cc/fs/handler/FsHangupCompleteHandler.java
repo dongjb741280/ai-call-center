@@ -36,6 +36,9 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
     private RestTemplate restTemplate;
 
     @Autowired
+    private com.voxai.cc.dialer.TaskAfterService taskAfterService;
+
+    @Autowired
     private MinioClient minioClient;
 
     @Override
@@ -126,7 +129,10 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         //清空坐席通话状态
         if (callInfo.getAgentKey() != null) {
             AgentInfo agentInfo = cacheService.getAgentInfo(callInfo.getAgentKey());
-            if (agentInfo != null) {
+            if (agentInfo != null && callInfo.getTaskId() != null && callInfo.getCallType() == com.voxai.core.enums.CallType.AUTO_CALL
+                    && java.util.Objects.equals(agentInfo.getCallId(),callInfo.getCallId())) {
+                taskAfterService.begin(callInfo,agentInfo);
+            } else if (agentInfo != null && callInfo.getTaskId() == null) {
                 agentInfo.setCallId(null);
                 agentInfo.setDeviceId(null);
                 agentInfo.setAgentState(AgentState.NOT_READY);

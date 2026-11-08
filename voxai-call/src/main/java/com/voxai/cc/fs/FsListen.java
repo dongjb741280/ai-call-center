@@ -78,7 +78,7 @@ public class FsListen {
     /**
      * 媒体集合
      */
-    private Map<String, Client> fsClient = new HashMap<>();
+    private Map<String, Client> fsClient = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * 线程组
@@ -293,7 +293,18 @@ public class FsListen {
                  * 一个callId挂机处理必须使用一个相同的线程
                  */
                 ExecutorService executorService = null;
-                if (formatEvent instanceof FsHangupCompleteEvent) {
+                // Restore the local device index from Redis after restart, using the trusted ESL channel variable.
+                CallInfo indexedCall = cacheService.getCallInfo(formatEvent.getDeviceId());
+                if (indexedCall == null && formatEvent.getCallId() != null) {
+                    indexedCall = cacheService.getCallInfo(formatEvent.getCallId());
+                    if (indexedCall != null && indexedCall.getDeviceInfoMap().containsKey(formatEvent.getDeviceId())) {
+                        cacheService.addDevice(formatEvent.getDeviceId(), indexedCall.getCallId());
+                    } else { indexedCall = null; }
+                }
+                if (indexedCall != null && indexedCall.getTaskId() != null) {
+                    executorService = executorMap.get(RandomUtil.getNum(indexedCall.getCallId().toString(), threadNum));
+                }
+                if (executorService == null && formatEvent instanceof FsHangupCompleteEvent) {
                     CallInfo callInfo = cacheService.getCallInfo(formatEvent.getDeviceId());
                     if (callInfo == null) {
                         return;
@@ -434,6 +445,72 @@ public class FsListen {
     }
 
     public void makeCall(String media, RouteGetway routeGetway, String display, String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, boolean autoAnswer, String... sipHeaders) {
+        originate(media, routeGetway, display, called, callId, deviceId, timeout, originateTimeout, autoAnswer, java.util.Collections.emptyMap(), sipHeaders);
+    }
+
+    public String availableMedia() {
+        return fsClient.entrySet().stream().filter(e -> e.getValue().isActivate()).map(Map.Entry::getKey).sorted().findFirst().orElse(null);
+    }
+
+    /** Reconciliation must observe all already-queued task events before rebuilding a final CDR. */
+    public void withTaskEvents(Long callId, Runnable operation) {
+        ExecutorService executor=executorMap.get(RandomUtil.getNum(callId.toString(),threadNum));
+        if (executor==null) { throw new IllegalStateException("Media event executor unavailable"); }
+        try {
+            executor.submit(operation).get(10,TimeUnit.SECONDS);
+        } catch (InterruptedException failure) {
+            Thread.currentThread().interrupt(); throw new IllegalStateException("Task reconciliation interrupted",failure);
+        } catch (java.util.concurrent.ExecutionException failure) {
+            if (failure.getCause() instanceof RuntimeException) { throw (RuntimeException)failure.getCause(); }
+            throw new IllegalStateException("Task reconciliation failed",failure.getCause());
+        } catch (java.util.concurrent.TimeoutException failure) {
+            // The queued operation still owns its database fence; an HTTP timeout never starts a second call.
+            throw new IllegalStateException("Task reconciliation deferred",failure);
+        }
+    }
+
+    private String taskApi(String media, String command, String args) {
+        Client client = fsClient.get(media);
+        if (client == null || !client.isActivate()) { throw new IllegalStateException("Task media connection unavailable"); }
+        EslMessage response = client.sendApiCommand(command, args);
+        if (response == null) { throw new IllegalStateException("Empty media response"); }
+        return String.join("\n", response.getBodyLines()).trim();
+    }
+
+    public boolean taskChannelExists(String media, String uuid) {
+        if (uuid == null || !uuid.matches("[A-Za-z0-9_-]{1,64}")) { throw new IllegalArgumentException("Invalid channel ID"); }
+        String result = taskApi(media, "uuid_exists", uuid);
+        if (!"true".equals(result) && !"false".equals(result)) { throw new IllegalStateException("Uncertain media response"); }
+        return "true".equals(result);
+    }
+
+    public java.util.List<String> taskChannels(String media, Long callId) {
+        com.alibaba.fastjson.JSONObject channels = com.alibaba.fastjson.JSON.parseObject(taskApi(media, "show", "channels as json"));
+        java.util.List<String> found = new java.util.ArrayList<>();
+        if (channels == null || !channels.containsKey("row_count")) { throw new IllegalStateException("Invalid channel inventory"); }
+        com.alibaba.fastjson.JSONArray rows = channels.getJSONArray("rows");
+        if (rows == null && channels.getIntValue("row_count") != 0) { throw new IllegalStateException("Incomplete channel inventory"); }
+        if (rows != null) {
+            for (Object item : rows) {
+                String uuid = ((com.alibaba.fastjson.JSONObject) item).getString("uuid");
+                if (uuid == null || !uuid.matches("[A-Za-z0-9_-]{1,64}")) { throw new IllegalStateException("Invalid channel inventory"); }
+                if (String.valueOf(callId).equals(taskApi(media, "uuid_getvar", uuid + " callId"))) { found.add(uuid); }
+            }
+        }
+        return found;
+    }
+
+    public java.util.concurrent.CompletableFuture<EslEvent> originateTask(String media, RouteGetway route, String display,
+            String called, Long callId, String uuid, int timeout, int maxCallSeconds) {
+        Map<String,String> variables = new HashMap<>();
+        variables.put("hangup_after_bridge", "true");
+        variables.put("execute_on_answer", "sched_hangup +" + maxCallSeconds + " NORMAL_CLEARING");
+        return originate(media, route, display, called, callId, uuid, timeout, timeout, false, variables);
+    }
+
+    private java.util.concurrent.CompletableFuture<EslEvent> originate(String media, RouteGetway routeGetway, String display,
+            String called, Long callId, String deviceId, Integer timeout, Integer originateTimeout, boolean autoAnswer,
+            Map<String,String> variables, String... sipHeaders) {
         Client client = null;
         if (StringUtils.isBlank(media)) {
             media = RandomUtil.getRandomKey(fsClient.keySet());
@@ -495,11 +572,14 @@ public class FsListen {
         // originate 的 {} 变量用 ^^; 转义为分号分隔，使 absolute_codec_string 能携带逗号（如 OPUS,PCMU,PCMA）
         StringBuilder builder = new StringBuilder();
         builder.append("{^^;return_ring_ready=true").append(";").append("sip_contact_user=").append(display).append(";").append("ring_asr=true").append(";").append("absolute_codec_string=").append(codecs).append(";").append("origination_caller_id_number=").append(display).append(";").append("origination_caller_id_name=").append(display).append(";").append("origination_uuid=").append(deviceId);
+        builder.append(";callId=").append(callId);
+        variables.forEach((key, value) -> builder.append(";").append(key).append("=").append(value));
         if (autoAnswer) {
             builder.append(";").append("sip_auto_answer=true");
         }
-        if (originateTimeout != null) {
-            builder.append(";").append("originate_timeout=" + originateTimeout);
+        Integer effectiveTimeout = originateTimeout != null ? originateTimeout : timeout;
+        if (effectiveTimeout != null) {
+            builder.append(";").append("originate_timeout=" + effectiveTimeout);
         }
         if (StringUtils.isNoneBlank(sipBuffer)) {
             builder.append(";").append(sipBuffer);
@@ -509,7 +589,7 @@ public class FsListen {
         } else {
             builder.append("}user/").append(called).append(FsConstant.PARK);
         }
-        client.sendBackgroundApiCommand(FsConstant.ORIGINATE, builder.toString());
+        return client.sendBackgroundApiCommand(FsConstant.ORIGINATE, builder.toString());
     }
 
 

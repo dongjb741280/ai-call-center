@@ -115,7 +115,9 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
     @Override
     public void completeCall(CdrCompletion completion) {
         completion.setNotifyVersion(notifyVersion);
-        if (callCdrPressure != 1 || !cdrPublisher.publish(Constant.CALL_COMPLETE_KEY, completion)) {
+        // Task recovery reads the final CDR as its durable completion fence. Do not leave
+        // a gap between clearing its Redis context and committing its final snapshot.
+        if (completion.getCallLog().getTaskId() != null || callCdrPressure != 1 || !cdrPublisher.publish(Constant.CALL_COMPLETE_KEY, completion)) {
             cdrPersistence.complete(completion);
         }
     }

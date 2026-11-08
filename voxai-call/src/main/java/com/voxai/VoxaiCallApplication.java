@@ -115,8 +115,9 @@ public class VoxaiCallApplication implements CommandLineRunner, ApplicationListe
     }
 
     @Bean
-    public SnowflakeIdWorker snowflakeIdWorker() {
-        return new SnowflakeIdWorker(0, 0);
+    public SnowflakeIdWorker snowflakeIdWorker(@Value("${snowflake.worker-id:0}") long workerId,
+            @Value("${snowflake.datacenter-id:0}") long datacenterId) {
+        return new SnowflakeIdWorker(workerId, datacenterId);
     }
 
     @Bean

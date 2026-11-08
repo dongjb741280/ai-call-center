@@ -96,7 +96,7 @@ class TaskManagementDatabaseTest {
                 }
                 session.clearCache();
                 assertThrows(BusinessException.class, () -> service.completeAttempt(company, taskId, claim));
-                try (PreparedStatement update = session.getConnection().prepareStatement("update cc_call_log set company_id=? where call_id=?")) {
+                try (PreparedStatement update = session.getConnection().prepareStatement("update cc_call_log set company_id=?,end_time=1 where call_id=?")) {
                     update.setLong(1, company); update.setLong(2, claim.getCallId()); update.executeUpdate();
                 }
                 session.clearCache();

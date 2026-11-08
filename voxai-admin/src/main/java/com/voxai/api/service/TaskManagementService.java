@@ -21,6 +21,7 @@ import java.util.*;
 @Transactional
 public class TaskManagementService {
     @Autowired private TaskManagementMapper tasks;
+    @Autowired private TaskDialerMapper dialer;
     @Autowired private TaskSourceMapper sources;
     @Autowired private TaskFieldMapper fields;
     @Autowired private GroupMapper groups;
@@ -28,6 +29,20 @@ public class TaskManagementService {
     @Autowired private AgentMapper agents;
     @Autowired private CompanyDisplayMapper pools;
 
+    public List<TaskConfig> engineTasks(Long company, Long afterId, int limit) {
+        require(afterId != null && afterId >= 0 && limit > 0 && limit <= 200, "引擎分页参数错误");
+        return dialer.engineTasks(company, afterId, limit);
+    }
+    public List<com.voxai.core.po.dialer.DialerWork> activeAttempts(Long company, Long taskId, String after, int limit) {
+        task(company, taskId);
+        require(limit > 0 && limit <= 200 && after != null && after.length() <= 64, "引擎分页参数错误");
+        long current=now(); tasks.releaseExpired(company,taskId,current); tasks.expireAttempts(company,taskId,current);
+        return dialer.activeAttempts(company, taskId, after, limit);
+    }
+    public int pendingContacts(Long company, Long taskId) {
+        task(company, taskId);
+        return dialer.pendingContacts(company, taskId);
+    }
     public TaskConfig task(Long company, Long id) {
         require(company != null && company > 0, "企业不能为空");
         TaskConfig task = tasks.lockTask(company, id);
@@ -275,14 +290,15 @@ public class TaskManagementService {
         }
         require("claimed".equals(attempt.getState()), "attempt已过期或不能回写");
         require(tasks.countTaskCall(company, taskId, claim.getCallId())==1, "话单尚未落库或不属于当前企业任务，请续租后重试");
-        require(tasks.countCallAttempts(company, taskId, claim.getCallId())==0, "话单已关联其他拨打记录");
+        require(attempt.getCallId() == null || Objects.equals(attempt.getCallId(), claim.getCallId()), "callId与已发起拨打不匹配");
+        require(tasks.countCallAttempts(company, taskId, claim.getCallId())==(attempt.getCallId()==null?0:1), "话单已关联其他拨打记录");
         boolean retryable=Arrays.asList("no_answer","busy","failed").contains(claim.getResult());
         boolean retry=retryable && attempt.getRound()<task.getCallRounds();
         String state=retry?"retry":"completed";
         attempt.setCallId(claim.getCallId()); attempt.setState("completed"); attempt.setResult(claim.getResult()); attempt.setUts(current);
         require(tasks.completeAttempt(attempt)==1,"拨打记录已处理或租约已过期");
         TaskContact contact=new TaskContact(); contact.setId(claim.getContactId()); contact.setTaskId(taskId); contact.setActiveAttemptId(claim.getAttemptId());
-        contact.setCallTime(current); contact.setAnswerTime(claim.getAnswerTime()); contact.setBridgeTime(claim.getBridgeTime()); contact.setCallStatus(state); contact.setCallResult(claim.getResult()); contact.setAgentCode(claim.getAgentCode());
+        contact.setCallTime(attempt.getDispatchTime()==null?current:attempt.getDispatchTime()); contact.setAnswerTime(claim.getAnswerTime()); contact.setBridgeTime(claim.getBridgeTime()); contact.setCallStatus(state); contact.setCallResult(claim.getResult()); contact.setAgentCode(claim.getAgentCode());
         contact.setNextAttemptAt(retry?current+task.getRetryInterval():Long.MAX_VALUE);
         require(tasks.completeContact(contact)==1,"名单已被新拨打轮次接管，拒绝覆盖");
         require(tasks.updateTaskCounters(company,taskId,current)==1,"任务统计更新失败");

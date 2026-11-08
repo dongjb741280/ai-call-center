@@ -1,6 +1,12 @@
 package com.voxai.core.entity;
 
 public class TaskAttempt {
+    private String mediaHost;
+    public String getMediaHost() { return mediaHost; }
+    public void setMediaHost(String value) { mediaHost = value; }
+    private Long dispatchTime;
+    public Long getDispatchTime() { return dispatchTime; }
+    public void setDispatchTime(Long value) { dispatchTime = value; }
     private String attemptId;
     public String getAttemptId() { return attemptId; }
     public void setAttemptId(String value) { this.attemptId = value; }

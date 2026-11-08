@@ -26,6 +26,9 @@ import java.time.Instant;
 @Component
 @HandlerType("CHANNEL_ANSWER")
 public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.voxai.cc.dialer.TaskTransferHandler taskTransferHandler;
+
 
     @Override
     public void handleEvent(FsAnswerEvent event) {
@@ -52,6 +55,10 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
 
         logger.info("callId:{}, deviceId:{}, nextCommand:{}", deviceInfo.getCallId(), deviceInfo.getDeviceId(), nextCommand);
         switch (nextCommand.getNextType()) {
+            case NEXT_TASK:
+                cacheService.addCallInfo(callInfo);
+                taskTransferHandler.route(callInfo,deviceInfo);
+                return;
             case NEXT_VDN:
                 //进vdn
                 matchVdnCode(event, callInfo, deviceInfo);

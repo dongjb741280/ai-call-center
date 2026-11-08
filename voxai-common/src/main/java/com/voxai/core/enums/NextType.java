@@ -7,6 +7,7 @@ package com.voxai.core.enums;
 public enum NextType {
 
     NORNAL,
+    NEXT_TASK,
     /**
      * 呼叫另外一侧
      */

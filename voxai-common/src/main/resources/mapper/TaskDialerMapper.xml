@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.voxai.core.mapper.TaskDialerMapper">
+  <resultMap id="WorkResultMap" type="com.voxai.core.po.dialer.DialerWork" extends="com.voxai.core.mapper.TaskManagementMapper.AttemptResultMap">
+    <result column="phone" property="phone"/>
+    <result column="custom_data" property="customData"/>
+  </resultMap>
+  <resultMap id="MetricsResultMap" type="com.voxai.core.po.dialer.DialerCapacity">
+    <result column="active_calls" property="activeCalls"/>
+    <result column="target_active_calls" property="targetActiveCalls"/>
+    <result column="company_active_calls" property="companyActiveCalls"/>
+    <result column="completed_calls" property="completedCalls"/>
+    <result column="answered_calls" property="answeredCalls"/>
+    <result column="abandoned_calls" property="abandonedCalls"/>
+  </resultMap>
+  <select id="engineTasks" resultMap="com.voxai.core.mapper.TaskConfigMapper.BaseResultMap">
+    select t.* from cc_task_config t where t.company_id=#{companyId} and t.archived=0 and t.id &gt; #{afterId}
+    and (t.status=1 or t.requested_status is not null or exists(select 1 from cc_task_attempt a where a.company_id=#{companyId} and a.task_id=t.id and a.state='claimed'))
+    order by t.id limit #{limit}
+  </select>
+  <select id="activeAttempts" resultMap="WorkResultMap">
+    select a.*,c.phone,c.custom_data from cc_task_attempt a join cc_task_contact c on c.id=a.contact_id and c.task_id=a.task_id
+    where a.company_id=#{companyId} and a.task_id=#{taskId} and a.state='claimed' and a.attempt_id &gt; #{afterAttemptId}
+    order by a.attempt_id limit #{limit}
+  </select>
+  <select id="lockAttempt" resultMap="com.voxai.core.mapper.TaskManagementMapper.AttemptResultMap">
+    select * from cc_task_attempt where company_id=#{companyId} and task_id=#{taskId} and attempt_id=#{attemptId} for update
+  </select>
+  <select id="lockCompany" resultType="long">select id from cc_company where id=#{companyId} and status=1 for update</select>
+  <select id="pendingContacts" resultType="int">select count(*) from cc_task_contact c join cc_task_config t on t.id=c.task_id where t.company_id=#{companyId} and t.id=#{taskId} and c.call_status in ('pending','retry','dialing','ringing','answered')</select>
+  <update id="assignCall">
+    update cc_task_attempt set call_id=#{callId},media_host=#{mediaHost},dispatch_time=#{dispatchTime},uts=#{uts}
+    where company_id=#{companyId} and task_id=#{taskId} and attempt_id=#{attemptId} and lease_token=#{leaseToken}
+      and state='claimed' and call_id is null and lease_until &gt; #{uts}
+  </update>
+  <select id="metrics" resultMap="MetricsResultMap">
+    select
+      (select count(*) from cc_task_attempt where company_id=#{companyId} and task_id=#{taskId} and state='claimed' and call_id is not null) as active_calls,
+      (select count(*) from cc_task_attempt a join cc_task_config t on t.id=a.task_id where a.company_id=#{companyId} and t.company_id=#{companyId} and t.transfer_type=#{transferType} and t.transfer_id=#{transferId} and a.state='claimed' and a.call_id is not null) as target_active_calls,
+      (select count(*) from cc_task_attempt where company_id=#{companyId} and state='claimed' and call_id is not null) as company_active_calls,
+      count(*) as completed_calls,
+      coalesce(sum(case when l.answer_flag in (0,3) then 1 else 0 end),0) as answered_calls,
+      coalesce(sum(case when l.answer_flag=3 then 1 else 0 end),0) as abandoned_calls
+    from cc_task_attempt a join cc_call_log l on l.call_id=a.call_id and l.company_id=a.company_id and l.task_id=a.task_id
+    where a.company_id=#{companyId} and a.task_id=#{taskId} and a.state='completed' and a.cts &gt;= #{since}
+  </select>
+  <select id="displayPhones" resultMap="com.voxai.core.mapper.CompanyPhoneMapper.BaseResultMap">
+    select p.* from cc_company_phone p join cc_company_phone_group g on g.phone_id=p.id join cc_company_display d on d.id=g.display_id
+    where d.id=#{poolId} and d.company_id=#{companyId} and g.company_id=#{companyId} and d.status=1 and p.company_id=#{companyId} and p.status=2 and p.type in (2,3)
+    order by p.id
+  </select>
+  <select id="call" resultMap="com.voxai.core.mapper.CallLogMapper.BaseResultMap">select * from cc_call_log where company_id=#{companyId} and task_id=#{taskId} and call_id=#{callId}</select>
+  <select id="customer" resultMap="com.voxai.core.mapper.CallDeviceMapper.BaseResultMap">select * from cc_call_device where company_id=#{companyId} and call_id=#{callId} and device_type=2 order by id limit 1</select>
+</mapper>

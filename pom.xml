@@ -22,6 +22,7 @@
         <module>voxai-admin</module>
         <module>voxai-call</module>
         <module>voxai-ivr</module>
+        <module>voxai-dialer</module>
     </modules>
 
     <developers>

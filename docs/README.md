@@ -9,7 +9,7 @@
 | [01-业务范围](01-业务范围.md) | 系统定位、多租户模型、功能清单（按领域划分） |
 | [02-业务流程](02-业务流程.md) | 核心业务场景与 Mermaid 流程图（呼入/呼出/ACD/转接咨询/坐席状态机等） |
 | [03-数据模型](03-数据模型.md) | 全部数据表、字段说明、表间关系（ER 图） |
-| [04-外部引擎接口约定](04-外部引擎接口约定.md) | IVR 引擎、外呼任务引擎的对外接口约定与缺口 |
+| [04-外部引擎接口约定](04-外部引擎接口约定.md) | IVR 引擎、`voxai-dialer` 外呼任务引擎的接口与剩余缺口 |
 | [10-话单一致性与回调](10-话单一致性与回调.md) | 三层话单、时间单位、月表、压力模式和回调 outbox |
 | [05-IVR引擎](05-IVR引擎.md) | IVR 引擎：架构、流程定义 JSON、数据模型、可视化编辑器与联调 |
 | [06-SIP分机注册流程](06-SIP分机注册流程.md) | 坐席分机 SIP 注册链路：软电话 REGISTER → FreeSWITCH → voxai-admin → cc_agent_sip |
@@ -33,6 +33,7 @@
 | **voxai-admin** | 7100（8080） | `com.voxai.api` | 管理 API：企业/坐席/技能组/技能/VDN/IVR/溢出/号码/路由/外呼任务/话单/统计/权限 CRUD，Quartz 定时统计 |
 | **voxai-call** | 7200（8081） | `com.voxai` | 呼叫控制：FreeSwitch ESL 事件、ACD 路由、WebSocket 实时通信、TCP 状态订阅 |
 | **voxai-ivr** | 7300 | `com.voxai.ivr` | IVR 引擎：放音/收键/按键分支，结束时回控 voxai-call 继续路由 |
+| **voxai-dialer** | —（独立进程） | `com.voxai.dialer` | 外呼任务执行器：巡航/预测调度、租约恢复、客户优先呼叫和结果回写，默认关闭 |
 | **ai-call-center-web**（独立项目） | 3000 | — | Vue3 + Element Plus + Pinia + JsSIP 软电话坐席前端 |
 
 ### 外部协作服务
@@ -44,6 +45,7 @@
 | `CC_API` | 管理 API（voxai-admin） |
 | `FS_API` | FreeSwitch API |
 | `CC_IVR`（:7300） | IVR 引擎（本仓库 `voxai-ivr` 模块），通过 HTTP `/voxai-ivr/index/start` 拉起 |
+| `DIALER` | 外呼任务执行器（本仓库 `voxai-dialer` 模块），通过管理端和呼叫控制 API 工作 |
 | `FS_MEDIA`（:7430） | FreeSwitch 媒体服务，录音文件经此拉取后上传 MinIO |
 
 ## 核心概念速览
