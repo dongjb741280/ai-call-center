@@ -35,6 +35,12 @@ public class RouteGroup implements Serializable {
     private Integer status;
 
 
+    /** ROUND_ROBIN (default), WEIGHTED, or FAILOVER. */
+    private String selectionStrategy;
+
+    public String getSelectionStrategy() { return selectionStrategy; }
+    public void setSelectionStrategy(String selectionStrategy) { this.selectionStrategy = selectionStrategy; }
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {

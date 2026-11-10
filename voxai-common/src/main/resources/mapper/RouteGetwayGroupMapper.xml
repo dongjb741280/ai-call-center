@@ -6,11 +6,12 @@
         <result column="cts" jdbcType="BIGINT" property="cts"/>
         <result column="uts" jdbcType="BIGINT" property="uts"/>
         <result column="getway_id" jdbcType="BIGINT" property="getwayId"/>
+        <result column="weight" property="weight"/>
         <result column="route_group_id" jdbcType="BIGINT" property="routeGroupId"/>
     </resultMap>
     <sql id="Base_Column_List">
         id
-        , cts, uts, getway_id, route_group_id
+        , cts, uts, getway_id, route_group_id, weight
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
@@ -25,9 +26,9 @@
     </delete>
     <insert id="insert" parameterType="com.voxai.core.entity.RouteGetwayGroup">
         insert into cc_route_getway_group (id, cts, uts, getway_id,
-                                           route_group_id)
+                                           route_group_id, weight)
         values (#{id,jdbcType=BIGINT}, #{cts,jdbcType=BIGINT}, #{uts,jdbcType=BIGINT}, #{getwayId,jdbcType=BIGINT},
-                #{routeGroupId,jdbcType=BIGINT})
+                #{routeGroupId,jdbcType=BIGINT}, coalesce(#{weight}, 1))
     </insert>
     <insert id="insertSelective" parameterType="com.voxai.core.entity.RouteGetwayGroup">
         insert into cc_route_getway_group
@@ -44,6 +45,7 @@
             <if test="getwayId != null">
                 getway_id,
             </if>
+            <if test="weight != null">weight,</if>
             <if test="routeGroupId != null">
                 route_group_id,
             </if>
@@ -61,6 +63,7 @@
             <if test="getwayId != null">
                 #{getwayId,jdbcType=BIGINT},
             </if>
+            <if test="weight != null">#{weight},</if>
             <if test="routeGroupId != null">
                 #{routeGroupId,jdbcType=BIGINT},
             </if>
@@ -78,6 +81,7 @@
             <if test="getwayId != null">
                 getway_id = #{getwayId,jdbcType=BIGINT},
             </if>
+            <if test="weight != null">weight = #{weight},</if>
             <if test="routeGroupId != null">
                 route_group_id = #{routeGroupId,jdbcType=BIGINT},
             </if>
@@ -89,6 +93,7 @@
         set cts            = #{cts,jdbcType=BIGINT},
             uts            = #{uts,jdbcType=BIGINT},
             getway_id      = #{getwayId,jdbcType=BIGINT},
+            weight = coalesce(#{weight}, 1),
             route_group_id = #{routeGroupId,jdbcType=BIGINT}
         where id = #{id,jdbcType=BIGINT}
     </update>

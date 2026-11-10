@@ -57,6 +57,7 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
             logger.warn("device:{} is null, callId:{}", event.getDeviceId(), callInfo.getCallId());
             return;
         }
+        if (deviceInfo.getEndTime() != null) return;
         callInfo.getDeviceList().remove(event.getDeviceId());
         deviceInfo.setHangupCause(event.getHangupCause());
         deviceInfo.setSipProtocol(event.getSipProtocol());
@@ -95,6 +96,8 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         callDevice.setCompanyId(callInfo.getCompanyId());
         callCdrService.saveCallDevice(callDevice);
         callInfo.getDeviceInfoMap().put(callDevice.getDeviceId(), deviceInfo);
+
+        if (fsListen.failover(callInfo, deviceInfo)) return;
 
         /**
          * 一般情况下，挂断其他所有设备

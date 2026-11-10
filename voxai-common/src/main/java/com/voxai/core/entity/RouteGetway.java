@@ -74,6 +74,12 @@ public class RouteGetway implements Serializable {
      */
     private Integer status;
 
+    /** Membership-specific weight, populated only when loading a gateway group. */
+    private Integer weight;
+
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) { this.weight = weight; }
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
