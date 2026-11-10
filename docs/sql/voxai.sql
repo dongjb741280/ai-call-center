@@ -2660,6 +2660,7 @@ CREATE TABLE `cc_route_getway_group` (
   `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
   `getway_id` bigint NOT NULL DEFAULT '0' COMMENT '媒体网关',
   `route_group_id` bigint NOT NULL DEFAULT '0' COMMENT '网关组',
+  `weight` int NOT NULL DEFAULT '1' COMMENT 'Membership gateway weight 1-1000',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='路由字冠关联组表';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2670,7 +2671,7 @@ CREATE TABLE `cc_route_getway_group` (
 
 LOCK TABLES `cc_route_getway_group` WRITE;
 /*!40000 ALTER TABLE `cc_route_getway_group` DISABLE KEYS */;
-INSERT INTO `cc_route_getway_group` VALUES (1,1,1,3,1),(2,1,1,2,2),(3,1,1,1,3),(4,1,1,7,4),(5,1,1,5,5),(12,1638933705,0,1,8),(13,1638933705,0,2,8),(14,1638933705,0,3,8),(24,1638933719,0,1,7),(25,1638933719,0,2,7),(26,1638933719,0,3,7);
+INSERT INTO `cc_route_getway_group` (`id`,`cts`,`uts`,`getway_id`,`route_group_id`) VALUES (1,1,1,3,1),(2,1,1,2,2),(3,1,1,1,3),(4,1,1,7,4),(5,1,1,5,5),(12,1638933705,0,1,8),(13,1638933705,0,2,8),(14,1638933705,0,3,8),(24,1638933719,0,1,7),(25,1638933719,0,2,7),(26,1638933719,0,3,7);
 /*!40000 ALTER TABLE `cc_route_getway_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2685,6 +2686,7 @@ CREATE TABLE `cc_route_group` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'PK',
   `cts` bigint NOT NULL DEFAULT '0' COMMENT '创建时间',
   `uts` bigint NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `selection_strategy` varchar(16) NOT NULL DEFAULT 'ROUND_ROBIN' COMMENT 'ROUND_ROBIN/WEIGHTED/FAILOVER',
   `route_group` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '网关组',
   `status` int NOT NULL DEFAULT '1' COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE
@@ -2697,7 +2699,7 @@ CREATE TABLE `cc_route_group` (
 
 LOCK TABLES `cc_route_group` WRITE;
 /*!40000 ALTER TABLE `cc_route_group` DISABLE KEYS */;
-INSERT INTO `cc_route_group` VALUES (1,1,1,'87路由',1),(2,1,1,'133路由',1),(3,1,1,'871556590425003',1),(4,1,1,'CALL_OUT',1),(5,1,1,'144路由',1),(7,0,1638933719,'网关组2',1),(8,0,0,'网关组1',1);
+INSERT INTO `cc_route_group` (`id`,`cts`,`uts`,`route_group`,`status`) VALUES (1,1,1,'87路由',1),(2,1,1,'133路由',1),(3,1,1,'871556590425003',1),(4,1,1,'CALL_OUT',1),(5,1,1,'144路由',1),(7,0,1638933719,'网关组2',1),(8,0,0,'网关组1',1);
 /*!40000 ALTER TABLE `cc_route_group` ENABLE KEYS */;
 UNLOCK TABLES;
 

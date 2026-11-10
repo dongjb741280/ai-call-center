@@ -23,6 +23,17 @@ public class RouteGroupVo {
     @NotNull
     private List<Long> routeGetways;
 
+    @javax.validation.constraints.Pattern(regexp = "ROUND_ROBIN|WEIGHTED|FAILOVER")
+    private String selectionStrategy;
+
+    /** Per membership weights; omitted gateway IDs default to 1. */
+    private java.util.Map<Long, Integer> gatewayWeights;
+
+    public String getSelectionStrategy() { return selectionStrategy; }
+    public void setSelectionStrategy(String selectionStrategy) { this.selectionStrategy = selectionStrategy; }
+    public java.util.Map<Long, Integer> getGatewayWeights() { return gatewayWeights; }
+    public void setGatewayWeights(java.util.Map<Long, Integer> gatewayWeights) { this.gatewayWeights = gatewayWeights; }
+
     public Long getId() {
         return id;
     }

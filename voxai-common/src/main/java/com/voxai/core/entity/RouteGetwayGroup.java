@@ -34,6 +34,11 @@ public class RouteGetwayGroup implements Serializable {
      */
     private Long routeGroupId;
 
+    private Integer weight;
+
+    public Integer getWeight() { return weight; }
+    public void setWeight(Integer weight) { this.weight = weight; }
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {

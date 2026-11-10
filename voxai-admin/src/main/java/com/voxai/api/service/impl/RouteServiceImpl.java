@@ -150,8 +150,19 @@ public class RouteServiceImpl extends BaseServiceImpl<RouteCallInfo> implements 
 
     @Override
     public int saveOrUpdateRouteCall(RouteCallVo routeCallVo) {
-        if (routeCallVo.getNumMax() < routeCallVo.getNumMin()) {
+        if (routeCallVo.getCompanyId() == null) routeCallVo.setCompanyId(0L);
+        if (routeCallVo.getRouteNum() == null || !routeCallVo.getRouteNum().matches("\\*|[+#0-9]{1,32}")) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "字冠必须是号码前缀或*");
+        }
+        if (routeCallVo.getNumMin() == null || routeCallVo.getNumMax() == null
+                || routeCallVo.getNumMin() < 1 || routeCallVo.getNumMax() > 32
+                || routeCallVo.getNumMax() < routeCallVo.getNumMin()) {
             throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "字冠匹配长度错误");
+        }
+        validateRewrite(routeCallVo.getCallerChange(), routeCallVo.getCallerChangeNum());
+        validateRewrite(routeCallVo.getCalledChange(), routeCallVo.getCalledChangeNum());
+        if (routeCallVo.getCalledChange() != null && routeCallVo.getCalledChange() > routeCallVo.getNumMin()) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "被叫删除位数不能大于最小号码长度");
         }
         RouteGroupPo routeGroup = routeGroupMapper.selectById(routeCallVo.getRouteGroupId());
         if (routeGroup == null) {
@@ -172,6 +183,7 @@ public class RouteServiceImpl extends BaseServiceImpl<RouteCallInfo> implements 
         RouteCall routeCall = new RouteCall();
         BeanUtils.copyProperties(routeCallVo, routeCall);
         if (routeCall.getId() == null) {
+            routeCall.setStatus(1);
             routeCall.setCts(Instant.now().getEpochSecond());
             return routeCallMapper.insertSelective(routeCall);
         }
@@ -190,10 +202,26 @@ public class RouteServiceImpl extends BaseServiceImpl<RouteCallInfo> implements 
         if (CollectionUtils.isEmpty(getwayIds)) {
             throw new BusinessException(ErrorCode.PARAMETER_ERROR);
         }
+        if (new java.util.HashSet<>(getwayIds).size() != getwayIds.size()) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "网关不能重复");
+        }
+        String strategy = routeGroupVo.getSelectionStrategy();
+        if (strategy != null && !java.util.Arrays.asList("ROUND_ROBIN", "WEIGHTED", "FAILOVER").contains(strategy)) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "无效的网关选择策略");
+        }
+        if (routeGroupVo.getGatewayWeights() != null) {
+            routeGroupVo.getGatewayWeights().forEach((id, weight) -> {
+                if (!getwayIds.contains(id) || weight == null || weight < 1 || weight > 1000) {
+                    throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "网关权重必须为1-1000且属于该组");
+                }
+            });
+        }
         List<RouteGetway> routeGetways = routeGetwayMapper.selectByIds(getwayIds);
         if (routeGetways.size() != getwayIds.size()) {
             throw new BusinessException(ErrorCode.PARAMETER_ERROR);
         }
+        // Preserve the operator's order for primary/backup selection.
+        routeGetways.sort(java.util.Comparator.comparingInt(gateway -> getwayIds.indexOf(gateway.getId())));
         //判断名称是否重复
         Map<String, Object> params = new HashMap<>();
         params.put("routeGroupName", routeGroupVo.getRouteGroup());
@@ -220,6 +248,8 @@ public class RouteServiceImpl extends BaseServiceImpl<RouteCallInfo> implements 
                 routeGetwayGroup.setUts(null);
                 routeGetwayGroup.setGetwayId(routeGetway.getId());
                 routeGetwayGroup.setRouteGroupId(id);
+                routeGetwayGroup.setWeight(routeGroupVo.getGatewayWeights() == null ? 1
+                        : routeGroupVo.getGatewayWeights().getOrDefault(routeGetway.getId(), 1));
                 routeGetwayGroupMapper.insertSelective(routeGetwayGroup);
             }
             return 1;
@@ -243,9 +273,18 @@ public class RouteServiceImpl extends BaseServiceImpl<RouteCallInfo> implements 
             routeGetwayGroup.setUts(null);
             routeGetwayGroup.setGetwayId(routeGetway.getId());
             routeGetwayGroup.setRouteGroupId(routeGroup.getId());
+            routeGetwayGroup.setWeight(routeGroupVo.getGatewayWeights() == null ? 1
+                    : routeGroupVo.getGatewayWeights().getOrDefault(routeGetway.getId(), 1));
             routeGetwayGroupMapper.insertSelective(routeGetwayGroup);
         }
         return 1;
+    }
+
+    private void validateRewrite(Integer strip, String replacement) {
+        if (strip != null && (strip < 0 || strip > 32)
+                || replacement != null && !replacement.matches("[+#0-9]{0,32}")) {
+            throw new BusinessException(ErrorCode.PARAMETER_ERROR.getCode(), "号码替换须为0-32位删除长度及数字前缀");
+        }
     }
 
     @Override

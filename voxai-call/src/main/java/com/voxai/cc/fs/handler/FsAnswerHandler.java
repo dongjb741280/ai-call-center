@@ -32,6 +32,7 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
 
     @Override
     public void handleEvent(FsAnswerEvent event) {
+        fsListen.routeAnswered(event.getDeviceId());
         CallInfo callInfo = cacheService.getCallInfo(event.getDeviceId());
         if (callInfo == null) {
             return;

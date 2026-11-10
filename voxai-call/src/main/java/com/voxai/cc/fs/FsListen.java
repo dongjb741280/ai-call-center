@@ -13,6 +13,11 @@ import com.voxai.core.entity.Station;
 import com.voxai.core.enums.ErrorCode;
 import com.voxai.core.mapper.StationMapper;
 import com.voxai.core.po.CallInfo;
+import com.voxai.core.po.DeviceInfo;
+import com.voxai.core.po.AgentInfo;
+import com.voxai.cc.route.RouteSelection;
+import com.voxai.cc.route.GatewayRouter;
+import org.springframework.beans.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +89,24 @@ public class FsListen {
      * 线程组
      */
     private Map<Integer, ThreadPoolExecutor> executorMap = new ConcurrentHashMap<>();
+
+    private final Map<String, PendingOriginate> pendingRoutes = new ConcurrentHashMap<>();
+
+    private static final class PendingOriginate {
+        final String media, display, called;
+        final RouteSelection route;
+        final Integer timeout, originateTimeout;
+        final boolean autoAnswer;
+        final Map<String, String> variables;
+        final String[] headers;
+        volatile boolean progressed;
+        PendingOriginate(String media, RouteSelection route, String display, String called, Integer timeout,
+                         Integer originateTimeout, boolean autoAnswer, Map<String, String> variables, String[] headers) {
+            this.media = media; this.route = route; this.display = display; this.called = called;
+            this.timeout = timeout; this.originateTimeout = originateTimeout; this.autoAnswer = autoAnswer;
+            this.variables = new HashMap<>(variables); this.headers = headers == null ? new String[0] : headers.clone();
+        }
+    }
 
 
     @Autowired
@@ -189,6 +212,14 @@ public class FsListen {
             @Override
             public void onEslEvent(Context ctx, EslEvent event) {
                 String eventName = event.getEventName();
+                if ("CHANNEL_PROGRESS".equals(eventName) || "CHANNEL_PROGRESS_MEDIA".equals(eventName)) {
+                    PendingOriginate pending = pendingRoutes.get(event.getEventHeaders().get("Unique-ID"));
+                    if (pending != null) pending.progressed = true;
+                } else if ("CHANNEL_CALLSTATE".equals(eventName)
+                        && "RINGING".equalsIgnoreCase(event.getEventHeaders().get("Channel-Call-State"))) {
+                    PendingOriginate pending = pendingRoutes.get(event.getEventHeaders().get("Unique-ID"));
+                    if (pending != null) pending.progressed = true;
+                }
                 /**
                  * https://freeswitch.org/confluence/display/FREESWITCH/Event+List
                  */
@@ -301,7 +332,7 @@ public class FsListen {
                         cacheService.addDevice(formatEvent.getDeviceId(), indexedCall.getCallId());
                     } else { indexedCall = null; }
                 }
-                if (indexedCall != null && indexedCall.getTaskId() != null) {
+                if (indexedCall != null) {
                     executorService = executorMap.get(RandomUtil.getNum(indexedCall.getCallId().toString(), threadNum));
                 }
                 if (executorService == null && formatEvent instanceof FsHangupCompleteEvent) {
@@ -524,6 +555,20 @@ public class FsListen {
         }
         client = fsClient.get(media);
 
+        if (client == null || !client.isActivate()) {
+            throw new BusinessException(ErrorCode.MEDIA_NOT_AVALIABLE);
+        }
+        final String originateMedia = media;
+        if (routeGetway instanceof RouteSelection) {
+            RouteSelection selection = (RouteSelection) routeGetway;
+            PendingOriginate pending = new PendingOriginate(media, selection, display, called, timeout,
+                    originateTimeout, autoAnswer, variables, sipHeaders);
+            // Apply the route rule before the gateway prefixes. Keep originals for any next gateway.
+            display = selection.caller(display);
+            called = selection.called(called);
+            pendingRoutes.put(deviceId, pending);
+        }
+
         if (StringUtils.isNotBlank(routeGetway.getMediaHost())) {
             called = called + Constant.AT + routeGetway.getMediaHost() + Constant.CO + routeGetway.getMediaPort();
         }
@@ -589,7 +634,97 @@ public class FsListen {
         } else {
             builder.append("}user/").append(called).append(FsConstant.PARK);
         }
-        return client.sendBackgroundApiCommand(FsConstant.ORIGINATE, builder.toString());
+        java.util.concurrent.CompletableFuture<EslEvent> job;
+        try {
+            job = client.sendBackgroundApiCommand(FsConstant.ORIGINATE, builder.toString());
+        } catch (RuntimeException failure) {
+            if (!(routeGetway instanceof RouteSelection)) throw failure;
+            job = new java.util.concurrent.CompletableFuture<>();
+            job.completeExceptionally(failure);
+        }
+        if (routeGetway instanceof RouteSelection) {
+            job.whenComplete((event, error) -> {
+                String body = event == null ? "" : String.join("\n", event.getEventBodyLines());
+                if (error == null && (body == null || !body.trim().startsWith("-ERR"))) return;
+                CallInfo call = cacheService.getCallInfo(callId);
+                if (call == null || call.getTaskId() != null || !pendingRoutes.containsKey(deviceId)) return;
+                String cause = error != null ? "NETWORK_OUT_OF_ORDER" : originateFailureCause(body);
+                ThreadPoolExecutor executor = executorMap.get(RandomUtil.getNum(callId.toString(), threadNum));
+                if (executor == null) return;
+                executor.execute(() -> {
+                    try {
+                        com.voxai.cc.configration.Handler handler = handlerContext.getInstance(FsConstant.CHANNEL_HANGUP_COMPLETE);
+                        if (handler instanceof com.voxai.cc.fs.handler.FsHangupCompleteHandler) {
+                            com.voxai.cc.fs.event.FsHangupCompleteEvent failure = new com.voxai.cc.fs.event.FsHangupCompleteEvent();
+                            failure.setEventName(FsConstant.CHANNEL_HANGUP_COMPLETE);
+                            failure.setCallId(callId);
+                            failure.setDeviceId(deviceId);
+                            failure.setTimestamp(System.currentTimeMillis() * 1000);
+                            failure.setHangupCause(cause);
+                            failure.setRemoteAddress(originateMedia);
+                            ((com.voxai.cc.fs.handler.FsHangupCompleteHandler) handler).handleEvent(failure);
+                        }
+                    } catch (Exception failure) {
+                        logger.error("callId:{} originate failure handling failed", callId, failure);
+                    }
+                });
+            });
+        }
+        return job;
+    }
+
+    private String originateFailureCause(String body) {
+        String result = body == null ? "" : body.toUpperCase(java.util.Locale.ROOT);
+        if (result.contains("USER_BUSY")) return "USER_BUSY";
+        if (result.contains("NO_ANSWER")) return "NO_ANSWER";
+        if (result.contains("CALL_REJECTED") || result.contains("FORBIDDEN")) return "CALL_REJECTED";
+        if (result.contains("NO_ROUTE") || result.contains("INVALID_GATEWAY")) return "DESTINATION_OUT_OF_ORDER";
+        if (result.contains("TEMPORARY")) return "NORMAL_TEMPORARY_FAILURE";
+        if (result.contains("CONGESTION")) return "SWITCH_CONGESTION";
+        return "INVALID_PROFILE";
+    }
+
+    public void routeAnswered(String deviceId) {
+        PendingOriginate pending = pendingRoutes.remove(deviceId);
+        if (pending != null) pending.route.succeeded();
+    }
+
+    /** Called after persisting the failed device, before ending the overall call. */
+    public boolean failover(CallInfo call, DeviceInfo failed) {
+        PendingOriginate pending = pendingRoutes.remove(failed.getDeviceId());
+        if (pending == null || failed.getAnswerTime() != null && failed.getAnswerTime() > 0) return false;
+        pending.route.failed(failed.getHangupCause());
+        // Task attempts own a durable customer UUID and are reconciled by the dialer, never re-originated here.
+        if (call.getTaskId() != null || call.getEndTime() != null || !GatewayRouter.isGatewayFailure(failed.getHangupCause())
+                || pending.progressed) return false;
+        RouteSelection next = pending.route.next();
+        if (next == null) return false;
+
+        DeviceInfo replacement = new DeviceInfo();
+        BeanUtils.copyProperties(failed, replacement);
+        String previous = failed.getDeviceId(), uuid = java.util.UUID.randomUUID().toString();
+        replacement.setDeviceId(uuid); replacement.setCallTime(System.currentTimeMillis());
+        replacement.setEndTime(null); replacement.setTalkTime(null); replacement.setHangupCause(null);
+        replacement.setSipStatus(null); replacement.setSipProtocol(null); replacement.setChannelName(null);
+        call.getDeviceList().remove(previous);
+        call.getDeviceList().add(uuid);
+        call.getDeviceInfoMap().put(uuid, replacement);
+        call.getNextCommands().forEach(command -> {
+            if (previous.equals(command.getDeviceId())) command.setDeviceId(uuid);
+            if (previous.equals(command.getNextValue())) command.setNextValue(uuid);
+        });
+        if (failed.getAgentKey() != null) {
+            AgentInfo agent = cacheService.getAgentInfo(failed.getAgentKey());
+            if (agent != null && previous.equals(agent.getDeviceId()) && java.util.Objects.equals(call.getCallId(), agent.getCallId())) {
+                agent.setDeviceId(uuid); cacheService.addAgentInfo(agent);
+            }
+        }
+        cacheService.addDevice(uuid, call.getCallId());
+        cacheService.addCallInfo(call);
+        logger.info("callId:{} gateway:{} failed, retry gateway:{} device:{}", call.getCallId(), pending.route.getId(), next.getId(), uuid);
+        originate(pending.media, next, pending.display, pending.called, call.getCallId(), uuid,
+                pending.timeout, pending.originateTimeout, pending.autoAnswer, pending.variables, pending.headers);
+        return true;
     }
 
 

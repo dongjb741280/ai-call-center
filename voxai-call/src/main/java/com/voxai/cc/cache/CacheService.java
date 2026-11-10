@@ -42,6 +42,8 @@ import java.util.stream.Collectors;
 public class CacheService {
     private Logger logger = LoggerFactory.getLogger(CacheService.class);
 
+    private final com.voxai.cc.route.GatewayRouter gatewayRouter = new com.voxai.cc.route.GatewayRouter();
+
     @Value("${token.cache.day:7}")
     private Integer cacheDay;
 
@@ -236,6 +238,7 @@ public class CacheService {
     public void initCompany() {
         this.companyMap = companyService.initAll();
         if (companyMap.isEmpty()) {
+            gatewayRouter.load(java.util.Collections.emptySet(), java.util.Collections.emptyList());
             return;
         }
 
@@ -243,6 +246,7 @@ public class CacheService {
          * 查询所以子冠，按照每个子冠所属网关组分
          */
         routeCallList = routeCallMapper.selectListByMap(new HashMap());
+        gatewayRouter.load(companyMap.keySet(), routeCallList);
 
         /**
          * 初始化企业数据
@@ -255,14 +259,6 @@ public class CacheService {
                     groupMap.put(groupInfo.getId(), groupInfo);
                 });
             }
-            //初始化企业字冠路由信息
-            Map<String, RouteGroupPo> routeGroupMap = new LinkedHashMap<>();
-            for (RouteCallInfo routeCallInfo : routeCallList) {
-                if (routeCallInfo.getCompanyId() == 0 || routeCallInfo.getCompanyId().equals(k)) {
-                    routeGroupMap.put(routeCallInfo.getRouteNum(), routeCallInfo.getRouteGroupPo());
-                }
-            }
-            v.setRouteGroupMap(routeGroupMap);
             //vdn
             companyService.initVdn(v);
         });
@@ -283,21 +279,7 @@ public class CacheService {
     }
 
     public RouteGetway getRouteGetway(Long companyId, String called) {
-        CompanyInfo companyInfo = companyMap.get(companyId);
-        RouteGroupPo routeGroup = null;
-        //先匹配最长的。
-        for (String route : companyInfo.getRouteGroupMap().keySet()) {
-            if (called.contains(route) || route.equals("*")) {
-                routeGroup = companyInfo.getRouteGroupMap().get(route);
-                break;
-            }
-        }
-        if (routeGroup == null || CollectionUtils.isEmpty(routeGroup.getRouteGetways())) {
-            return null;
-        }
-        //根据RouteGroup的规则判断
-        Integer index = 0;
-        return routeGroup.getRouteGetways().get(index);
+        return gatewayRouter.select(companyId, called);
     }
 
     public VdnPhone getVdnPhone(String phone) {
