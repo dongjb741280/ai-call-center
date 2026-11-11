@@ -73,3 +73,6 @@ hs_err_pid*
 
 # CodeGraph runtime files
 /.codegraph/
+
+# GStack QA artifacts
+/.gstack/
