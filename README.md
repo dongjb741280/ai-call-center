@@ -1,4 +1,6 @@
-# AI Call Center System
+# AI Call Center · 开源呼叫中心系统
+
+基于 FreeSWITCH、Spring Boot 和 Vue 3 的开源呼叫中心系统，支持多租户、人工呼入呼出、智能外呼任务、ACD 技能组路由、IVR、WebRTC 坐席与录音管理，适用于企业客服和外呼业务，也可作为 AI 语音应用的呼叫底座。
 
 An enterprise-grade AI call center system built on FreeSwitch and Spring Boot, providing multi-tenant, multi-skill-group, and intelligent routing — a complete set of call center capabilities.
 
