@@ -30,6 +30,7 @@ import com.voxai.cc.service.AgentService;
 import com.voxai.cc.service.CallCdrService;
 import com.voxai.cc.util.RandomUtil;
 import com.voxai.cc.websocket.WebSocketHandler;
+import com.voxai.cc.websocket.response.WsResponseEntity;
 
 import java.time.Instant;
 import java.util.List;
@@ -270,34 +271,22 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
         callInfo.setHiddenCustomer(companyInfo.getHiddenCustomer());
         callInfo.setCdrNotifyUrl(companyInfo.getNotifyUrl());
 
-        callInfo.getDeviceInfoMap().put(deviceInfo.getDeviceId(), deviceInfo);
-        cacheService.addCallInfo(callInfo);
-        cacheService.addDevice(deviceInfo.getDeviceId(), callInfo.getCallId());
-
         RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), caller);
         if (routeGetway == null) {
             logger.error("agent:{} make call:{} origin route error", agentInfo.getAgentKey(), callInfo.getCallId());
-            agentInfo.setBeforeTime(agentInfo.getStateTime());
-            agentInfo.setBeforeState(agentInfo.getAgentState());
-            agentInfo.setStateTime(Instant.now().getEpochSecond());
-            agentInfo.setAgentState(AgentState.AFTER);
-            agentInfo.setCallId(null);
-
-            /**
-             * 通知ws坐席请求外呼
-             */
-            webSocketHandler.sendMessgae(agentInfo, "");
-//            sendMessgae(event, new WsResponseEntity<>(ErrorCode.CALL_ROUTE_ERROR, AgentState.OUT_CALL.name(), event.getAgentKey()));
-            return;
+            throw new BusinessException(ErrorCode.CALL_ROUTE_ERROR);
         }
+        callInfo.getDeviceInfoMap().put(deviceInfo.getDeviceId(), deviceInfo);
+        cacheService.addCallInfo(callInfo);
+        cacheService.addDevice(deviceInfo.getDeviceId(), callInfo.getCallId());
         logger.info("agent:{} makecall, callId:{}, caller:{} called:{}", agentInfo.getAgentKey(), callInfo.getCallId(), callerDisplay, caller);
         fsListen.makeCall(routeGetway, callerDisplay, caller, callInfo.getCallId(), deviceInfo.getDeviceId(), null, null);
 
         /**
          * 通知ws坐席请求外呼
          */
-        webSocketHandler.sendMessgae(agentInfo, "");
-        //sendMessgae(event, new WsResponseEntity<>(AgentState.OUT_CALL.name(), event.getAgentKey()));
+        webSocketHandler.sendMessgae(agentInfo, JSON.toJSONString(
+                new WsResponseEntity<>(AgentState.OUT_CALL.name(), agentInfo.getAgentKey())));
 
         /**
          * 坐席请求外呼中
