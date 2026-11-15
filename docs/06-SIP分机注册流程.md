@@ -6,6 +6,8 @@
 - 后端：`ai-call-center` 的 `voxai-admin`（目录查询接口）、`voxai-common`（`AgentSip` / mapper）
 - FreeSWITCH：本机 `/Users/dongjb/soft/freeswitch/etc/freeswitch`（生产为 Docker 镜像）
 
+注册成功后，网页 SoftPhone 拨打 Zoiper5 的呼叫控制与媒体链路见 [业务流程 §2.4](02-业务流程.md#24-网页-softphone-拨打-zoiper5)。SIP 注册只建立账号与终端地址的联系，具体通话是否由平台接管取决于拨号入口和拨号计划。
+
 ## 参与方
 
 ```text
