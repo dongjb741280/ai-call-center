@@ -76,3 +76,8 @@ hs_err_pid*
 
 # GStack QA artifacts
 /.gstack/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
