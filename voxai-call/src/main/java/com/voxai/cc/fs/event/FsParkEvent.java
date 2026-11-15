@@ -9,6 +9,17 @@ import com.voxai.cc.fs.event.base.FsBaseEvent;
  */
 public class FsParkEvent extends FsBaseEvent {
 
+    @JSONField(name = "variable_sip_auth_username")
+    private String authenticatedUser;
+
+    @JSONField(name = "variable_voxai_agent_call")
+    private String agentCall;
+
+    public String getAuthenticatedUser() { return authenticatedUser; }
+    public void setAuthenticatedUser(String value) { authenticatedUser = value; }
+    public String getAgentCall() { return agentCall; }
+    public void setAgentCall(String value) { agentCall = value; }
+
     /**
      * 主叫号码
      */

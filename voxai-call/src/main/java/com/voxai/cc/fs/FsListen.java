@@ -47,6 +47,7 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.concurrent.*;
 
 /**
@@ -481,6 +482,26 @@ public class FsListen {
 
     public String availableMedia() {
         return fsClient.entrySet().stream().filter(e -> e.getValue().isActivate()).map(Map.Entry::getKey).sorted().findFirst().orElse(null);
+    }
+
+    /**
+     * SIP terminals do not open a platform WebSocket. Their online state is the
+     * registration held by FreeSWITCH, so inner calls must consult the SIP profile.
+     */
+    public boolean isSipRegistered(String sip) {
+        if (StringUtils.isBlank(sip)) return false;
+        String expression = "(?m)^(?:User|Auth-User):\\s*" + Pattern.quote(sip) + "(?:@|\\s|$)";
+        for (Client client : fsClient.values()) {
+            if (client == null || !client.isActivate()) continue;
+            try {
+                EslMessage response = client.sendApiCommand("sofia", "status profile internal reg");
+                String body = response == null ? "" : String.join("\n", response.getBodyLines());
+                if (Pattern.compile(expression).matcher(body).find()) return true;
+            } catch (RuntimeException failure) {
+                logger.warn("Unable to inspect SIP registration for {}", sip, failure);
+            }
+        }
+        return false;
     }
 
     /** Reconciliation must observe all already-queued task events before rebuilding a final CDR. */

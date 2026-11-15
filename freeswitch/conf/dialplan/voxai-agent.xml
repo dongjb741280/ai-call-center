@@ -1,0 +1,13 @@
+<include>
+  <!-- Only directory users with user_context=voxai-agent enter this context.
+       Do not include the default Local_Extension bridge here. -->
+  <context name="voxai-agent">
+    <extension name="voxai-agent-call">
+      <condition field="${sip_auth_username}" expression="^.+$"/>
+      <condition field="destination_number" expression="^[0-9]+$">
+        <action application="set" data="voxai_agent_call=true"/>
+        <action application="park"/>
+      </condition>
+    </extension>
+  </context>
+</include>

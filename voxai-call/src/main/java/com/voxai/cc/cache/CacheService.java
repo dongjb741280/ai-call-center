@@ -161,6 +161,19 @@ public class CacheService {
         }
     }
 
+    public boolean tryClaimAgentCall(String agentKey, Long callId) {
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(Constant.AGENT_CALL + agentKey,
+                String.valueOf(callId), 24L * cacheDay, TimeUnit.HOURS));
+    }
+
+    /** Never delete the reservation of a newer call while rolling back an older one. */
+    public void releaseAgentCall(String agentKey, Long callId) {
+        org.springframework.data.redis.core.script.DefaultRedisScript<Long> script =
+                new org.springframework.data.redis.core.script.DefaultRedisScript<>(
+                        "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", Long.class);
+        redisTemplate.execute(script, java.util.Collections.singletonList(Constant.AGENT_CALL + agentKey), String.valueOf(callId));
+    }
+
     /**
      * 通过 agentKey 查找通话
      */

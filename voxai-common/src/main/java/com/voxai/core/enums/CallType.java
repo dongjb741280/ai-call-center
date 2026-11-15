@@ -43,7 +43,7 @@ public enum CallType {
     /**
      * 内呼
      */
-    INNER_CALL(6);
+    INNER_CALL(7);
 
 
 

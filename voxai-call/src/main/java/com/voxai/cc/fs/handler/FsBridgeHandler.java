@@ -70,10 +70,16 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
              * 手动外呼：接通录音时在此录音
              * 呼入: 在此录音
              */
-            if (callInfo.getCallType() == CallType.OUTBOUNT_CALL && groupInfo.getRecordType() == 2) {
-                String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + callInfo.getDeviceList().get(0) + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
-                super.record(event.getRemoteAddress(), callInfo.getCallId(), callInfo.getDeviceList().get(0), record);
-                deviceInfo1.setRecord(record);
+            if ((callInfo.getCallType() == CallType.OUTBOUNT_CALL || callInfo.getCallType() == CallType.INNER_CALL
+                    || callInfo.getCallType() == CallType.SIP_OUTBOUND_CALL) && groupInfo.getRecordType() == 2) {
+                DeviceInfo recorded = callInfo.getDeviceInfoMap().get(callInfo.getDeviceList().get(0));
+                if (recorded != null && StringUtils.isBlank(recorded.getRecord())) {
+                    String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + recorded.getDeviceId() + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
+                    recorded.setRecord(record);
+                    recorded.setRecordStartTime(event.getTimestamp() / 1000);
+                    cacheService.addCallInfo(callInfo);
+                    super.record(event.getRemoteAddress(), callInfo.getCallId(), recorded.getDeviceId(), record);
+                }
             } else if (callInfo.getCallType() == CallType.INBOUND_CALL || callInfo.getCallType() == CallType.AUTO_CALL) {
                 String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + event.getDeviceId() + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
                 super.record(event.getRemoteAddress(), callInfo.getCallId(), event.getDeviceId(), record);
@@ -86,6 +92,14 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
         }
 
         if (deviceInfo1 == null || deviceInfo2 == null) { return; }
+        if (callInfo.getCallType() == CallType.INNER_CALL) {
+            java.util.Set<String> participants = new java.util.HashSet<>();
+            participants.add(deviceInfo1.getAgentKey()); participants.add(deviceInfo2.getAgentKey());
+            participants.stream().filter(StringUtils::isNotBlank)
+                    .forEach(key -> sendAgentState(callInfo, key, AgentState.TALKING));
+            cacheService.addCallInfo(callInfo);
+            return;
+        }
         if (Integer.valueOf(5).equals(deviceInfo1.getCdrType())) {
             sendAgentState(callInfo, deviceInfo1.getAgentKey(), AgentState.CONSULTED_TALKING);
             if (deviceInfo2.getCdrType() == 2 && deviceInfo2.getDeviceType() == 1) {
@@ -126,7 +140,7 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
         if (agentInfo == null) {
             return;
         }
-        if (agentInfo.getHiddenCustomer() == 1) {
+        if (callInfo.getCallType() != CallType.INNER_CALL && agentInfo.getHiddenCustomer() == 1) {
             if (callInfo.getDirection() == Direction.OUTBOUND) {
                 callEntity.setCalled(hiddenNumber(callInfo.getCalled()));
             } else if (callInfo.getDirection() == Direction.INBOUND) {
@@ -137,6 +151,8 @@ public class FsBridgeHandler extends BaseEventHandler<FsBridgeEvent> {
         agentInfo.setBeforeTime(agentInfo.getStateTime());
         agentInfo.setStateTime(Instant.now().getEpochSecond());
         agentInfo.setAgentState(agentState);
-        sendWsMessage(agentInfo, new WsResponseEntity<WsCallEntity>(AgentState.TALKING.name(), agentInfo.getAgentKey(), callEntity));
+        cacheService.addAgentInfo(agentInfo);
+        agentService.syncAgentStateMessage(agentInfo);
+        sendWsMessage(agentInfo, new WsResponseEntity<WsCallEntity>(agentState.name(), agentInfo.getAgentKey(), callEntity));
     }
 }

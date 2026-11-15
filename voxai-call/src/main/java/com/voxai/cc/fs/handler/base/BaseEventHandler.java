@@ -49,7 +49,7 @@ public abstract class BaseEventHandler<T extends FsBaseEvent> extends BaseHandle
      * @param responseEntity
      */
     protected void sendWsMessage(AgentInfo agentInfo, WsResponseEntity responseEntity) {
-        if (StringUtils.isBlank(agentInfo.getHost())) {
+        if (agentInfo == null || StringUtils.isBlank(agentInfo.getHost())) {
             return;
         }
         webSocketHandler.sendMessgae(agentInfo, JSON.toJSONString(responseEntity));

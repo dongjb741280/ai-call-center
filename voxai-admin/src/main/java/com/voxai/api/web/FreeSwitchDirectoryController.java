@@ -3,6 +3,7 @@ package com.voxai.api.web;
 import com.voxai.core.entity.AgentSip;
 import com.voxai.core.mapper.AgentSipMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,12 @@ public class FreeSwitchDirectoryController {
     @Autowired
     private AgentSipMapper agentSipMapper;
 
+    @Autowired
+    private com.voxai.core.mapper.AgentMapper agentMapper;
+
+    @Value("${freeswitch.agent.context:voxai-agent}")
+    private String agentContext = "voxai-agent";
+
     // mod_xml_curl 未配置 method 时默认 POST（参数在 form 体里）；同时放开 GET 便于 curl 排查。
     @RequestMapping(value = "directory", method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/xml")
     public String directory(@RequestParam(required = false) String user,
@@ -39,6 +46,7 @@ public class FreeSwitchDirectoryController {
             return EMPTY_DIRECTORY;
         }
 
+        String context = agentMapper.selectAgentBySip(String.valueOf(sip.getSip())) == null ? "default" : agentContext;
         StringBuilder xml = new StringBuilder();
         xml.append("<document type=\"freeswitch/xml\">")
                 .append("<section name=\"directory\">")
@@ -49,7 +57,7 @@ public class FreeSwitchDirectoryController {
                 .append("<param name=\"dial-string\" value=\"{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})},${verto_contact(${dialed_user}@${dialed_domain})}\"/>")
                 .append("</params>")
                 .append("<variables>")
-                .append("<variable name=\"user_context\" value=\"default\"/>")
+                .append("<variable name=\"user_context\" value=\"").append(escape(context)).append("\"/>")
                 .append("<variable name=\"accountcode\" value=\"").append(sip.getCompanyId()).append("\"/>")
                 .append("</variables>")
                 .append("</user></users></group></groups>")

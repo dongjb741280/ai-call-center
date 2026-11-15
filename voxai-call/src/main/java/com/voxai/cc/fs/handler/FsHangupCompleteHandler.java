@@ -129,17 +129,42 @@ public class FsHangupCompleteHandler extends BaseEventHandler<FsHangupCompleteEv
         // The complete snapshot is persisted or broker-confirmed before Redis is removed.
         callCdrService.completeCall(completion);
 
-        //清空坐席通话状态
-        if (callInfo.getAgentKey() != null) {
-            AgentInfo agentInfo = cacheService.getAgentInfo(callInfo.getAgentKey());
+        // Release both participants, even when the callee device was never originated.
+        java.util.Set<String> participants = new java.util.HashSet<>();
+        participants.add(callInfo.getAgentKey()); participants.add(callInfo.getCalledAgentKey());
+        callInfo.getDeviceInfoMap().values().stream().filter(d -> Integer.valueOf(1).equals(d.getDeviceType()))
+                .forEach(d -> participants.add(d.getAgentKey()));
+        for (String key : participants) {
+            if (StringUtils.isBlank(key)) continue;
+            AgentInfo agentInfo = cacheService.getAgentInfo(key);
+            boolean sameDevice = agentInfo != null && agentInfo.getCallId() == null
+                    && callInfo.getDeviceInfoMap().values().stream().anyMatch(d -> key.equals(d.getAgentKey())
+                    && java.util.Objects.equals(d.getDeviceId(), agentInfo.getDeviceId()));
+            if (agentInfo == null || (!java.util.Objects.equals(agentInfo.getCallId(), callInfo.getCallId()) && !sameDevice)) {
+                cacheService.releaseAgentCall(key, callInfo.getCallId());
+                continue;
+            }
             if (agentInfo != null && callInfo.getTaskId() != null && callInfo.getCallType() == com.voxai.core.enums.CallType.AUTO_CALL
                     && java.util.Objects.equals(agentInfo.getCallId(),callInfo.getCallId())) {
                 taskAfterService.begin(callInfo,agentInfo);
-            } else if (agentInfo != null && callInfo.getTaskId() == null) {
+            } else if (callInfo.getTaskId() == null) {
                 agentInfo.setCallId(null);
                 agentInfo.setDeviceId(null);
-                agentInfo.setAgentState(AgentState.NOT_READY);
+                agentInfo.setBeforeState(agentInfo.getAgentState());
+                agentInfo.setBeforeTime(agentInfo.getStateTime());
+                agentInfo.setStateTime(java.time.Instant.now().getEpochSecond());
+                AgentState restored = AgentState.NOT_READY;
+                if (callInfo.getCallType() == com.voxai.core.enums.CallType.INNER_CALL
+                        && callInfo.getAgentStatesBeforeCall() != null) {
+                    restored = callInfo.getAgentStatesBeforeCall().getOrDefault(key, AgentState.NOT_READY);
+                }
+                if (agentInfo.getLogoutTime() != null && agentInfo.getLogoutTime() > 0) restored = AgentState.LOGOUT;
+                agentInfo.setAgentState(restored);
                 cacheService.addAgentInfo(agentInfo);
+                agentService.syncAgentStateMessage(agentInfo);
+                com.voxai.cc.websocket.response.WsCallEntity data = new com.voxai.cc.websocket.response.WsCallEntity();
+                data.setCallId(callInfo.getCallId()); data.setCallType(callInfo.getCallType()); data.setAgentState(restored);
+                sendWsMessage(agentInfo, new com.voxai.cc.websocket.response.WsResponseEntity<>("AFTER", key, data));
             }
         }
         //清空电话信息

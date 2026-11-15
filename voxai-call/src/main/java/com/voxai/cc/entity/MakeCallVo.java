@@ -46,7 +46,7 @@ public class MakeCallVo {
      * 被叫
      */
     @NotNull(message = "被叫号码不能为空")
-    @Size(min = 2, max = 16, message = "号码必须在2,16字符")
+    @Size(min = 2, max = 64, message = "被叫号码或坐席标识必须在2,64字符")
     private String called;
 
     /**

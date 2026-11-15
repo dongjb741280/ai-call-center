@@ -74,6 +74,15 @@ public class CallInfo implements Serializable {
      */
     private String agentKey;
 
+    /** The other platform agent, including the interval before its device is originated. */
+    private String calledAgentKey;
+    private Map<String, AgentState> agentStatesBeforeCall = new HashMap<>();
+
+    public String getCalledAgentKey() { return calledAgentKey; }
+    public void setCalledAgentKey(String value) { calledAgentKey = value; }
+    public Map<String, AgentState> getAgentStatesBeforeCall() { return agentStatesBeforeCall; }
+    public void setAgentStatesBeforeCall(Map<String, AgentState> value) { agentStatesBeforeCall = value; }
+
     /**
      * 坐席名称
      */

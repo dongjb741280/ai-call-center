@@ -32,6 +32,9 @@ import java.time.Instant;
 public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
     private Logger logger = LoggerFactory.getLogger(FsParkHandler.class);
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.voxai.cc.service.InnerCallService innerCallService;
+
 
     @Override
     public void handleEvent(FsParkEvent event) {
@@ -40,13 +43,19 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         }
         logger.info("channel park:{}", event);
         CallInfo callInfo = cacheService.getCallInfo(event.getDeviceId());
-        if (callInfo == null && Direction.INBOUND.name().equals(event.getDirection().toUpperCase())) {
-            if (event.getSipPort() != null && !event.getSipPort().equals(event.getSipContactPort())) {
-                //硬话机外呼（via port 与 contact port 不一致）
+        if (callInfo == null && Direction.INBOUND.name().equalsIgnoreCase(event.getDirection())) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(event.getAuthenticatedUser())
+                    && ("true".equalsIgnoreCase(event.getAgentCall())
+                    || agentService.getAgentBySip(event.getAuthenticatedUser()) != null)) {
+                // Use the authenticated identity, never the spoofable From number or NAT-dependent ports.
                 sipOutboundCall(event);
                 return;
             }
-            //呼入：trunk/loopback 无 via port，或软话机 via==contact
+            if ("true".equalsIgnoreCase(event.getAgentCall())) {
+                hangupCall(event.getRemoteAddress(), null, event.getDeviceId());
+                return;
+            }
+            // Unauthenticated trunk/loopback calls remain VDN inbound calls.
             inboundCall(event);
             return;
         }
@@ -201,7 +210,7 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
     private void outboundCall(CallInfo callInfo, DeviceInfo deviceInfo, AgentInfo agentInfo, WsCallEntity ringEntity) {
         if (1 == deviceInfo.getDeviceType()) {
             CallType callType = callInfo.getCallType();
-            if (callType == CallType.OUTBOUNT_CALL) {
+            if (callType == CallType.OUTBOUNT_CALL || callType == CallType.SIP_OUTBOUND_CALL) {
                 if (deviceInfo.getCdrType() == 4) {
                     //外呼转接坐席
                     ringEntity.setAgentState(AgentState.TRANSFER_CALL_RING);
@@ -244,9 +253,22 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
                     sendWsMessage(cacheService.getAgentInfo(deviceInfo.getAgentKey()), new WsResponseEntity<WsCallEntity>(AgentState.OUT_CALLER_RING.name(), callInfo.getAgentKey(), ringEntity));
                 }
             } else if (callType == CallType.INNER_CALL) {
-                //内呼坐席振铃
-                ringEntity.setAgentState(AgentState.IN_CALL_RING);
-                sendWsMessage(cacheService.getAgentInfo(deviceInfo.getAgentKey()), new WsResponseEntity<WsCallEntity>(AgentState.IN_CALL_RING.name(), callInfo.getAgentKey(), ringEntity));
+                boolean origin = deviceInfo.getAgentKey().equals(callInfo.getAgentKey());
+                AgentState state = origin ? AgentState.OUT_CALLER_RING : AgentState.IN_CALL_RING;
+                agentInfo.setBeforeState(agentInfo.getAgentState());
+                agentInfo.setBeforeTime(agentInfo.getStateTime());
+                agentInfo.setStateTime(Instant.now().getEpochSecond());
+                agentInfo.setAgentState(state);
+                cacheService.addAgentInfo(agentInfo);
+                agentService.syncAgentStateMessage(agentInfo);
+                ringEntity.setCallType(callType);
+                ringEntity.setAgentState(state);
+                sendWsMessage(agentInfo, new WsResponseEntity<>(state.name(), deviceInfo.getAgentKey(), ringEntity));
+                if (!origin) {
+                    ringEntity.setAgentState(AgentState.OUT_CALLED_RING);
+                    sendWsMessage(cacheService.getAgentInfo(callInfo.getAgentKey()),
+                            new WsResponseEntity<>(AgentState.OUT_CALLED_RING.name(), callInfo.getAgentKey(), ringEntity));
+                }
             }
         } else {
             //外呼被叫振铃
@@ -265,8 +287,9 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
      * @param event
      */
     private void sipOutboundCall(FsParkEvent event) {
+        event.setCaller(event.getAuthenticatedUser());
         //通过sip号码获取绑定的坐席
-        Agent agent = agentService.getAgentBySip(event.getCaller());
+        Agent agent = agentService.getAgentBySip(event.getAuthenticatedUser());
         Long callId = snowflakeIdWorker.nextId();
         if (agent == null) {
             logger.warn("sipOutbound callId:{}  sip:{} called:{}", callId, event.getCaller(), event.getCalled());
@@ -282,6 +305,21 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         }
         if (agentInfo == null || agentInfo.getGroupId() == null) {
             logger.warn("sipOutbound callId:{}  sip:{} called:{} no primary group", callId, event.getCaller(), event.getCalled());
+            hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
+            return;
+        }
+        Agent target = agentService.getAgentBySip(event.getCalled());
+        if (target != null) {
+            try {
+                innerCallService.makeSipCall(event, agentInfo);
+            } catch (com.voxai.cc.exception.BusinessException error) {
+                logger.warn("SIP inner call rejected: {}", error.getMessage());
+                sendWsMessage(agentInfo, new WsResponseEntity<>(error.getErrorCode(), error.getMessage(), AgentState.INNER_CALL.name(), agentInfo.getAgentKey()));
+                hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
+            }
+            return;
+        }
+        if (agentInfo.getCallId() != null) {
             hangupCall(event.getRemoteAddress(), callId, event.getDeviceId());
             return;
         }
@@ -308,6 +346,15 @@ public class FsParkHandler extends BaseEventHandler<FsParkEvent> {
         callInfo.getNextCommands().add(new NextCommand(deviceInfo.getDeviceId(), NextType.NEXT_CALL_OTHER, null));
         cacheService.addCallInfo(callInfo);
         cacheService.addDevice(event.getDeviceId(), callId);
+        agentInfo.setBeforeState(agentInfo.getAgentState() == null ? AgentState.LOGOUT : agentInfo.getAgentState());
+        agentInfo.setBeforeTime(agentInfo.getStateTime());
+        agentInfo.setAgentState(AgentState.OUT_CALL);
+        agentInfo.setStateTime(Instant.now().getEpochSecond());
+        agentInfo.setCallId(callId);
+        agentInfo.setDeviceId(event.getDeviceId());
+        cacheService.addAgentInfo(agentInfo);
+        agentService.syncAgentStateMessage(agentInfo);
+        fsListen.sendBgapiMessage(event.getRemoteAddress(), "uuid_setvar", event.getDeviceId() + " callId " + callId);
         super.answer(event.getRemoteAddress(), event.getDeviceId());
     }
 }

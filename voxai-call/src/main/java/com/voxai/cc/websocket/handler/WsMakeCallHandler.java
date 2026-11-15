@@ -32,6 +32,9 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
     @org.springframework.beans.factory.annotation.Autowired
     private TaskManagementMapper taskManagementMapper;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.voxai.cc.service.InnerCallService innerCallService;
+
     @Override
     public void handleEvent(WsMakeCallEvent event) {
         if (StringUtils.isBlank(event.getCalled())) {
@@ -54,6 +57,18 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
             }
         }
         AgentInfo agentInfo = getAgent(event);
+        if (event.getCallType() == CallType.INNER_CALL) {
+            com.voxai.cc.entity.MakeCallVo request = new com.voxai.cc.entity.MakeCallVo();
+            request.setCallType(CallType.INNER_CALL); request.setCalled(event.getCalled());
+            request.setFollowData(event.getFollowData()); request.setUuid1(event.getUuid1()); request.setUuid2(event.getUuid2());
+            try {
+                if (event.getTaskId() != null) throw new com.voxai.cc.exception.BusinessException(ErrorCode.PARAMETER_ERROR);
+                innerCallService.makeCall(request, agentInfo);
+            } catch (com.voxai.cc.exception.BusinessException error) {
+                sendMessage(event, new WsResponseEntity<>(error.getErrorCode(), error.getMessage(), AgentState.INNER_CALL.name(), event.getAgentKey()));
+            }
+            return;
+        }
         if (event.getTaskId() != null) {
             TaskConfig task = taskManagementMapper.selectTaskForCall(agentInfo.getCompanyId(), event.getTaskId());
             if (task == null) {
@@ -108,20 +123,6 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
         callInfo.setTaskId(event.getTaskId());
 
         switch (event.getCallType()) {
-            case INNER_CALL:
-                AgentInfo calledAgent = cacheService.getAgentInfo(event.getCalled());
-                if (calledAgent == null || calledAgent.getLogoutTime() > 0L) {
-                    sendMessage(event, new WsResponseEntity<>(ErrorCode.AGENT_NOT_ONLINE, AgentState.INNER_CALL.name(), event.getAgentKey()));
-                    return;
-                }
-                //坐席不在READY、NOT_READY
-                if (calledAgent.getAgentState() != AgentState.READY && calledAgent.getAgentState() != AgentState.NOT_READY) {
-                    sendMessage(event, new WsResponseEntity<>(ErrorCode.AGENT_BUSY, AgentState.INNER_CALL.name(), event.getAgentKey()));
-                    return;
-                }
-                //内呼
-                innerCall(agentInfo, callInfo, callerDisplay, caller, event);
-                break;
             case OUTBOUNT_CALL:
                 //外呼
                 outboundCall(agentInfo, callInfo, callerDisplay, caller, event);
@@ -152,83 +153,6 @@ public class WsMakeCallHandler extends WsBaseHandler<WsMakeCallEvent> {
         }
         return RandomUtil.getRandom(groupInfo.getCalledDisplays());
     }
-
-    /**
-     * 坐席内呼
-     *
-     * @param agentInfo
-     * @param callInfo
-     * @param callerDisplay
-     * @param caller
-     * @param event
-     */
-    private void innerCall(AgentInfo agentInfo, CallInfo callInfo, String callerDisplay, String caller, WsMakeCallEvent event) {
-        callInfo.setCallType(CallType.INNER_CALL);
-        String deviceId = getDeviceId();
-        DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setCaller(agentInfo.getAgentId());
-        deviceInfo.setDisplay(callerDisplay);
-        deviceInfo.setCalled(caller);
-        deviceInfo.setCallTime(callInfo.getCallTime());
-        deviceInfo.setCallId(callInfo.getCallId());
-        deviceInfo.setDeviceId(deviceId);
-        deviceInfo.setDeviceType(1);
-        deviceInfo.setCdrType(3);
-        deviceInfo.setAgentKey(agentInfo.getAgentKey());
-        deviceInfo.setAgentName(agentInfo.getAgentName());
-        callInfo.getNextCommands().add(new NextCommand(deviceId, NextType.NEXT_CALL_OTHER, null));
-
-        CompanyInfo companyInfo = cacheService.getCompany(agentInfo.getCompanyId());
-        callInfo.setHiddenCustomer(companyInfo.getHiddenCustomer());
-        callInfo.setCdrNotifyUrl(companyInfo.getNotifyUrl());
-
-        callInfo.getDeviceList().add(deviceId);
-        callInfo.getDeviceInfoMap().put(deviceId, deviceInfo);
-        cacheService.addCallInfo(callInfo);
-        cacheService.addDevice(deviceId, callInfo.getCallId());
-
-        RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), caller);
-        if (routeGetway == null) {
-            logger.error("make call:{} origin route error", callInfo.getCallId());
-            agentInfo.setBeforeTime(agentInfo.getStateTime());
-            agentInfo.setBeforeState(agentInfo.getAgentState());
-            agentInfo.setStateTime(Instant.now().getEpochSecond());
-            agentInfo.setAgentState(AgentState.AFTER);
-            syncAgentStateMessage(agentInfo);
-            agentInfo.setCallId(null);
-
-            /**
-             * 通知ws坐席请求外呼
-             */
-            sendMessage(event, new WsResponseEntity<>(ErrorCode.CALL_ROUTE_ERROR, AgentState.INNER_CALL.name(), event.getAgentKey()));
-            return;
-        }
-        logger.info("agent:{} makecall, callId:{}, caller:{} called:{}", event.getAgentKey(), callInfo.getCallId(), callerDisplay, caller);
-        fsListen.makeCall(routeGetway, callerDisplay, caller, callInfo.getCallId(), deviceId, null, null);
-
-
-        /**
-         * 通知ws坐席请求外呼
-         */
-        sendMessage(event, new WsResponseEntity<>(AgentState.INNER_CALL.name(), event.getAgentKey()));
-
-
-        /**
-         * 坐席请求外呼中
-         */
-        agentInfo.setBeforeState(agentInfo.getAgentState());
-        agentInfo.setBeforeTime(agentInfo.getStateTime());
-        agentInfo.setStateTime(Instant.now().getEpochSecond());
-        agentInfo.setAgentState(AgentState.INNER_CALL);
-        agentInfo.setCallId(callInfo.getCallId());
-        agentInfo.setDeviceId(deviceId);
-        cacheService.addAgentInfo(agentInfo);
-        /**
-         * 广播坐席状态
-         */
-        syncAgentStateMessage(agentInfo);
-    }
-
 
     /**
      * 坐席外呼

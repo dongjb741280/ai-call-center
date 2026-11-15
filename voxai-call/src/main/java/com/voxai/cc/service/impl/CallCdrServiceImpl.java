@@ -77,6 +77,9 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
     @Autowired
     private AgentService agentService;
 
+    @Autowired
+    private com.voxai.cc.service.InnerCallService innerCallService;
+
     @Value("${call.cdr.pressure:0}")
     private Integer callCdrPressure;
 
@@ -148,6 +151,10 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public int makeCall(MakeCallVo makeCallVo, AgentInfo agentInfo) {
+        if (makeCallVo.getCallType() == com.voxai.core.enums.CallType.INNER_CALL) {
+            innerCallService.makeCall(makeCallVo, agentInfo);
+            return 0;
+        }
         Long callId = snowflakeIdWorker.nextId();
         String deviceId = RandomStringUtils.randomNumeric(16);
         Long now = Instant.now().toEpochMilli();
@@ -184,6 +191,10 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
 
     @Override
     public void hangupCall(CallInfo callInfo, String deviceId) {
+        if (callInfo.getCallType() == com.voxai.core.enums.CallType.INNER_CALL && StringUtils.isBlank(deviceId)) {
+            callInfo.getDeviceList().forEach(id -> fsListen.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), id));
+            return;
+        }
         fsListen.hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceId);
     }
 
@@ -276,21 +287,16 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
             logger.error("agent:{} make call:{} origin route error", agentInfo.getAgentKey(), callInfo.getCallId());
             throw new BusinessException(ErrorCode.CALL_ROUTE_ERROR);
         }
+        callInfo.setCaller(caller);
+        deviceInfo.setCaller(callerDisplay);
+        deviceInfo.setCalled(caller);
+        deviceInfo.setDisplay(callerDisplay);
         callInfo.getDeviceInfoMap().put(deviceInfo.getDeviceId(), deviceInfo);
         cacheService.addCallInfo(callInfo);
         cacheService.addDevice(deviceInfo.getDeviceId(), callInfo.getCallId());
-        logger.info("agent:{} makecall, callId:{}, caller:{} called:{}", agentInfo.getAgentKey(), callInfo.getCallId(), callerDisplay, caller);
-        fsListen.makeCall(routeGetway, callerDisplay, caller, callInfo.getCallId(), deviceInfo.getDeviceId(), null, null);
 
-        /**
-         * 通知ws坐席请求外呼
-         */
-        webSocketHandler.sendMessgae(agentInfo, JSON.toJSONString(
-                new WsResponseEntity<>(AgentState.OUT_CALL.name(), agentInfo.getAgentKey())));
-
-        /**
-         * 坐席请求外呼中
-         */
+        // Persist call ownership before originate or sendMessgae (which also broadcasts to MQ).
+        AgentState previousState = agentInfo.getAgentState();
         agentInfo.setBeforeState(agentInfo.getAgentState());
         agentInfo.setBeforeTime(agentInfo.getStateTime());
         agentInfo.setStateTime(Instant.now().getEpochSecond());
@@ -299,6 +305,21 @@ public class CallCdrServiceImpl extends BaseServiceImpl<CallLog> implements Call
         agentInfo.setDeviceId(deviceInfo.getDeviceId());
         cacheService.addAgentInfo(agentInfo);
 
+        logger.info("agent:{} makecall, callId:{}, caller:{} called:{}", agentInfo.getAgentKey(), callInfo.getCallId(), callerDisplay, caller);
+        try {
+            fsListen.makeCall(routeGetway, callerDisplay, caller, callInfo.getCallId(), deviceInfo.getDeviceId(), null, null);
+        } catch (RuntimeException failure) {
+            agentInfo.setCallId(null);
+            agentInfo.setDeviceId(null);
+            agentInfo.setAgentState(previousState);
+            cacheService.addAgentInfo(agentInfo);
+            cacheService.removeCallInfo(callInfo.getCallId());
+            throw failure;
+        }
+        // Re-read after originate: an immediate ESL event may already have advanced the state.
+        AgentInfo current = cacheService.getAgentInfo(agentInfo.getAgentKey());
+        webSocketHandler.sendMessgae(current == null ? agentInfo : current, JSON.toJSONString(
+                new WsResponseEntity<>(AgentState.OUT_CALL.name(), agentInfo.getAgentKey())));
         agentService.saveAgentLog(agentInfo);
     }
 

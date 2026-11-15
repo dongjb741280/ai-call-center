@@ -83,6 +83,34 @@ class CallCdrMakeCallTest {
         verify(fs).makeCall(eq(gateway), eq("1001"), eq("1001"), anyLong(), anyString(), isNull(), isNull());
     }
 
+    @Test void outboundPublishesCallOwnershipBeforeAnyMediaEventOrWebsocketSideEffect() {
+        RouteGetway gateway = new RouteGetway();
+        when(cache.getRouteGetway(1L, "1001")).thenReturn(gateway);
+        doAnswer(invocation -> {
+            assertEquals(AgentState.OUT_CALL, agent.getAgentState(), "originate may immediately produce ESL events");
+            assertNotNull(agent.getCallId());
+            verify(cache).addAgentInfo(agent);
+            return null;
+        }).when(fs).makeCall(eq(gateway), anyString(), anyString(), anyLong(), anyString(), isNull(), isNull());
+        doAnswer(invocation -> {
+            AgentInfo sent = invocation.getArgument(0);
+            assertEquals(AgentState.OUT_CALL, sent.getAgentState(), "sendMessgae also publishes this snapshot to MQ");
+            assertNotNull(sent.getCallId(), "MQ must not erase the active callId");
+            return null;
+        }).when(websocket).sendMessgae(eq(agent), anyString());
+        service.makeCall(request, agent);
+    }
+
+    @Test void innerCallIsAcceptedByRestEntry() {
+        com.voxai.cc.service.InnerCallService inner = mock(com.voxai.cc.service.InnerCallService.class);
+        ReflectionTestUtils.setField(service, "innerCallService", inner);
+        request.setCallType(CallType.INNER_CALL);
+        assertEquals(0, service.makeCall(request, agent));
+        verify(inner).makeCall(request, agent);
+        verifyNoInteractions(fs);
+    }
+
+
     private JSONObject response() {
         ArgumentCaptor<String> payload = ArgumentCaptor.forClass(String.class);
         verify(websocket).sendMessgae(eq(agent), payload.capture());

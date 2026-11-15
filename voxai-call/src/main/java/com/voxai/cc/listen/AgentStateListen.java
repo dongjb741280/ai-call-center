@@ -82,6 +82,13 @@ public class AgentStateListen {
         }
         String state = json.getString("agentState");
 
+        // A delayed state broadcast must not replace a newer call's cache snapshot.
+        if (resppnse.getStateTime() < agentInfo.getStateTime()) {
+            logger.info("ignore stale agent state: agent:{} incoming:{} current:{}", agentInfo.getAgentKey(),
+                    resppnse.getStateTime(), agentInfo.getStateTime());
+            return;
+        }
+
         if (agentInfo.getHost().equals(json.getString("host"))) {
             agentInfo.setAgentKey(resppnse.getAgentKey());
             agentInfo.setCompanyId(resppnse.getCompanyId());

@@ -121,7 +121,11 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
      */
     private void callOther(CallInfo callInfo, DeviceInfo deviceInfo) {
         GroupInfo groupInfo = cacheService.getGroupInfo(callInfo.getGroupId());
-        if (groupInfo != null && groupInfo.getRecordType() == 1) {
+        if (groupInfo == null) {
+            hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId());
+            return;
+        }
+        if (Integer.valueOf(1).equals(groupInfo.getRecordType())) {
             //振铃录音
             String record = recordPath + DateTimeUtil.format() + Constant.SK + callInfo.getCallId() + Constant.UNDER_LINE + deviceInfo.getDeviceId() + Constant.UNDER_LINE + Instant.now().getEpochSecond() + Constant.POINT + recordFile;
             super.record(callInfo.getMediaHost(), callInfo.getCallId(), callInfo.getDeviceList().get(0), record);
@@ -130,11 +134,10 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
         }
         String deviceId = getDeviceId();
         logger.info("呼另外一侧电话: callId:{}  display:{}  called:{}  deviceId:{} ", callInfo.getCallId(), callInfo.getCalledDisplay(), hiddenNumber(callInfo.getCalled()), deviceId);
-        callInfo.getDeviceList().add(deviceId);
         String called = callInfo.getCalled();
 
         //被叫是坐席时设置callId/deviceId，支持被叫接听、挂机、转接
-        AgentInfo calledAgent = cacheService.getAgentInfo(called);
+        AgentInfo calledAgent = cacheService.getAgentInfo(callInfo.getCalledAgentKey() == null ? called : callInfo.getCalledAgentKey());
         if (calledAgent == null) {
             // 通过SIP号查找坐席
             com.voxai.core.entity.Agent agent = agentService.getAgentBySip(called);
@@ -142,11 +145,22 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
                 calledAgent = cacheService.getAgentInfo(agent.getAgentKey());
             }
         }
-        if (calledAgent != null) {
+        if (callInfo.getCallType() == CallType.INNER_CALL && (calledAgent == null
+                || !java.util.Objects.equals(calledAgent.getCallId(), callInfo.getCallId())
+                || !java.util.Objects.equals(calledAgent.getCompanyId(), callInfo.getCompanyId())
+                || (calledAgent.getLogoutTime() != null && calledAgent.getLogoutTime() > 0))) {
+            hangupCall(callInfo.getMediaHost(), callInfo.getCallId(), deviceInfo.getDeviceId());
+            return;
+        }
+        if (calledAgent != null && java.util.Objects.equals(calledAgent.getCompanyId(), callInfo.getCompanyId())
+                && (calledAgent.getCallId() == null || java.util.Objects.equals(calledAgent.getCallId(), callInfo.getCallId()))) {
             called = calledAgent.getCalled();
             calledAgent.setCallId(callInfo.getCallId());
             calledAgent.setDeviceId(deviceId);
             cacheService.addAgentInfo(calledAgent);
+            callInfo.setCalledAgentKey(calledAgent.getAgentKey());
+        } else {
+            calledAgent = null;
         }
         RouteGetway routeGetway = cacheService.getRouteGetway(callInfo.getCompanyId(), called);
         if (routeGetway == null) {
@@ -155,6 +169,7 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
             return;
         }
         DeviceInfo deviceInfo1 = new DeviceInfo();
+        callInfo.getDeviceList().add(deviceId);
         //1:坐席,2:客户,3:外线
         deviceInfo1.setDeviceType(callInfo.getCallType() == CallType.INNER_CALL ? 1 : 2);
         //1:呼入,2:外呼,3:内呼,4:转接,5:咨询,6:监听,7:强插
@@ -165,7 +180,12 @@ public class FsAnswerHandler extends BaseEventHandler<FsAnswerEvent> {
         deviceInfo1.setCaller(callInfo.getCalledDisplay());
         deviceInfo1.setDeviceId(deviceId);
         deviceInfo1.setCallTime(Instant.now().toEpochMilli());
-        deviceInfo1.setAgentKey(callInfo.getAgentKey());
+        if (calledAgent != null) {
+            deviceInfo1.setAgentKey(calledAgent.getAgentKey());
+            deviceInfo1.setAgentName(calledAgent.getAgentName());
+        } else if (callInfo.getCallType() != CallType.INNER_CALL) {
+            deviceInfo1.setAgentKey(callInfo.getAgentKey());
+        }
         callInfo.getNextCommands().add(new NextCommand(deviceInfo.getDeviceId(), NextType.NEXT_CALL_BRIDGE, deviceInfo1.getDeviceId()));
         callInfo.getDeviceInfoMap().put(deviceId, deviceInfo1);
         cacheService.addDevice(deviceId, callInfo.getCallId());
