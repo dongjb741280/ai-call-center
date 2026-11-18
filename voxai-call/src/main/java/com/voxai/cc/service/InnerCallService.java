@@ -80,13 +80,28 @@ public class InnerCallService {
     }
 
     private void available(AgentInfo agent, ErrorCode error, boolean sipCaller) {
-        if (agent.getCallId() != null || (!sipCaller && agent.getAgentState() != AgentState.READY
-                && agent.getAgentState() != AgentState.NOT_READY)
-                || (sipCaller && agent.getAgentState() != null && agent.getAgentState() != AgentState.LOGOUT
-                && agent.getAgentState() != AgentState.READY && agent.getAgentState() != AgentState.NOT_READY)) {
+        if (agent.getCallId() != null || isCallState(agent.getAgentState())) {
             throw new BusinessException(error);
         }
+        if (!sipCaller && (agent.getAgentState() == null || agent.getAgentState() == AgentState.LOGOUT
+                || (agent.getLogoutTime() != null && agent.getLogoutTime() > 0))) {
+            throw new BusinessException(ErrorCode.ACCOUNT_NOT_LOGIN);
+        }
+        if (!sipCaller && agent.getAgentState() != AgentState.READY && agent.getAgentState() != AgentState.NOT_READY) {
+            throw new BusinessException(ErrorCode.AGENT_BUSY);
+        }
+        if (sipCaller && agent.getAgentState() != null && agent.getAgentState() != AgentState.LOGOUT
+                && agent.getAgentState() != AgentState.READY && agent.getAgentState() != AgentState.NOT_READY) {
+            throw new BusinessException(ErrorCode.AGENT_BUSY);
+        }
         if (StringUtils.isBlank(agent.getCalled())) throw new BusinessException(ErrorCode.CALL_NUMBER_ERROR);
+    }
+
+    private boolean isCallState(AgentState state) {
+        return state != null && (state.name().contains("CALL") || state == AgentState.TALKING
+                || state == AgentState.CONSULT || state == AgentState.CONSULT_TALKING
+                || state == AgentState.CONSULTED_TALKING || state == AgentState.CONFERENCE_TALKING
+                || state == AgentState.TRANSFER || state == AgentState.HOLD);
     }
 
     private void start(MakeCallVo request, AgentInfo caller, FsParkEvent sip) {

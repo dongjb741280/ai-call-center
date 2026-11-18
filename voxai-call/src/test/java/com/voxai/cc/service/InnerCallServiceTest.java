@@ -74,6 +74,16 @@ class InnerCallServiceTest {
         assertError(ErrorCode.AGENT_NOT_ONLINE);
     }
 
+    @Test void loggedOutCallerGetsLoginErrorInsteadOfCallInProgress() {
+        caller.setAgentState(AgentState.LOGOUT); caller.setLogoutTime(1L);
+        assertError(ErrorCode.ACCOUNT_NOT_LOGIN);
+    }
+
+    @Test void callerMustChooseReadyOrNotReadyBeforeStartingAnInnerCall() {
+        caller.setAgentState(AgentState.LOGIN);
+        assertError(ErrorCode.AGENT_BUSY);
+    }
+
     @Test void registeredZoiperIsOnlineWithoutPlatformWebsocketLogin() {
         callee.setLogoutTime(1L); callee.setAgentState(AgentState.LOGOUT);
         when(fs.isSipRegistered("1002")).thenReturn(true);
