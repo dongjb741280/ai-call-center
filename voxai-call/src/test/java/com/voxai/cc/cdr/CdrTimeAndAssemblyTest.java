@@ -3,6 +3,11 @@ package com.voxai.cc.cdr;
 import com.voxai.cc.cache.CacheService;
 import com.voxai.cc.fs.event.FsRecordStartEvent;
 import com.voxai.cc.fs.handler.FsRecordStartHandler;
+import com.voxai.cc.fs.handler.FsBridgeHandler;
+import com.voxai.cc.fs.event.FsBridgeEvent;
+import com.voxai.core.po.GroupInfo;
+import com.alibaba.fastjson.JSON;
+import java.util.concurrent.atomic.AtomicReference;
 import com.voxai.core.entity.CallDetail;
 import com.voxai.core.entity.CallDevice;
 import com.voxai.core.entity.CallLog;
@@ -79,6 +84,48 @@ class CdrTimeAndAssemblyTest {
         assertEquals(25000L, complete.getDevices().get(0).getRecordTime());
         assertEquals(START + 5000, complete.getCallLog().getRecordStartTime());
         assertEquals(START + 30000, queue.getEndTime());
+    }
+
+    @Test void inboundBridgePersistsRecordingBeforeCommandEvenWithoutAgentKey() {
+        CacheService cache = mock(CacheService.class);
+        CallInfo call = call();
+        call.setGroupId(25L); call.setAnswerTime(START + 2000);
+        DeviceInfo device = device();
+        call.getDeviceInfoMap().put("a", device);
+        GroupInfo group = new GroupInfo(); group.setRecordType(1);
+        when(cache.getGroupInfo(25L)).thenReturn(group);
+        AtomicReference<CallInfo> saved = new AtomicReference<>(JSON.parseObject(JSON.toJSONString(call), CallInfo.class));
+        when(cache.getCallInfo("a")).thenAnswer(invocation -> JSON.parseObject(JSON.toJSONString(saved.get()), CallInfo.class));
+        doAnswer(invocation -> {
+            saved.set(JSON.parseObject(JSON.toJSONString(invocation.getArgument(0)), CallInfo.class));
+            return null;
+        }).when(cache).addCallInfo(any(CallInfo.class));
+        AtomicReference<String> startedFile = new AtomicReference<>();
+        com.voxai.cc.fs.FsListen fs = mock(com.voxai.cc.fs.FsListen.class);
+        doAnswer(invocation -> {
+                String file = saved.get().getDeviceInfoMap().get("a").getRecord();
+                assertNotNull(file, "Recording path must reach Redis before issuing the command");
+                assertEquals(START + 2000, saved.get().getDeviceInfoMap().get("a").getRecordStartTime());
+                assertNull(startedFile.get(), "Duplicate bridge event must not start another recording");
+                startedFile.set(file);
+                return null;
+        }).when(fs).sendSyncMessage(any(), any());
+        FsBridgeHandler handler = new FsBridgeHandler();
+        ReflectionTestUtils.setField(handler, "fsListen", fs);
+        ReflectionTestUtils.setField(handler, "cacheService", cache);
+        ReflectionTestUtils.setField(handler, "recordPath", "/recordings/");
+        ReflectionTestUtils.setField(handler, "recordFile", "wav");
+        FsBridgeEvent event = new FsBridgeEvent();
+        event.setDeviceId("a"); event.setOtherUniqueId("b");
+        event.setTimestamp((START + 2000) * 1000L);
+        handler.handleEvent(event);
+        assertNotNull(startedFile.get());
+        CallLog log = CdrAssembler.complete(saved.get(), null).getCallLog();
+        assertEquals(startedFile.get(), log.getRecord());
+        assertEquals(28000L, log.getRecordTime());
+        handler.handleEvent(event);
+        assertEquals(startedFile.get(), saved.get().getDeviceInfoMap().get("a").getRecord());
+        verify(fs, times(1)).sendSyncMessage(any(), any());
     }
 
     @Test void unansweredAndOnlyOneSideAnsweredHaveDistinctFlagsAndZeroTalkTime() {
