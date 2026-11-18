@@ -199,6 +199,65 @@ curl -fsS http://127.0.0.1:9000/minio/health/live
 
 本地可用 Nginx 或其他静态 HTTP 服务监听 `7430`，将 URL 路径映射到 `record.path` 对应目录。媒体服务的监听地址必须覆盖 `event.localMediaIp`，不能只监听一个其他节点无法访问的回环地址。
 
+#### 本机 Nginx 配置与启动
+
+开发机使用 `/Users/dongjb/soft/nginx/freeswitch-recording.conf` 提供 FS_MEDIA。配置通过精确的 URL 路径映射读取 FreeSWITCH 本地 WAV：
+
+```nginx
+pid /Users/dongjb/soft/nginx/freeswitch-recording.pid;
+error_log /Users/dongjb/soft/nginx/freeswitch-recording-error.log;
+
+events {}
+
+http {
+    access_log off;
+
+    server {
+        listen 7430;
+
+        # 仅允许本机和 voxai-call 所在媒体/业务节点访问；按实际来源 IP 更新白名单。
+        allow 127.0.0.1;
+        allow ::1;
+        allow 172.20.10.5;
+        deny all;
+
+        # /Users/dongjb/soft/freeswitch/<日期>/<文件名>.wav
+        # 映射到同一路径下的 FreeSWITCH 录音文件。
+        location ~ ^/Users/dongjb/soft/freeswitch/([0-9]+/[^/]+\.wav)$ {
+            alias /Users/dongjb/soft/freeswitch/$1;
+            default_type audio/wav;
+        }
+
+        location / {
+            return 404;
+        }
+    }
+}
+```
+
+Nginx 可执行文件通过 Homebrew 安装（本机为 `/opt/homebrew/bin/nginx`）。启动脚本
+`/Users/dongjb/soft/shell/nginx.sh` 会先检查可执行文件、配置文件和配置语法，再使用该配置启动：
+
+```bash
+# 启动（若已有 nginx 进程，脚本提示已运行并退出）
+/Users/dongjb/soft/shell/nginx.sh
+
+# 单独验证配置
+/opt/homebrew/bin/nginx -t -c /Users/dongjb/soft/nginx/freeswitch-recording.conf
+
+# 修改配置后重载
+/opt/homebrew/bin/nginx -s reload -c /Users/dongjb/soft/nginx/freeswitch-recording.conf
+
+# 优雅停止
+/opt/homebrew/bin/nginx -s quit -c /Users/dongjb/soft/nginx/freeswitch-recording.conf
+
+# 检查端口及错误日志
+lsof -nP -iTCP:7430 -sTCP:LISTEN
+tail -f /Users/dongjb/soft/nginx/freeswitch-recording-error.log
+```
+
+`allow` 白名单必须包含 `voxai-call` 请求录音时使用的 `event.localMediaIp`；如果地址不匹配，Nginx 会返回 `403`。录音路径正则、`alias` 根目录和 FreeSWITCH 的 `record.path` 必须对应，否则会返回 `404`。此配置是开发机示例，部署到其他主机时应替换绝对路径和来源 IP，并确保 Nginx 用户有录音目录的读取权限。
+
 ### 7.2 一次完整联调
 
 1. 确认坐席 SIP 已注册，FreeSWITCH 能看到坐席分机。
