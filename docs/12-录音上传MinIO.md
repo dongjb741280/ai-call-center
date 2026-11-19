@@ -18,11 +18,14 @@
 | --- | --- | --- |
 | FreeSWITCH | 执行录音命令，生成 WAV 文件并发送 `CHANNEL_HANGUP_COMPLETE` 事件 | ESL `localhost:8022` |
 | `voxai-call` | 根据技能组录音策略开始录音；挂机时下载、上传、落话单 | HTTP `7200`，WebSocket `7250` |
-| FS_MEDIA | 通过 HTTP 提供 FreeSWITCH 本地录音文件 | `http://<媒体节点 IP>:7430` |
+| 录音文件服务（Nginx） | 通过 HTTP 提供 FreeSWITCH 本地 WAV，供 `voxai-call` 下载 | `http://<媒体节点 IP>:7430` |
 | MinIO | 持久化录音对象 | `http://localhost:9000`，桶 `cc-record` |
+| `voxai-admin` | 校验当前企业的话单权限，签发 MinIO 临时播放地址 | `GET /voxai-admin/config/callRecording/{callId}` |
 | MySQL | 保存 `cc_call_device` 分机录音地址和 `cc_call_log` 主录音地址 | 数据库 `voxai` |
 
-`FS_MEDIA` 只负责读取文件，不负责上传；上传动作由 `voxai-call` 的 `FsHangupCompleteHandler` 执行。
+录音文件服务只负责通过 HTTP 读取文件；上传动作由 `voxai-call` 的 `FsHangupCompleteHandler` 执行。FreeSWITCH 负责通话媒体处理并生成录音，Nginx 在 7430 提供挂机上传链路所需的文件读取。浏览器播放走管理端鉴权和 MinIO 临时地址。
+
+代码中的枚举名称为 `StationType.RECORDING_FILE_SERVICE`，保留历史数值 `4`；文档统一使用“录音文件服务（Nginx）”这一名称。当前 FreeSWITCH ESL 节点查询也使用硬编码 `applicationType=4`，本次名称调整不改变这些查询。7430 下载地址由事件中的媒体 IP 和本地录音路径拼接，不通过该枚举发现 Nginx。
 
 ## 3. 端到端流程
 
@@ -31,7 +34,7 @@ sequenceDiagram
     participant A as 坐席/客户
     participant FS as FreeSWITCH
     participant CC as voxai-call
-    participant MEDIA as FS_MEDIA :7430
+    participant MEDIA as 录音文件服务 Nginx :7430
     participant OSS as MinIO
     participant DB as MySQL
 
@@ -46,8 +49,9 @@ sequenceDiagram
     CC->>DB: 保存 cc_call_device
     CC->>CC: 所有设备结束后组装 CDR
     CC->>DB: 保存/更新 cc_call_log、cc_call_detail
-    CC-->>A: 查询话单时返回 MinIO 录音地址
 ```
+
+报表播放流程见 §5.6：浏览器通过 `voxai-admin` 获取临时地址后直接向 MinIO 读取音频。
 
 ## 4. 录音何时开始
 
@@ -65,7 +69,7 @@ sequenceDiagram
 2. 设置双声道录音。
 3. 向 FreeSWITCH 发送 `uuid_record <deviceId> start <file>` 命令。
 
-调用方随后把文件绝对路径写入运行时 `DeviceInfo.record`。开始录音日志表示已发送命令，仍需检查媒体节点上的实际文件。
+调用方负责记录文件绝对路径和开始时间。桥接录音分支（包括呼入、自动外呼）会先写入 `DeviceInfo.record`、`recordStartTime` 并保存到 Redis，再发送录音命令，确保后续录音事件和挂机处理能取到路径。开始录音日志表示已发送命令，仍需检查媒体节点上的实际文件。
 
 开发环境默认配置：
 
@@ -108,7 +112,7 @@ fs.sample.rate=8000
 http://{event.localMediaIp}:7430{DeviceInfo.record}
 ```
 
-因此媒体服务必须能访问录音文件，并且 URL 的路径必须与 `record.path` 生成的路径一致。以开发环境为例：
+因此录音文件服务必须能访问录音文件，并且 URL 的路径必须与 `record.path` 生成的路径一致。以开发环境为例：
 
 ```bash
 curl -I \
@@ -116,6 +120,8 @@ curl -I \
 ```
 
 应从 `voxai-call` 所在主机验证：HEAD 返回 `200` 可确认路径响应，实际下载还需 GET 成功并取得有效音频；`404` 通常表示路径映射或文件名不一致，连接失败通常表示 7430 服务未启动或网络不可达。
+
+`event.localMediaIp` 是下载 URL 的目标媒体节点 IP；Nginx `allow` 检查的是请求来源 IP，即 `voxai-call` 访问媒体节点时的出口地址（跨容器或 NAT 时可能被转换）。两者应分别核对。
 
 该下载使用 `restTemplate`，连接超时默认 `100ms`、读取超时默认 `300ms`，对应配置 `cdr.notify.connectTimeout` 和 `cdr.notify.readTimeout`。长录音或跨节点访问可能需要调整；这两个配置也影响共享该客户端的调用。
 
@@ -169,6 +175,12 @@ AccessKey 和 SecretKey 使用部署环境配置，不在业务文档中展开�
 
 主话单有 `record` 值并不表示上传成功：组装器只检查地址非空，因此最早的录音设备上传失败时，本地路径也可能进入主话单。应结合地址格式和 MinIO 中的对象核验结果。
 
+### 5.6 报表播放录音
+
+呼入、外呼报表共用录音弹窗，打开时携带登录凭证请求 `GET /voxai-admin/config/callRecording/{callId}`。管理端按当前绑定企业查询主话单，校验录音地址以 `/cc-record/` 开头且 MinIO 对象存在，再返回有效期 **300 秒**的签名 GET 地址（成功响应 `code=0`，`data` 为 URL）。无可用录音时返回“录音文件暂不可用”。
+
+浏览器使用该地址直接读取 MinIO 音频，桶可以保持私有。`voxai-admin` 使用的 MinIO endpoint 必须能被浏览器访问；远程用户无法通过 `localhost:9000` 访问开发机 MinIO。若页面使用 HTTPS，也需提供浏览器可访问的 HTTPS 对象存储入口，并在签发地址前正确配置 endpoint，避免修改签名 URL 导致校验失败。地址过期后重新打开录音弹窗获取新地址。
+
 ## 6. 关键数据字段
 
 | 数据位置 | 字段 | 含义 |
@@ -189,7 +201,7 @@ AccessKey 和 SecretKey 使用部署环境配置，不在业务文档中展开�
 # FreeSWITCH ESL
 fs_cli -x 'show calls count'
 
-# FS_MEDIA
+# 录音文件服务（Nginx）
 lsof -nP -iTCP:7430 -sTCP:LISTEN
 curl -I 'http://<媒体节点 IP>:7430/<录音文件路径>'
 
@@ -197,11 +209,11 @@ curl -I 'http://<媒体节点 IP>:7430/<录音文件路径>'
 curl -fsS http://127.0.0.1:9000/minio/health/live
 ```
 
-本地可用 Nginx 或其他静态 HTTP 服务监听 `7430`，将 URL 路径映射到 `record.path` 对应目录。媒体服务的监听地址必须覆盖 `event.localMediaIp`，不能只监听一个其他节点无法访问的回环地址。
+本地可用 Nginx 或其他静态 HTTP 服务监听 `7430`，将 URL 路径映射到 `record.path` 对应目录。录音文件服务的监听地址必须覆盖 `event.localMediaIp`，不能只监听一个其他节点无法访问的回环地址。
 
 #### 本机 Nginx 配置与启动
 
-开发机使用 `/Users/dongjb/soft/nginx/freeswitch-recording.conf` 提供 FS_MEDIA。配置通过精确的 URL 路径映射读取 FreeSWITCH 本地 WAV：
+开发机使用 `/Users/dongjb/soft/nginx/freeswitch-recording.conf` 配置录音文件服务。配置通过精确的 URL 路径映射读取 FreeSWITCH 本地 WAV：
 
 ```nginx
 pid /Users/dongjb/soft/nginx/freeswitch-recording.pid;
@@ -215,7 +227,7 @@ http {
     server {
         listen 7430;
 
-        # 仅允许本机和 voxai-call 所在媒体/业务节点访问；按实际来源 IP 更新白名单。
+        # 允许 voxai-call 请求的实际来源 IP；以下为开发机示例。
         allow 127.0.0.1;
         allow ::1;
         allow 172.20.10.5;
@@ -235,8 +247,7 @@ http {
 }
 ```
 
-Nginx 可执行文件通过 Homebrew 安装（本机为 `/opt/homebrew/bin/nginx`）。启动脚本
-`/Users/dongjb/soft/shell/nginx.sh` 会先检查可执行文件、配置文件和配置语法，再使用该配置启动：
+Nginx 可执行文件通过 Homebrew 安装（本机为 `/opt/homebrew/bin/nginx`）。配置文件和启动脚本均位于仓库外，不会随 Maven 构建自动安装。启动脚本 `/Users/dongjb/soft/shell/nginx.sh` 检查可执行文件和配置文件后，若发现任何 `nginx` 进程就直接退出；没有进程时才检查配置语法并启动：
 
 ```bash
 # 启动（若已有 nginx 进程，脚本提示已运行并退出）
@@ -244,6 +255,9 @@ Nginx 可执行文件通过 Homebrew 安装（本机为 `/opt/homebrew/bin/nginx
 
 # 单独验证配置
 /opt/homebrew/bin/nginx -t -c /Users/dongjb/soft/nginx/freeswitch-recording.conf
+
+# 确认该独立配置的主进程（配置已启动时执行）
+ps -p "$(cat /Users/dongjb/soft/nginx/freeswitch-recording.pid)" -o pid=,command=
 
 # 修改配置后重载
 /opt/homebrew/bin/nginx -s reload -c /Users/dongjb/soft/nginx/freeswitch-recording.conf
@@ -256,13 +270,41 @@ lsof -nP -iTCP:7430 -sTCP:LISTEN
 tail -f /Users/dongjb/soft/nginx/freeswitch-recording-error.log
 ```
 
-`allow` 白名单必须包含 `voxai-call` 请求录音时使用的 `event.localMediaIp`；如果地址不匹配，Nginx 会返回 `403`。录音路径正则、`alias` 根目录和 FreeSWITCH 的 `record.path` 必须对应，否则会返回 `404`。此配置是开发机示例，部署到其他主机时应替换绝对路径和来源 IP，并确保 Nginx 用户有录音目录的读取权限。
+脚本提示 `nginx is already running` 不能证明 7430 已启动：其他用途的 Nginx 也会触发此提示。应结合 PID、进程命令和 `lsof` 确认本配置的监听；若只有其他 Nginx 实例，先检查配置，再用 `/opt/homebrew/bin/nginx -c /Users/dongjb/soft/nginx/freeswitch-recording.conf` 启动此独立实例。
+
+`allow` 白名单应包含 `voxai-call` 的实际请求来源 IP，否则返回 `403`。录音路径正则、`alias` 根目录和 FreeSWITCH 的 `record.path` 必须对应；此正则仅匹配一层数字日期目录下的 `.wav`，更换目录结构或 `fs.record.file` 时需同步修改。Nginx 运行用户还需有目录遍历和文件读取权限。部署到其他主机时，应替换配置中的绝对路径、PID/日志路径和来源 IP。
+
+容器部署时，Nginx 必须能在容器内读到同一份录音文件，并将 URL 中的绝对路径映射到实际挂载目录。容器入口执行 `nginx start` 并不代表已加载此 7430 配置；还需核对配置挂载、端口发布或 host 网络，以及从 `voxai-call` 到 `event.localMediaIp:7430` 的连通性。
+
+#### 验收文件读取
+
+从 `voxai-call` 所在主机或容器执行，使用媒体节点上已存在的 WAV 的完整路径。以下值需要替换，`RECORD_PATH` 以 `/` 开头，不要额外添加一层目录：
+
+```bash
+MEDIA_IP=172.20.10.5
+RECORD_PATH=/Users/dongjb/soft/freeswitch/20260717/call_device.wav
+RECORD_URL="http://${MEDIA_IP}:7430${RECORD_PATH}"
+RECORD_CHECK_DIR="$(mktemp -d /tmp/recording-check.XXXXXX)"
+
+# 预期 200、audio/wav；完整 GET 成功才证明文件可下载
+curl -fsSI "$RECORD_URL"
+curl -fS "$RECORD_URL" -o "$RECORD_CHECK_DIR/record.wav"
+file "$RECORD_CHECK_DIR/record.wav"
+
+# 预期 206 和 Content-Range: bytes 0-43/总字节数
+curl -fS -D - -H 'Range: bytes=0-43' "$RECORD_URL" -o "$RECORD_CHECK_DIR/header.bin"
+
+# 未映射路径预期 404（从白名单允许的来源访问）
+curl -sS -o /dev/null -w '%{http_code}\n' "http://${MEDIA_IP}:7430/"
+```
+
+`file` 应识别为 RIFF/WAVE 音频；必要时用音频工具确认时长和内容。临时文件位于 `$RECORD_CHECK_DIR`，验收后按本地录音保留要求清理。这里的 Range 检查验证 Nginx 文件服务；前端播放仍需单独验证 MinIO 签名地址。
 
 ### 7.2 一次完整联调
 
 1. 确认坐席 SIP 已注册，FreeSWITCH 能看到坐席分机。
 2. 确认目标号码可呼叫，技能组 `record_type` 设置为 `1` 或 `2`。
-3. 启动 `voxai-call`、FS_MEDIA 和 MinIO。
+3. 启动 `voxai-call`、录音文件服务（Nginx）和 MinIO。
 4. 完成一通通话后正常挂机。
 5. 在 `voxai-call` 日志中依次查找：
    - `开始录音`；
@@ -271,19 +313,24 @@ tail -f /Users/dongjb/soft/nginx/freeswitch-recording-error.log
    - `record fileName` 和 `minioTag`。
 6. 查询 `cc_call_device.record` 和 `cc_call_log.record`，确认值为 `/cc-record/...`。
 7. 用 MinIO 客户端或对象管理界面确认 `cc-record` 中存在对应对象并可读取。
+8. 登录呼入或外呼报表，打开录音弹窗，确认临时地址接口成功、音频可播放且可拖动进度；刷新页面后重新打开也应可用。
 
 ## 8. 异常定位
 
 | 现象 | 优先检查 | 说明 |
 | --- | --- | --- |
 | 没有 WAV 文件 | `record_type`、`开始录音`日志、FreeSWITCH 录音命令 | 录音策略为 0 或录音命令未执行 |
-| WAV 存在但上传日志没有 `get record file` | `event.localMediaIp`、7430 监听、URL 路径映射 | `voxai-call` 无法通过 FS_MEDIA 读取 |
+| WAV 存在但没有 `get record file` | 先检查缓存中的 `DeviceInfo.record`，再检查 `url:` 异常、7430 和路径映射 | 路径为空不会尝试下载；此日志在 GET 成功后才打印。旧版本呼入录音路径未写入缓存也可能导致跳过上传 |
+| 7430 拒绝连接或超时 | `lsof`、Nginx PID/配置、目标媒体 IP、网络和下载超时配置 | “已有 nginx 进程”不代表正在监听 7430；需从 `voxai-call` 的实际运行环境验证 |
+| 7430 返回 403 | 请求来源 IP 白名单、目录和文件权限、Nginx error.log | `allow` 匹配来源地址；权限不足也可能返回 403，按日志区分 |
 | 7430 返回 404 | `record.path` 与静态服务 root/alias | URL 使用的是录音绝对路径，映射必须保持一致 |
 | MinIO 连接失败 | endpoint、网络、凭据 | 检查 MinIO 健康接口和服务日志 |
 | MinIO 返回桶不存在/无权限 | `cc-record` 桶、AccessKey 权限 | 需先创建桶并授权写入 |
 | `cc_call_device.record` 仍是本地路径 | 查看 `FsHangupCompleteHandler` 异常日志 | 当前实现失败后继续落库，不自动重试 |
 | 主话单没有录音 | 先检查设备明细，再检查最后一个设备挂机和 CDR 组装 | 主话单从设备明细中选择最早录音地址 |
-| 录音已上传但前端无法播放 | 检查前端播放地址拼接、反向代理和对象访问权限 | 数据库存的是 `/cc-record/...`，可播放地址由访问层提供 |
+| 录音已上传但临时地址接口不可用 | `voxai-admin` 是否已部署并重启、登录企业、主话单地址和对象是否存在 | 接口按当前企业查主话单；返回“录音文件暂不可用”时先核对这些条件 |
+| 播放请求仍直接访问前端 `/cc-record/...` 并返回 404 | 前端是否已更新、录音弹窗请求链路 | 应先请求管理端临时地址接口，再访问 MinIO 签名 URL |
+| 签名 URL 无法访问或返回 403 | 浏览器到 MinIO endpoint 的网络、HTTPS、签名有效期和 URL 是否被改写 | 私有桶通过有效签名读取，无需开放公共访问；过期后重新打开弹窗 |
 
 ## 9. 当前实现边界
 
@@ -292,7 +339,7 @@ tail -f /Users/dongjb/soft/nginx/freeswitch-recording-error.log
 - 上传对象的目录日期取上传时刻，不取录音开始时刻。
 - `record_storage` 已作为企业配置字段存在，但当前挂机上传流程未实现按保留月数自动清理 MinIO 对象。
 - 主话单只保留一个主 `record` 地址；转接、咨询等多设备录音仍以 `cc_call_device` 明细为准。
-- 业务文档描述的是当前代码行为，部署环境若改变 FS_MEDIA、MinIO 或访问代理，需要同步修改配置和联调检查项。
+- 业务文档描述的是当前代码行为，部署环境若改变录音文件服务、MinIO 或访问代理，需要同步修改配置和联调检查项。
 
 ## 10. 代码定位
 
@@ -301,4 +348,6 @@ tail -f /Users/dongjb/soft/nginx/freeswitch-recording-error.log
 - 接通录音触发：`voxai-call/src/main/java/com/voxai/cc/fs/handler/FsBridgeHandler.java`
 - 下载、上传和设备落库：`voxai-call/src/main/java/com/voxai/cc/fs/handler/FsHangupCompleteHandler.java`
 - 主话单组装：`voxai-call/src/main/java/com/voxai/cc/cdr/CdrAssembler.java`
+- 临时播放地址：`voxai-admin/src/main/java/com/voxai/api/web/CallRecordingController.java`
+- 报表录音弹窗：独立前端项目 `ai-call-center-web/src/components/CallReportDialogs.vue`
 - 录音和 MinIO 开发配置：`voxai-call/src/main/resources/application-dev.properties`

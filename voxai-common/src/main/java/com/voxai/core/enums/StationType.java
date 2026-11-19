@@ -12,7 +12,7 @@ public enum StationType {
 
     CC_IVR(3),
 
-    FS_MEDIA(4);
+    RECORDING_FILE_SERVICE(4);
 
     private Integer type;
 

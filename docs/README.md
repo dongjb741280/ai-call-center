@@ -19,7 +19,7 @@
 | [08-技能与技能组配置](08-技能与技能组配置.md) | 三类关联、页面操作、组技能与坐席技能接口、呼叫引擎能力边界 |
 | [09-号码与号码池](09-号码与号码池.md) | 号码用途、号码池关系、呼入 VDN 入口及外呼显号行为 |
 | [11-外呼任务](11-外呼任务.md) | 任务配置、名单、预测式/巡航式边界、话单关联和对接限制 |
-| [12-录音上传MinIO](12-录音上传MinIO.md) | 录音触发、FreeSWITCH 本地文件、7430 媒体服务、MinIO 上传、话单落库和异常定位 |
+| [12-录音上传MinIO](12-录音上传MinIO.md) | 录音触发、7430 Nginx 配置与验收、MinIO 上传、话单落库、临时地址播放和异常定位 |
 | [15-外部拨号引擎](15-外部拨号引擎.md) | 任务执行器、租约恢复、任务重拨与网关换线的区别、部署与运行 |
 | [路由网关升级脚本](sql/migration_20261110_gateway_routing.sql) | 网关组选路策略/权重字段及旧字冠改写数据审计 |
 | [SQL 建库脚本](sql/voxai.sql) | `voxai` 库完整建表脚本 + 数据（MySQL 9.2.0，88 张表） |
@@ -51,7 +51,9 @@
 | `FS_API` | FreeSwitch API |
 | `CC_IVR`（:7300） | IVR 引擎（本仓库 `voxai-ivr` 模块），通过 HTTP `/voxai-ivr/index/start` 拉起 |
 | `DIALER` | 外呼任务执行器（本仓库 `voxai-dialer` 模块），通过管理端和呼叫控制 API 工作 |
-| `FS_MEDIA`（:7430） | FreeSwitch 媒体服务，录音文件经此拉取后上传 MinIO |
+| 录音文件服务（Nginx，:7430） | 通过 HTTP 提供本地 WAV，供 voxai-call 下载后上传 MinIO；部署与验收见[录音文档 §7](12-录音上传MinIO.md#7-部署与联调检查) |
+
+录音文件服务的枚举名称为 `StationType.RECORDING_FILE_SERVICE`，保留历史数值 `4`。当前 `FsListen` 和 `IvrFsClient` 仍以硬编码 `applicationType=4` 查询 FreeSWITCH ESL 节点；7430 文件下载则直接使用事件中的媒体 IP，并不通过该枚举发现 Nginx。FreeSWITCH 负责 SIP/RTP 和通话媒体处理，Nginx 负责 HTTP 文件读取。
 
 ## 核心概念速览
 

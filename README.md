@@ -47,7 +47,7 @@ flowchart LR
     AG[Agent Console<br/>Vue3 + JsSIP Softphone] -- WebSocket --> CALL
     CP[Caller / Customer] -- SIP/RTP --> FS[FreeSWITCH<br/>Media & Signaling]
     FS <-- "ESL events / commands" --> CALL[voxai-call<br/>Call Control :7200]
-    FS -. Local recording files .-> MEDIA[FS_MEDIA<br/>Recording File Server :7430]
+    FS -. Local recording files .-> MEDIA[Recording File Service<br/>Nginx :7430]
     CALL -- HTTP GET recordings --> MEDIA
     CALL -- HTTP --> IVR[voxai-ivr<br/>IVR Engine :7300]
     IVR -- callback --> CALL
@@ -60,7 +60,7 @@ flowchart LR
     CALL --> N
 ```
 
-`FS_MEDIA` serves FreeSWITCH local recording files over HTTP on port `7430`. After hangup, `voxai-call` downloads recordings from this server and uploads them to MinIO. See [Recording Upload Flow](docs/12-录音上传MinIO.md).
+The recording file service (Nginx) serves FreeSWITCH local recording files over HTTP on port `7430`. FreeSWITCH handles call media and generates recordings; after hangup, `voxai-call` downloads the files from Nginx and uploads them to MinIO. See [Recording Upload Flow](docs/12-录音上传MinIO.md).
 
 ### Project Structure
 
@@ -270,7 +270,7 @@ docker run -d --name voxai-admin --network host \
 - **voxai-admin**: admin backend service (port 7100)
 - **voxai-call**: call control service (port 7200)
 - **voxai-ivr**: IVR engine service (port 7300)
-- **FS_MEDIA**: recording file server on the FreeSWITCH media node (HTTP port 7430), used by `voxai-call` to retrieve local recordings
+- **Recording file service (Nginx)**: HTTP port 7430, used by `voxai-call` to retrieve FreeSWITCH local recordings
 - **freeswitch**: call engine (port 5060)
 
 ### Data Storage

@@ -45,7 +45,7 @@ flowchart LR
     AG[坐席前端<br/>Vue3 + JsSIP 软电话] -- WebSocket --> CALL
     CP[客户话机] -- SIP/RTP --> FS[FreeSWITCH<br/>媒体/信令]
     FS <-- "ESL 事件/命令" --> CALL[voxai-call<br/>呼叫控制 :7200]
-    FS -. 本地录音文件 .-> MEDIA[FS_MEDIA<br/>录音文件服务器 :7430]
+    FS -. 本地录音文件 .-> MEDIA[录音文件服务<br/>Nginx :7430]
     CALL -- HTTP GET 拉取录音 --> MEDIA
     CALL -- HTTP --> IVR[voxai-ivr<br/>IVR 引擎 :7300]
     IVR -- 回控 --> CALL
@@ -58,7 +58,7 @@ flowchart LR
     CALL --> N
 ```
 
-`FS_MEDIA` 在 `7430` 端口通过 HTTP 提供 FreeSWITCH 本地录音文件。挂机后，`voxai-call` 从该服务器拉取录音，再上传至 MinIO。详见[录音上传流程](docs/12-录音上传MinIO.md)。
+录音文件服务（Nginx）在 `7430` 端口通过 HTTP 提供 FreeSWITCH 本地录音文件。FreeSWITCH 负责通话媒体处理并生成录音；挂机后，`voxai-call` 从 Nginx 拉取文件，再上传至 MinIO。详见[录音上传流程](docs/12-录音上传MinIO.md)。
 
 ### 项目结构
 
@@ -263,7 +263,7 @@ docker run -d --name voxai-admin --network host \
 - **voxai-admin**: 管理后台服务（端口：7100）
 - **voxai-call**: 呼叫控制服务（端口：7200）
 - **voxai-ivr**: IVR 引擎服务（端口：7300）
-- **FS_MEDIA**: FreeSWITCH 媒体节点上的录音文件服务器（HTTP 端口：7430），供 `voxai-call` 拉取本地录音
+- **录音文件服务（Nginx）**: HTTP 端口 7430，供 `voxai-call` 拉取 FreeSWITCH 本地录音
 - **freeswitch**: 呼叫引擎（端口：5060）
 
 ### 数据存储
